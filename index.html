@@ -19,13 +19,17 @@
 
         .card { background: var(--tg-theme-secondary-bg-color, #f5f5f5); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
         input, button { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 16px; margin-bottom: 10px; }
-        input { background: var(--tg-theme-secondary-bg-color, #f0f0f0); color: var(--tg-theme-text-color, #000); }
+        input { background: var(--tg-theme-secondary-bg-color, #f0f0f0); color: var(--tg-theme-text-color, #000); outline: none; }
+        input:focus { outline: 2px solid var(--tg-theme-button-color, #007aff); }
         button { background: var(--tg-theme-button-color, #007aff); color: var(--tg-theme-button-text-color, #fff); font-weight: 600; cursor: pointer; }
         .btn-danger { background: #ff3b30; }
         .btn-success { background: #34c759; }
         .btn-warning { background: #ff9500; }
+        .btn-secondary { background: var(--tg-theme-secondary-bg-color, #e5e5e5); color: var(--tg-theme-text-color, #000); }
         .row { display: flex; gap: 10px; }
         .row input { flex: 1; }
+        .row button { width: auto; flex: 1; margin: 0; }
+
         .set-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 14px; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .stat-card { background: var(--tg-theme-secondary-bg-color, #f5f5f5); padding: 12px; border-radius: 10px; text-align: center; }
@@ -71,7 +75,102 @@
         .sync-status.synced { color: #34c759; }
         .sync-status.syncing { color: #ff9500; }
 
-        /* ===== ИСТОРИЯ — ПЛАШКИ С КНОПКОЙ УДАЛИТЬ ===== */
+        /* ===== НОВАЯ КАРТОЧКА УПРАЖНЕНИЯ ===== */
+        .exercise-card .ex-header {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .exercise-card .ex-header input {
+            flex: 1;
+            margin: 0;
+        }
+        .exercise-card .ex-header .ex-badge {
+            background: var(--tg-theme-button-color, #007aff);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .exercise-card .set-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .exercise-card .set-input-row input {
+            width: 60px;
+            padding: 10px 8px;
+            font-size: 15px;
+            margin: 0;
+            flex-shrink: 0;
+        }
+        .exercise-card .set-input-row input.weight-input { width: 70px; }
+        .exercise-card .set-input-row input.reps-input { width: 60px; }
+        .exercise-card .set-input-row button {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            margin: 0;
+        }
+        .exercise-card .sets-list {
+            margin: 10px 0;
+        }
+        .exercise-card .sets-list .set-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-size: 14px;
+        }
+        .exercise-card .sets-list .set-row .del-set-btn {
+            background: none;
+            border: none;
+            color: #ff3b30;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 6px;
+            width: auto;
+            margin: 0;
+        }
+        .exercise-card .ex-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .exercise-card .ex-actions button {
+            flex: 1;
+            padding: 12px;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* ===== ТЕКУЩАЯ ТРЕНИРОВКА (обновлённая) ===== */
+        .workout-summary .ex-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .workout-summary .ex-summary .ex-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .workout-summary .ex-summary .ex-detail {
+            font-size: 13px;
+            opacity: 0.7;
+            text-align: right;
+        }
+        .workout-summary .ex-summary .ex-detail .sets-count {
+            font-weight: 600;
+            opacity: 1;
+        }
+
+        /* ===== ИСТОРИЯ ===== */
         .history-item {
             display: flex;
             align-items: center;
@@ -141,9 +240,7 @@
             justify-content: center;
             animation: fadeIn 0.25s ease;
         }
-        .modal-overlay.open {
-            display: flex;
-        }
+        .modal-overlay.open { display: flex; }
         .modal-content {
             background: var(--tg-theme-bg-color, #fff);
             width: 100%;
@@ -161,65 +258,28 @@
             border-radius: 2px;
             margin: 0 auto 16px;
         }
-        .modal-content .modal-title {
-            font-size: 20px;
-            font-weight: 700;
+        .modal-content .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .modal-content .modal-date { font-size: 14px; opacity: 0.6; margin-bottom: 16px; }
+        .modal-content .modal-ex {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            border-radius: 10px;
+        }
+        .modal-content .modal-ex .modal-ex-name {
+            font-weight: 600;
+            font-size: 15px;
             margin-bottom: 4px;
         }
-        .modal-content .modal-date {
-            font-size: 14px;
-            opacity: 0.6;
-            margin-bottom: 16px;
-        }
-        .modal-content .modal-set {
+        .modal-content .modal-ex .modal-ex-set {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.06);
-            font-size: 15px;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .modal-content .modal-set .set-info {
-            flex: 1;
-            min-width: 100px;
-        }
-        /* Режим просмотра */
-        .modal-content .modal-set.view-mode .set-info {
-            font-weight: 500;
-        }
-        /* Режим редактирования */
-        .modal-content .modal-set .set-edit {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .modal-content .modal-set .set-edit input {
-            width: 55px;
-            padding: 6px 8px;
+            padding: 4px 0;
             font-size: 14px;
-            margin: 0;
-            border-radius: 8px;
-            border: 1px solid rgba(0,0,0,0.08);
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            color: var(--tg-theme-text-color, #000);
+            opacity: 0.8;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
         }
-        .modal-content .modal-set .set-edit input.ex-name-input {
-            width: 90px;
-        }
-        .modal-content .modal-set .set-edit .del-btn {
-            background: none;
-            border: none;
-            color: #ff3b30;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 0 6px;
-            width: auto;
-            margin: 0;
-            line-height: 1;
-        }
+        .modal-content .modal-ex .modal-ex-set:last-child { border-bottom: none; }
         .modal-content .modal-close {
             margin-top: 16px;
             background: var(--tg-theme-button-color, #007aff);
@@ -235,7 +295,7 @@
         .modal-content .modal-actions {
             display: flex;
             gap: 10px;
-            margin-top: 16px;
+            margin-top: 12px;
         }
         .modal-content .modal-actions button {
             flex: 1;
@@ -246,48 +306,88 @@
             font-weight: 600;
             cursor: pointer;
         }
-        .modal-content .modal-actions .btn-edit {
-            background: #ff9500;
-            color: #fff;
+        .modal-content .modal-actions .btn-edit { background: #ff9500; color: #fff; }
+        .modal-content .modal-actions .btn-delete { background: #ff3b30; color: #fff; }
+
+        /* Режим редактирования в модалке */
+        .modal-edit-ex {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            border-radius: 10px;
         }
-        .modal-content .modal-actions .btn-delete {
-            background: #ff3b30;
-            color: #fff;
+        .modal-edit-ex .modal-edit-ex-name {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 6px;
         }
-        .modal-content .modal-actions .btn-save {
-            background: #34c759;
-            color: #fff;
-            flex: 1;
+        .modal-edit-ex .modal-edit-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            padding: 4px 0;
+            flex-wrap: wrap;
         }
-        .modal-content .modal-actions .btn-cancel-edit {
-            background: var(--tg-theme-secondary-bg-color, #e5e5e5);
+        .modal-edit-ex .modal-edit-row input {
+            width: 55px;
+            padding: 4px 6px;
+            font-size: 14px;
+            margin: 0;
+            border-radius: 6px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
             color: var(--tg-theme-text-color, #000);
-            flex: 1;
         }
-        .modal-content .modal-add-btn {
+        .modal-edit-ex .modal-edit-row input.ex-name-input { width: 100px; }
+        .modal-edit-ex .modal-edit-row .del-btn {
+            background: none;
+            border: none;
+            color: #ff3b30;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 4px;
+            width: auto;
+            margin: 0;
+        }
+        .modal-edit-add-btn {
             background: var(--tg-theme-button-color, #007aff);
             color: #fff;
             border: none;
-            padding: 12px;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+        .modal-edit-save-btn {
+            background: #34c759;
+            color: #fff;
+            border: none;
+            padding: 14px;
             border-radius: 12px;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             width: 100%;
             cursor: pointer;
             margin-top: 12px;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .modal-edit-cancel-btn {
+            background: var(--tg-theme-secondary-bg-color, #e5e5e5);
+            color: var(--tg-theme-text-color, #000);
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 8px;
         }
-        @keyframes slideUp {
-            from { transform: translateY(40px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
 
-        .edit-hidden { display: none; }
-        .view-hidden { display: none; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -299,30 +399,44 @@
         </div>
 
         <div class="content" id="content">
+            <!-- ВКЛАДКА ТРЕНИРОВКА -->
             <div id="tab-training">
-                <div class="card">
-                    <h3 style="margin-bottom:10px;">Добавить подход</h3>
-                    <input id="ex-name" placeholder="Упражнение" list="ex-list">
-                    <datalist id="ex-list"></datalist>
-                    <div class="row">
-                        <input id="ex-weight" placeholder="Вес (кг)" type="number">
-                        <input id="ex-reps" placeholder="Повторы" type="number">
+                <!-- Карточка активного упражнения -->
+                <div class="card exercise-card" id="exerciseCard">
+                    <div class="ex-header">
+                        <input id="ex-name-input" placeholder="Название упражнения" list="ex-list" autocomplete="off">
+                        <datalist id="ex-list"></datalist>
+                        <span class="ex-badge" id="setCounter">0 подходов</span>
                     </div>
-                    <button onclick="addSet()">✅ Добавить подход</button>
+                    <div class="sets-list" id="currentSetsList">
+                        <p style="opacity:0.4; font-size:14px; padding:4px 0;">Нет подходов</p>
+                    </div>
+                    <div class="set-input-row">
+                        <input type="number" class="weight-input" id="set-weight" placeholder="Вес">
+                        <input type="number" class="reps-input" id="set-reps" placeholder="Повт.">
+                        <button onclick="addSetToCurrentExercise()">➕ Добавить подход</button>
+                    </div>
+                    <div class="ex-actions">
+                        <button class="btn-success" onclick="finishExercise()">✅ Закончить упражнение</button>
+                        <button class="btn-danger" onclick="cancelExercise()">✕ Отменить</button>
+                    </div>
                 </div>
 
-                <div class="card">
-                    <h3 style="margin-bottom:10px;">Текущая тренировка</h3>
-                    <div id="current-workout"><p style="opacity:0.5;">Пока ничего нет</p></div>
-                    <button onclick="saveWorkout()" class="btn-success">💾 Сохранить</button>
+                <!-- Текущая тренировка -->
+                <div class="card workout-summary">
+                    <h3 style="margin-bottom:10px;">📋 Текущая тренировка</h3>
+                    <div id="currentWorkoutList"><p style="opacity:0.5;">Пока ничего нет</p></div>
+                    <button onclick="saveWorkout()" class="btn-success" style="margin-top:10px;">💾 Сохранить тренировку</button>
                     <div id="syncStatus" class="sync-status">☁️ Данные в облаке</div>
                 </div>
             </div>
 
+            <!-- ВКЛАДКА ИСТОРИЯ -->
             <div id="tab-history" class="hidden">
-                <div id="history-list"></div>
+                <div id="historyList"></div>
             </div>
 
+            <!-- ВКЛАДКА ПРОГРЕСС -->
             <div id="tab-stats" class="hidden">
                 <div class="card">
                     <h3 style="margin-bottom:10px;">Прогресс</h3>
@@ -350,11 +464,10 @@
 
     <script>
         // ===== ОСНОВНЫЕ ДАННЫЕ =====
-        let workouts = [];
-        let currentSets = [];
+        let workouts = []; // [{ date, exercises: [{ name, sets: [{weight, reps}] }] }]
+        let currentExercises = []; // [{ name, sets: [{weight, reps}] }]
+        let activeExerciseIndex = -1; // индекс текущего редактируемого упражнения
         let allExercises = new Set();
-        let currentModalIndex = null;
-        let isEditMode = false;
 
         // ===== CLOUD STORAGE =====
         let cloudStorage = null;
@@ -411,7 +524,7 @@
             return `${m}:${s}.<span class="ms">${ms}</span>`;
         }
 
-        function updateUI() {
+        function updateTimerUI() {
             timerDisplay.innerHTML = formatTime();
             if (isRunning) {
                 timerBtn.className = 'timer-bottom running';
@@ -442,7 +555,7 @@
                     timerDisplay.innerHTML = formatTime();
                 }, 20);
             }
-            updateUI();
+            updateTimerUI();
         }
 
         // ===== РАБОТА С ДАННЫМИ =====
@@ -458,20 +571,20 @@
 
         async function loadData() {
             try {
-                const saved = await loadFromCloud('workouts');
+                const saved = await loadFromCloud('workouts_v2');
                 if (saved) {
                     workouts = saved;
                     workouts.forEach(w => {
-                        w.sets.forEach(s => allExercises.add(s.name));
+                        w.exercises.forEach(ex => allExercises.add(ex.name));
                     });
                 }
             } catch (e) {
                 try {
-                    const local = localStorage.getItem('workouts_backup');
+                    const local = localStorage.getItem('workouts_backup_v2');
                     if (local) {
                         workouts = JSON.parse(local);
                         workouts.forEach(w => {
-                            w.sets.forEach(s => allExercises.add(s.name));
+                            w.exercises.forEach(ex => allExercises.add(ex.name));
                         });
                     }
                 } catch (e2) {}
@@ -488,14 +601,14 @@
                 statusEl.className = 'sync-status syncing';
             }
             try {
-                await saveToCloud('workouts', workouts);
-                localStorage.setItem('workouts_backup', JSON.stringify(workouts));
+                await saveToCloud('workouts_v2', workouts);
+                localStorage.setItem('workouts_backup_v2', JSON.stringify(workouts));
                 if (statusEl) {
                     statusEl.textContent = '✅ Сохранено в облаке';
                     statusEl.className = 'sync-status synced';
                 }
             } catch (e) {
-                localStorage.setItem('workouts_backup', JSON.stringify(workouts));
+                localStorage.setItem('workouts_backup_v2', JSON.stringify(workouts));
                 if (statusEl) {
                     statusEl.textContent = '⚠️ Сохранено локально';
                     statusEl.className = 'sync-status';
@@ -509,40 +622,170 @@
             }
         }
 
-        function addSet() {
-            const name = document.getElementById('ex-name').value.trim();
-            const weight = parseFloat(document.getElementById('ex-weight').value);
-            const reps = parseInt(document.getElementById('ex-reps').value);
-            if (!name || !weight || !reps) { alert('Заполните все поля'); return; }
-            currentSets.push({ name, weight, reps });
-            allExercises.add(name);
-            updateExerciseList();
-            document.getElementById('ex-name').value = '';
-            document.getElementById('ex-weight').value = '';
-            document.getElementById('ex-reps').value = '';
-            renderCurrentWorkout();
+        // ===== РАБОТА С ТЕКУЩИМ УПРАЖНЕНИЕМ =====
+        function getActiveExercise() {
+            if (activeExerciseIndex === -1) {
+                // Создаём новое упражнение
+                const name = document.getElementById('ex-name-input').value.trim();
+                if (!name) {
+                    alert('Введите название упражнения');
+                    return null;
+                }
+                const newEx = { name, sets: [] };
+                currentExercises.push(newEx);
+                activeExerciseIndex = currentExercises.length - 1;
+                allExercises.add(name);
+                updateExerciseList();
+                document.getElementById('ex-name-input').value = '';
+            }
+            return currentExercises[activeExerciseIndex];
         }
 
-        function renderCurrentWorkout() {
-            const div = document.getElementById('current-workout');
-            if (currentSets.length === 0) {
-                div.innerHTML = '<p style="opacity:0.5;">Пока ничего нет</p>';
+        function renderCurrentSets() {
+            const div = document.getElementById('currentSetsList');
+            const counter = document.getElementById('setCounter');
+            if (activeExerciseIndex === -1 || currentExercises.length === 0 || activeExerciseIndex >= currentExercises.length) {
+                div.innerHTML = '<p style="opacity:0.4; font-size:14px; padding:4px 0;">Нет подходов</p>';
+                counter.textContent = '0 подходов';
                 return;
             }
-            div.innerHTML = currentSets.map((s, i) =>
-                `<div class="set-item"><span>${s.name} — ${s.weight}кг × ${s.reps}</span></div>`
+            const ex = currentExercises[activeExerciseIndex];
+            if (!ex || ex.sets.length === 0) {
+                div.innerHTML = '<p style="opacity:0.4; font-size:14px; padding:4px 0;">Нет подходов</p>';
+                counter.textContent = '0 подходов';
+                return;
+            }
+            counter.textContent = ex.sets.length + ' подходов';
+            div.innerHTML = ex.sets.map((s, i) =>
+                `<div class="set-row">
+                    <span>Подход ${i+1}: ${s.weight}кг × ${s.reps}</span>
+                    <button class="del-set-btn" onclick="removeSetFromCurrent(${i})">✕</button>
+                </div>`
             ).join('');
         }
 
+        function addSetToCurrentExercise() {
+            const weight = parseFloat(document.getElementById('set-weight').value);
+            const reps = parseInt(document.getElementById('set-reps').value);
+            if (!weight || !reps || weight <= 0 || reps <= 0) {
+                alert('Введите корректный вес и повторения');
+                return;
+            }
+            let ex = getActiveExercise();
+            if (!ex) return;
+            ex.sets.push({ weight, reps });
+            document.getElementById('set-weight').value = '';
+            document.getElementById('set-reps').value = '';
+            renderCurrentSets();
+            renderCurrentWorkout();
+        }
+
+        function removeSetFromCurrent(index) {
+            if (activeExerciseIndex === -1) return;
+            const ex = currentExercises[activeExerciseIndex];
+            if (!ex) return;
+            ex.sets.splice(index, 1);
+            if (ex.sets.length === 0) {
+                // Если подходов не осталось, удаляем упражнение
+                currentExercises.splice(activeExerciseIndex, 1);
+                activeExerciseIndex = -1;
+                document.getElementById('ex-name-input').value = '';
+                renderCurrentSets();
+                renderCurrentWorkout();
+                return;
+            }
+            renderCurrentSets();
+            renderCurrentWorkout();
+        }
+
+        function finishExercise() {
+            if (activeExerciseIndex === -1) {
+                alert('Нет активного упражнения. Добавьте подходы.');
+                return;
+            }
+            const ex = currentExercises[activeExerciseIndex];
+            if (!ex || ex.sets.length === 0) {
+                alert('Добавьте хотя бы один подход перед завершением');
+                return;
+            }
+            // Сбрасываем активное упражнение
+            activeExerciseIndex = -1;
+            document.getElementById('ex-name-input').value = '';
+            document.getElementById('set-weight').value = '';
+            document.getElementById('set-reps').value = '';
+            renderCurrentSets();
+            renderCurrentWorkout();
+        }
+
+        function cancelExercise() {
+            if (activeExerciseIndex !== -1) {
+                currentExercises.splice(activeExerciseIndex, 1);
+                activeExerciseIndex = -1;
+            }
+            document.getElementById('ex-name-input').value = '';
+            document.getElementById('set-weight').value = '';
+            document.getElementById('set-reps').value = '';
+            renderCurrentSets();
+            renderCurrentWorkout();
+        }
+
+        // ===== ТЕКУЩАЯ ТРЕНИРОВКА =====
+        function renderCurrentWorkout() {
+            const div = document.getElementById('currentWorkoutList');
+            if (currentExercises.length === 0) {
+                div.innerHTML = '<p style="opacity:0.5;">Пока ничего нет</p>';
+                return;
+            }
+            div.innerHTML = currentExercises.map((ex, idx) => {
+                const totalSets = ex.sets.length;
+                const totalWeight = ex.sets.reduce((sum, s) => sum + s.weight, 0);
+                const avgWeight = totalSets > 0 ? Math.round(totalWeight / totalSets) : 0;
+                const maxWeight = totalSets > 0 ? Math.max(...ex.sets.map(s => s.weight)) : 0;
+                const minWeight = totalSets > 0 ? Math.min(...ex.sets.map(s => s.weight)) : 0;
+                const weightRange = minWeight === maxWeight ? `${minWeight}кг` : `${minWeight}-${maxWeight}кг`;
+                return `
+                    <div class="ex-summary">
+                        <span class="ex-name">${ex.name}</span>
+                        <span class="ex-detail">
+                            <span class="sets-count">${totalSets}</span> подходов · ${weightRange}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+        }
+
         async function saveWorkout() {
-            if (currentSets.length === 0) { alert('Нет подходов'); return; }
+            if (currentExercises.length === 0) {
+                alert('Нет упражнений для сохранения');
+                return;
+            }
+            // Проверяем, есть ли незавершённое упражнение
+            if (activeExerciseIndex !== -1) {
+                const ex = currentExercises[activeExerciseIndex];
+                if (ex && ex.sets.length > 0) {
+                    if (!confirm(`Упражнение "${ex.name}" не завершено. Сохранить его как есть?`)) {
+                        return;
+                    }
+                    activeExerciseIndex = -1;
+                    document.getElementById('ex-name-input').value = '';
+                    renderCurrentSets();
+                }
+            }
             const now = new Date();
             const date = now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-            workouts.push({ date, sets: [...currentSets] });
-            currentSets = [];
+            // Сохраняем копию текущих упражнений
+            const exercisesToSave = currentExercises.map(ex => ({
+                name: ex.name,
+                sets: ex.sets.map(s => ({ weight: s.weight, reps: s.reps }))
+            }));
+            workouts.push({ date, exercises: exercisesToSave });
+            currentExercises = [];
+            activeExerciseIndex = -1;
             renderCurrentWorkout();
+            renderCurrentSets();
             renderHistory();
             await syncToCloud();
+            alert('✅ Тренировка сохранена!');
         }
 
         // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
@@ -554,18 +797,17 @@
             return days[date.getDay()];
         }
 
-        function getExercisesCount(sets) {
-            const unique = new Set(sets.map(s => s.name));
-            return unique.size;
+        function getExercisesCount(exercises) {
+            return exercises.length;
         }
 
-        function getTotalSets(sets) {
-            return sets.length;
+        function getTotalSets(exercises) {
+            return exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
         }
 
-        // ===== ИСТОРИЯ — ПЛАШКИ С КНОПКОЙ УДАЛИТЬ =====
+        // ===== ИСТОРИЯ =====
         function renderHistory() {
-            const div = document.getElementById('history-list');
+            const div = document.getElementById('historyList');
             if (workouts.length === 0) {
                 div.innerHTML = '<div class="card"><p style="opacity:0.5;">История пуста</p></div>';
                 return;
@@ -575,8 +817,8 @@
             workouts.slice().reverse().forEach((w, idx) => {
                 const realIndex = workouts.length - 1 - idx;
                 const dayName = getDayName(w.date);
-                const exCount = getExercisesCount(w.sets);
-                const setCount = getTotalSets(w.sets);
+                const exCount = getExercisesCount(w.exercises);
+                const setCount = getTotalSets(w.exercises);
 
                 html += `
                     <div class="history-item">
@@ -594,6 +836,9 @@
         }
 
         // ===== МОДАЛЬНОЕ ОКНО =====
+        let currentModalIndex = null;
+        let isEditMode = false;
+
         function openModal(index) {
             currentModalIndex = index;
             isEditMode = false;
@@ -607,57 +852,59 @@
             const w = workouts[index];
             if (!w) return;
 
-            let setsHtml = w.sets.map((s, si) => {
-                if (isEditMode) {
-                    // Режим редактирования
-                    return `
-                        <div class="modal-set" data-setindex="${si}">
-                            <div class="set-edit">
-                                <input type="text" class="ex-name-input" value="${s.name}" data-set="${si}" placeholder="Упр.">
-                                <input type="number" class="edit-weight" value="${s.weight}" data-set="${si}" placeholder="Вес">
-                                <span>×</span>
-                                <input type="number" class="edit-reps" value="${s.reps}" data-set="${si}" placeholder="Повт.">
-                                <button class="del-btn" onclick="deleteSetFromModal(${index}, ${si})">✕</button>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    // Режим просмотра
-                    return `
-                        <div class="modal-set view-mode">
-                            <div class="set-info">${s.name}</div>
-                            <div class="set-info" style="text-align:right;font-weight:500;">${s.weight}кг × ${s.reps}</div>
-                        </div>
-                    `;
-                }
-            }).join('');
-
-            let actionsHtml = '';
+            let exercisesHtml = '';
             if (isEditMode) {
-                actionsHtml = `
-                    <button class="modal-add-btn" onclick="addSetToModal(${index})">➕ Добавить подход</button>
-                    <div class="modal-actions">
-                        <button class="btn-save" onclick="saveEditModal(${index})">💾 Сохранить</button>
-                        <button class="btn-cancel-edit" onclick="switchToViewMode(${index})">↩ Отмена</button>
-                    </div>
+                // Режим редактирования
+                w.exercises.forEach((ex, ei) => {
+                    exercisesHtml += `
+                        <div class="modal-edit-ex">
+                            <div class="modal-edit-ex-name">${ex.name}</div>
+                            ${ex.sets.map((s, si) => `
+                                <div class="modal-edit-row">
+                                    <input type="text" class="edit-ex-name" value="${ex.name}" data-ex="${ei}" data-set="${si}" style="width:80px;">
+                                    <input type="number" class="edit-weight" value="${s.weight}" data-ex="${ei}" data-set="${si}" style="width:50px;">
+                                    <span>×</span>
+                                    <input type="number" class="edit-reps" value="${s.reps}" data-ex="${ei}" data-set="${si}" style="width:50px;">
+                                    <button class="del-btn" onclick="deleteSetFromModal(${index}, ${ei}, ${si})">✕</button>
+                                </div>
+                            `).join('')}
+                            <button class="modal-edit-add-btn" onclick="addSetToExerciseInModal(${index}, ${ei})">➕ Добавить подход</button>
+                        </div>
+                    `;
+                });
+                body.innerHTML = `
+                    <div class="modal-title">✏️ Редактирование</div>
+                    <div class="modal-date">${w.date}</div>
+                    ${exercisesHtml}
+                    <button class="modal-edit-save-btn" onclick="saveEditModal(${index})">💾 Сохранить изменения</button>
+                    <button class="modal-edit-cancel-btn" onclick="switchToViewMode(${index})">↩ Отмена</button>
+                    <button class="modal-close" onclick="closeModal()">Закрыть</button>
                 `;
             } else {
-                actionsHtml = `
+                // Режим просмотра
+                w.exercises.forEach(ex => {
+                    exercisesHtml += `
+                        <div class="modal-ex">
+                            <div class="modal-ex-name">${ex.name}</div>
+                            ${ex.sets.map(s => `
+                                <div class="modal-ex-set">
+                                    <span>${s.weight}кг × ${s.reps}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                });
+                body.innerHTML = `
+                    <div class="modal-title">🏋️ Тренировка в ${getDayName(w.date)}</div>
+                    <div class="modal-date">${w.date}</div>
+                    ${exercisesHtml}
                     <div class="modal-actions">
                         <button class="btn-edit" onclick="switchToEditMode(${index})">✏️ Редактировать</button>
                         <button class="btn-delete" onclick="deleteWorkout(${index}); closeModal();">🗑️ Удалить</button>
                     </div>
+                    <button class="modal-close" onclick="closeModal()">Закрыть</button>
                 `;
             }
-
-            body.innerHTML = `
-                <div class="modal-title">🏋️ Тренировка в ${getDayName(w.date)}</div>
-                <div class="modal-date">${w.date}</div>
-                <div style="margin: 8px 0 4px; font-size: 13px; opacity:0.6;">${isEditMode ? '✏️ Редактирование подходов' : '📋 Подходы'}</div>
-                ${setsHtml}
-                ${actionsHtml}
-                <button class="modal-close" onclick="closeModal()">Закрыть</button>
-            `;
         }
 
         function switchToEditMode(index) {
@@ -670,24 +917,27 @@
             renderModalBody(index);
         }
 
-        function addSetToModal(index) {
-            const w = workouts[index];
-            if (!w) return;
-            w.sets.push({ name: 'Новое', weight: 0, reps: 0 });
-            renderModalBody(index);
+        function addSetToExerciseInModal(workoutIdx, exIdx) {
+            if (workouts[workoutIdx] && workouts[workoutIdx].exercises[exIdx]) {
+                workouts[workoutIdx].exercises[exIdx].sets.push({ weight: 0, reps: 0 });
+                renderModalBody(workoutIdx);
+            }
         }
 
-        function deleteSetFromModal(index, setIdx) {
-            if (workouts[index]) {
-                workouts[index].sets.splice(setIdx, 1);
-                if (workouts[index].sets.length === 0) {
-                    workouts.splice(index, 1);
+        function deleteSetFromModal(workoutIdx, exIdx, setIdx) {
+            if (workouts[workoutIdx] && workouts[workoutIdx].exercises[exIdx]) {
+                workouts[workoutIdx].exercises[exIdx].sets.splice(setIdx, 1);
+                if (workouts[workoutIdx].exercises[exIdx].sets.length === 0) {
+                    workouts[workoutIdx].exercises.splice(exIdx, 1);
+                }
+                if (workouts[workoutIdx].exercises.length === 0) {
+                    workouts.splice(workoutIdx, 1);
                     closeModal();
                     renderHistory();
                     syncToCloud();
                     return;
                 }
-                renderModalBody(index);
+                renderModalBody(workoutIdx);
                 renderHistory();
                 syncToCloud();
             }
@@ -695,30 +945,33 @@
 
         function saveEditModal(index) {
             const body = document.getElementById('modalBody');
-            const exInputs = body.querySelectorAll('.ex-name-input');
+            const exNameInputs = body.querySelectorAll('.edit-ex-name');
             const weightInputs = body.querySelectorAll('.edit-weight');
             const repInputs = body.querySelectorAll('.edit-reps');
 
-            const newSets = [];
-            let valid = true;
-            exInputs.forEach((el, i) => {
-                const name = el.value.trim();
+            // Группируем по упражнению
+            const exMap = {};
+            exNameInputs.forEach((el, i) => {
+                const exName = el.value.trim();
                 const weight = parseFloat(weightInputs[i].value);
                 const reps = parseInt(repInputs[i].value);
-                if (name && !isNaN(weight) && !isNaN(reps) && weight > 0 && reps > 0) {
-                    newSets.push({ name, weight, reps });
-                    allExercises.add(name);
-                } else {
-                    valid = false;
-                }
+                if (!exName || !weight || !reps || weight <= 0 || reps <= 0) return;
+                if (!exMap[exName]) exMap[exName] = [];
+                exMap[exName].push({ weight, reps });
+                allExercises.add(exName);
             });
 
-            if (!valid || newSets.length === 0) {
-                alert('Заполните все поля корректно (название, вес > 0, повторы > 0)');
+            const newExercises = Object.keys(exMap).map(name => ({
+                name: name,
+                sets: exMap[name]
+            }));
+
+            if (newExercises.length === 0) {
+                alert('Заполните все поля корректно');
                 return;
             }
 
-            workouts[index].sets = newSets;
+            workouts[index].exercises = newExercises;
             updateExerciseList();
             renderHistory();
             syncToCloud();
@@ -757,8 +1010,12 @@
             if (!exName) { div.innerHTML = 'Введите упражнение'; return; }
             const entries = [];
             workouts.forEach(w => {
-                w.sets.forEach(s => {
-                    if (s.name === exName) entries.push({ date: w.date, weight: s.weight, reps: s.reps });
+                w.exercises.forEach(ex => {
+                    if (ex.name === exName) {
+                        ex.sets.forEach(s => {
+                            entries.push({ date: w.date, weight: s.weight, reps: s.reps });
+                        });
+                    }
                 });
             });
             if (entries.length === 0) { div.innerHTML = 'Нет данных'; return; }
@@ -792,13 +1049,34 @@
                 Telegram.WebApp.expand();
                 initCloud();
                 loadData();
-                updateUI();
+                updateTimerUI();
             } else {
                 setTimeout(initApp, 500);
             }
         }
 
         initApp();
+
+        // При вводе названия упражнения — обновляем активное упражнение
+        document.getElementById('ex-name-input').addEventListener('input', function() {
+            // Если есть активное упражнение, но имя изменилось — обновляем
+            if (activeExerciseIndex !== -1 && currentExercises[activeExerciseIndex]) {
+                const newName = this.value.trim();
+                if (newName) {
+                    currentExercises[activeExerciseIndex].name = newName;
+                    allExercises.add(newName);
+                    updateExerciseList();
+                    renderCurrentWorkout();
+                }
+            }
+        });
+
+        // Автозаполнение названия из истории при вводе
+        document.getElementById('ex-name-input').addEventListener('focus', function() {
+            if (activeExerciseIndex === -1) {
+                // Просто показываем список
+            }
+        });
     </script>
 </body>
 </html>
