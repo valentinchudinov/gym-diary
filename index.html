@@ -7,18 +7,22 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     html, body { min-height: 100%; }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
       background: var(--tg-theme-bg-color, #ffffff);
       color: var(--tg-theme-text-color, #111111);
-      padding: max(12px, env(safe-area-inset-top)) 14px calc(112px + env(safe-area-inset-bottom));
+      padding: max(12px, env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom));
       font-size: 15px;
     }
+
     button, input, select {
       font: inherit;
       color: inherit;
     }
+
     button {
       min-height: 44px;
       border: 0;
@@ -27,11 +31,14 @@
       color: var(--tg-theme-button-text-color, #ffffff);
       font-weight: 650;
       cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
+
     button:disabled {
       opacity: .45;
       cursor: default;
     }
+
     input, select {
       width: 100%;
       min-height: 44px;
@@ -41,13 +48,16 @@
       background: var(--tg-theme-secondary-bg-color, #f3f4f6);
       outline: none;
     }
+
     input:focus, select:focus {
       border-color: var(--tg-theme-button-color, #2481cc);
     }
+
     .app {
       max-width: 560px;
       margin: 0 auto;
     }
+
     .top {
       display: flex;
       justify-content: space-between;
@@ -55,16 +65,19 @@
       gap: 12px;
       margin-bottom: 14px;
     }
+
     .title {
       font-size: 24px;
       line-height: 1.15;
       font-weight: 750;
     }
+
     .meta {
       margin-top: 4px;
       color: var(--tg-theme-hint-color, #777);
       font-size: 13px;
     }
+
     .tabs {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -74,6 +87,7 @@
       background: var(--tg-theme-secondary-bg-color, #f3f4f6);
       margin-bottom: 14px;
     }
+
     .tab {
       min-height: 38px;
       background: transparent;
@@ -81,84 +95,87 @@
       border-radius: 8px;
       font-size: 14px;
     }
+
     .tab.active {
       background: var(--tg-theme-bg-color, #fff);
       box-shadow: 0 1px 4px rgba(0,0,0,.08);
     }
+
     .panel { display: none; }
     .panel.active { display: block; }
+
     .section {
       margin-bottom: 14px;
     }
+
     .section-title {
       font-size: 17px;
       font-weight: 720;
       margin-bottom: 8px;
     }
+
     .card {
       border-radius: 10px;
       background: var(--tg-theme-secondary-bg-color, #f3f4f6);
       padding: 12px;
       margin-bottom: 10px;
     }
-    .grid-3 {
+
+    .form-stack {
       display: grid;
-      grid-template-columns: 1.3fr .7fr .7fr;
       gap: 8px;
-      margin-bottom: 8px;
     }
+
+    .form-numbers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
     .row {
       display: flex;
       gap: 8px;
       align-items: center;
     }
+
     .row > * { flex: 1; }
+
     .ghost {
       background: transparent;
       color: var(--tg-theme-button-color, #2481cc);
       border: 1px solid rgba(127,127,127,.22);
     }
+
     .danger {
       background: #e5484d;
       color: #fff;
     }
+
     .muted {
       color: var(--tg-theme-hint-color, #777);
       font-size: 13px;
     }
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .summary-item {
-      background: var(--tg-theme-secondary-bg-color, #f3f4f6);
-      border-radius: 10px;
-      padding: 10px;
-    }
-    .summary-num {
-      font-size: 20px;
-      font-weight: 760;
-      color: var(--tg-theme-button-color, #2481cc);
-      font-variant-numeric: tabular-nums;
-    }
+
     .exercise {
       padding: 12px 0;
       border-bottom: 1px solid rgba(127,127,127,.16);
     }
+
     .exercise:last-child { border-bottom: 0; }
+
     .exercise-head {
       display: flex;
       justify-content: space-between;
       gap: 10px;
       margin-bottom: 8px;
     }
+
     .exercise-name {
       font-size: 16px;
       font-weight: 720;
       overflow-wrap: anywhere;
     }
+
     .set-row {
       display: grid;
       grid-template-columns: 1fr auto auto;
@@ -167,20 +184,37 @@
       min-height: 44px;
       border-radius: 8px;
     }
-    .icon-btn {
+
+    .icon-btn,
+    .edit-set-btn {
       width: 44px;
       height: 44px;
       min-height: 44px;
       border-radius: 10px;
       background: transparent;
-      color: var(--tg-theme-hint-color, #777);
       border: 1px solid rgba(127,127,127,.18);
     }
+
+    .icon-btn {
+      color: var(--tg-theme-hint-color, #777);
+    }
+
+    .edit-set-btn {
+      color: var(--tg-theme-button-color, #2481cc);
+    }
+
     .empty {
       padding: 18px 12px;
       text-align: center;
       color: var(--tg-theme-hint-color, #777);
     }
+
+    .fallback-finish {
+      display: none;
+      margin-top: 10px;
+      width: 100%;
+    }
+
     .history-item {
       width: 100%;
       text-align: left;
@@ -191,54 +225,37 @@
       margin-bottom: 8px;
       border-radius: 10px;
     }
+
     .history-title {
       font-weight: 720;
       font-size: 16px;
       margin-bottom: 3px;
     }
+
     .stats-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       margin-top: 10px;
     }
+
     .stat {
       background: var(--tg-theme-secondary-bg-color, #f3f4f6);
       border-radius: 10px;
       padding: 12px;
     }
+
     .stat-num {
       font-size: 22px;
       font-weight: 760;
       color: var(--tg-theme-button-color, #2481cc);
       overflow-wrap: anywhere;
     }
-    .bottom {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
-      background: color-mix(in srgb, var(--tg-theme-bg-color, #fff) 94%, transparent);
-      border-top: 1px solid rgba(127,127,127,.14);
-      backdrop-filter: blur(14px);
-      z-index: 20;
-    }
-    .bottom-inner {
-      max-width: 560px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1.3fr;
-      gap: 8px;
-    }
-    .timer {
-      background: var(--tg-theme-secondary-bg-color, #f3f4f6);
-      color: var(--tg-theme-text-color, #111);
-    }
+
     .toast {
       position: fixed;
       left: 50%;
-      bottom: calc(78px + env(safe-area-inset-bottom));
+      bottom: calc(18px + env(safe-area-inset-bottom));
       transform: translateX(-50%);
       max-width: calc(100vw - 28px);
       padding: 10px 14px;
@@ -249,6 +266,7 @@
       z-index: 40;
       display: none;
     }
+
     .modal {
       position: fixed;
       inset: 0;
@@ -257,7 +275,9 @@
       align-items: flex-end;
       z-index: 30;
     }
+
     .modal.open { display: flex; }
+
     .sheet {
       width: 100%;
       max-width: 560px;
@@ -268,12 +288,19 @@
       border-radius: 18px 18px 0 0;
       padding: 18px 14px calc(18px + env(safe-area-inset-bottom));
     }
+
     .handle {
       width: 38px;
       height: 4px;
       border-radius: 4px;
       background: rgba(127,127,127,.28);
       margin: 0 auto 14px;
+    }
+
+    .modal-form {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
     }
   </style>
 </head>
@@ -294,32 +321,29 @@
 
     <main>
       <section class="panel active" id="todayPanel">
-        <div class="summary">
-          <div class="summary-item"><div class="summary-num" id="sumExercises">0</div><div class="muted">упражнений</div></div>
-          <div class="summary-item"><div class="summary-num" id="sumSets">0</div><div class="muted">подходов</div></div>
-          <div class="summary-item"><div class="summary-num" id="sumVolume">0</div><div class="muted">кг объем</div></div>
-        </div>
-
         <section class="section">
           <div class="section-title">Добавить подход</div>
           <div class="card">
-            <div class="grid-3">
-              <input id="exerciseInput" placeholder="Упражнение" list="exerciseList" autocomplete="off" />
-              <input id="weightInput" placeholder="кг" inputmode="decimal" />
-              <input id="repsInput" placeholder="раз" inputmode="numeric" />
+            <div class="form-stack">
+              <input id="exerciseInput" placeholder="Упражнение" list="exerciseList" autocomplete="off" enterkeyhint="next" />
+              <div class="form-numbers">
+                <input id="weightInput" placeholder="кг" inputmode="decimal" enterkeyhint="next" />
+                <input id="repsInput" placeholder="раз" inputmode="numeric" enterkeyhint="done" />
+              </div>
+              <datalist id="exerciseList"></datalist>
+              <div class="row">
+                <button id="repeatSetBtn" class="ghost" disabled>Такой же</button>
+                <button id="addSetBtn" disabled>Добавить</button>
+              </div>
+              <div class="muted" id="formHint">Выбери упражнение, вес и повторы</div>
             </div>
-            <datalist id="exerciseList"></datalist>
-            <div class="row">
-              <button id="repeatSetBtn" class="ghost" disabled>Такой же</button>
-              <button id="addSetBtn" disabled>Добавить</button>
-            </div>
-            <div class="muted" id="formHint" style="margin-top:8px;">Выбери упражнение, вес и повторы</div>
           </div>
         </section>
 
         <section class="section">
           <div class="section-title">Текущая тренировка</div>
           <div class="card" id="draftList"></div>
+          <button id="fallbackFinishBtn" class="fallback-finish">Завершить тренировку</button>
         </section>
       </section>
 
@@ -334,13 +358,6 @@
         </div>
       </section>
     </main>
-  </div>
-
-  <div class="bottom">
-    <div class="bottom-inner">
-      <button class="timer" id="timerBtn">Отдых 01:30</button>
-      <button id="finishBtn" disabled>Завершить</button>
-    </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -364,14 +381,7 @@
       draft: createDraft(),
       exercises: new Set(),
       selectedWorkoutId: null,
-      syncing: false,
-      lastDeletedWorkout: null,
-      timer: {
-        total: 90,
-        left: 90,
-        interval: null,
-        running: false
-      }
+      syncing: false
     };
 
     const el = {
@@ -391,14 +401,10 @@
       repeatSetBtn: document.getElementById("repeatSetBtn"),
       formHint: document.getElementById("formHint"),
       draftList: document.getElementById("draftList"),
+      fallbackFinishBtn: document.getElementById("fallbackFinishBtn"),
       historyList: document.getElementById("historyList"),
       progressSelect: document.getElementById("progressSelect"),
       progressResult: document.getElementById("progressResult"),
-      sumExercises: document.getElementById("sumExercises"),
-      sumSets: document.getElementById("sumSets"),
-      sumVolume: document.getElementById("sumVolume"),
-      finishBtn: document.getElementById("finishBtn"),
-      timerBtn: document.getElementById("timerBtn"),
       toast: document.getElementById("toast"),
       modal: document.getElementById("modal"),
       modalBody: document.getElementById("modalBody")
@@ -428,6 +434,12 @@
       return node;
     }
 
+    function hideKeyboard() {
+      if (document.activeElement && typeof document.activeElement.blur === "function") {
+        document.activeElement.blur();
+      }
+    }
+
     function haptic(type = "light") {
       if (!tg || !tg.HapticFeedback) return;
       tg.HapticFeedback.impactOccurred(type);
@@ -437,7 +449,9 @@
       text(el.toast, message);
       el.toast.style.display = "block";
       clearTimeout(toast.timer);
-      toast.timer = setTimeout(() => el.toast.style.display = "none", 2200);
+      toast.timer = setTimeout(() => {
+        el.toast.style.display = "none";
+      }, 2200);
     }
 
     function showPopup(message, buttons) {
@@ -446,28 +460,53 @@
           tg.showPopup({ message, buttons }, resolve);
         });
       }
+
       return Promise.resolve(confirm(message) ? "ok" : "cancel");
     }
 
     async function cloudGet(key) {
       if (!tg || !tg.CloudStorage || !tg.CloudStorage.getItem) return null;
+
       return new Promise(resolve => {
         tg.CloudStorage.getItem(key, (err, value) => {
           if (err || !value) return resolve(null);
-          try { resolve(JSON.parse(value)); } catch { resolve(null); }
+
+          try {
+            resolve(JSON.parse(value));
+          } catch {
+            resolve(null);
+          }
         });
       });
     }
 
     async function cloudSet(key, value) {
       if (!tg || !tg.CloudStorage || !tg.CloudStorage.setItem) return false;
+
       return new Promise(resolve => {
         tg.CloudStorage.setItem(key, JSON.stringify(value), err => resolve(!err));
       });
     }
 
+    function safeJson(value) {
+      try {
+        return value ? JSON.parse(value) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function parseRuDate(value) {
+      const match = String(value || "").match(/(\d{2})\.(\d{2})\.(\d{4})(?:\s+(\d{2}):(\d{2}))?/);
+      if (!match) return null;
+
+      const [, dd, mm, yyyy, hh = "12", min = "00"] = match;
+      return new Date(Number(yyyy), Number(mm) - 1, Number(dd), Number(hh), Number(min)).toISOString();
+    }
+
     function migrateV2(items) {
       if (!Array.isArray(items)) return [];
+
       return items.map(workout => ({
         id: id(),
         status: "completed",
@@ -480,16 +519,9 @@
             id: id(),
             weight: Number(set.weight),
             reps: Number(set.reps)
-          })).filter(set => Number.isFinite(set.weight) && Number.isFinite(set.reps) && set.reps > 0)
+          })).filter(set => Number.isFinite(set.weight) && Number.isFinite(set.reps) && set.weight >= 0 && set.reps > 0)
         })).filter(ex => ex.name && ex.sets.length)
       })).filter(workout => workout.exercises.length);
-    }
-
-    function parseRuDate(value) {
-      const match = String(value || "").match(/(\d{2})\.(\d{2})\.(\d{4})(?:\s+(\d{2}):(\d{2}))?/);
-      if (!match) return null;
-      const [, dd, mm, yyyy, hh = "12", min = "00"] = match;
-      return new Date(Number(yyyy), Number(mm) - 1, Number(dd), Number(hh), Number(min)).toISOString();
     }
 
     async function loadData() {
@@ -506,10 +538,6 @@
       sync();
     }
 
-    function safeJson(value) {
-      try { return value ? JSON.parse(value) : null; } catch { return null; }
-    }
-
     function persistLocal() {
       localStorage.setItem(storageKey, JSON.stringify(state.workouts));
       localStorage.setItem(draftKey, JSON.stringify(state.draft));
@@ -521,16 +549,20 @@
       updateMeta();
 
       const ok = await cloudSet(storageKey, state.workouts);
+
       state.syncing = false;
       updateMeta();
 
-      if (!ok) return;
-      toast("Сохранено");
+      if (ok) toast("Сохранено");
     }
 
     function rebuildExerciseCatalog() {
       state.exercises = new Set();
-      state.workouts.forEach(w => w.exercises.forEach(ex => state.exercises.add(ex.name)));
+
+      state.workouts.forEach(workout => {
+        workout.exercises.forEach(ex => state.exercises.add(ex.name));
+      });
+
       state.draft.exercises.forEach(ex => state.exercises.add(ex.name));
     }
 
@@ -538,15 +570,23 @@
       const exercises = state.draft.exercises.length;
       const sets = state.draft.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
       const volume = state.draft.exercises.reduce((sum, ex) => {
-        return sum + ex.sets.reduce((s, set) => s + Math.max(0, set.weight) * set.reps, 0);
+        return sum + ex.sets.reduce((setSum, set) => setSum + Math.max(0, set.weight) * set.reps, 0);
       }, 0);
+
       return { exercises, sets, volume };
     }
 
     function updateMeta() {
       const stats = getDraftStats();
+
       text(el.screenTitle, state.tab === "today" ? "Сегодня" : state.tab === "history" ? "История" : "Прогресс");
-      text(el.screenMeta, state.syncing ? "Синхронизация" : `${stats.exercises} упражнений · ${stats.sets} подходов`);
+
+      if (state.syncing) {
+        text(el.screenMeta, "Синхронизация");
+        return;
+      }
+
+      text(el.screenMeta, `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`);
     }
 
     function renderAll() {
@@ -558,7 +598,6 @@
       renderProgress();
       updateForm();
       updateMainActions();
-      updateTimer();
     }
 
     function renderTabs() {
@@ -571,6 +610,7 @@
 
     function renderExerciseList() {
       el.exerciseList.replaceChildren();
+
       [...state.exercises].sort().forEach(name => {
         const option = document.createElement("option");
         option.value = name;
@@ -579,11 +619,6 @@
     }
 
     function renderDraft() {
-      const stats = getDraftStats();
-      text(el.sumExercises, stats.exercises);
-      text(el.sumSets, stats.sets);
-      text(el.sumVolume, Math.round(stats.volume));
-
       el.draftList.replaceChildren();
 
       if (!state.draft.exercises.length) {
@@ -595,7 +630,9 @@
         const box = make("div", "exercise");
         const head = make("div", "exercise-head");
         const name = make("div", "exercise-name", ex.name);
-        const meta = make("div", "muted", `${ex.sets.length} подходов · ${Math.round(ex.sets.reduce((s, set) => s + set.weight * set.reps, 0))} кг`);
+        const volume = ex.sets.reduce((sum, set) => sum + set.weight * set.reps, 0);
+        const meta = make("div", "muted", `${ex.sets.length} подходов · ${Math.round(volume)} кг`);
+
         head.append(name, meta);
         box.appendChild(head);
 
@@ -603,15 +640,17 @@
           const row = make("div", "set-row");
           row.appendChild(make("div", "", `${index + 1}. ${set.weight} кг × ${set.reps}`));
 
-          const repeat = make("button", "icon-btn", "+");
-          repeat.type = "button";
-          repeat.onclick = () => repeatSet(ex.name, set);
+          const edit = make("button", "edit-set-btn", "✎");
+          edit.type = "button";
+          edit.setAttribute("aria-label", "Редактировать подход");
+          edit.onclick = () => openEditSetModal(ex.id, set.id);
 
           const del = make("button", "icon-btn", "×");
           del.type = "button";
+          del.setAttribute("aria-label", "Удалить подход");
           del.onclick = () => deleteSet(ex.id, set.id);
 
-          row.append(repeat, del);
+          row.append(edit, del);
           box.appendChild(row);
         });
 
@@ -635,6 +674,7 @@
 
         const title = make("div", "history-title", formatDateTitle(workout.finishedAt));
         const sub = make("div", "muted", `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`);
+
         btn.append(title, sub);
         el.historyList.appendChild(btn);
       });
@@ -644,6 +684,7 @@
       el.progressSelect.replaceChildren();
 
       const names = [...state.exercises].sort();
+
       if (!names.length) {
         const option = document.createElement("option");
         option.value = "";
@@ -670,12 +711,15 @@
       state.workouts.forEach(workout => {
         workout.exercises.forEach(ex => {
           if (ex.name !== name) return;
-          ex.sets.forEach(set => entries.push({
-            date: workout.finishedAt,
-            weight: set.weight,
-            reps: set.reps,
-            volume: set.weight * set.reps
-          }));
+
+          ex.sets.forEach(set => {
+            entries.push({
+              date: workout.finishedAt,
+              weight: set.weight,
+              reps: set.reps,
+              volume: set.weight * set.reps
+            });
+          });
         });
       });
 
@@ -686,12 +730,15 @@
         return;
       }
 
-      const maxWeight = Math.max(...entries.map(e => e.weight));
-      const maxVolume = Math.max(...entries.map(e => e.volume));
+      entries.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      const maxWeight = Math.max(...entries.map(item => item.weight));
+      const maxVolume = Math.max(...entries.map(item => item.volume));
       const totalSets = entries.length;
-      const last = entries.sort((a, b) => new Date(a.date) - new Date(b.date)).at(-1);
+      const last = entries[entries.length - 1];
 
       const grid = make("div", "stats-grid");
+
       [
         ["Макс вес", `${maxWeight} кг`],
         ["Лучший объем", `${Math.round(maxVolume)} кг`],
@@ -710,8 +757,9 @@
       const exercises = workout.exercises.length;
       const sets = workout.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
       const volume = workout.exercises.reduce((sum, ex) => {
-        return sum + ex.sets.reduce((s, set) => s + set.weight * set.reps, 0);
+        return sum + ex.sets.reduce((setSum, set) => setSum + set.weight * set.reps, 0);
       }, 0);
+
       return { exercises, sets, volume };
     }
 
@@ -724,6 +772,7 @@
 
       if (diff === 0) return "Сегодня";
       if (diff === 1) return "Вчера";
+
       return date.toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
     }
 
@@ -735,22 +784,28 @@
 
       el.addSetBtn.disabled = !valid;
       el.repeatSetBtn.disabled = !getLastSet(name);
+
       text(el.formHint, valid ? "Готово к добавлению" : "Выбери упражнение, вес и повторы");
     }
 
     function updateMainActions() {
       const hasSets = getDraftStats().sets > 0;
-      el.finishBtn.disabled = !hasSets;
+      const isToday = state.tab === "today";
 
       if (tg && tg.MainButton) {
-        if (hasSets && state.tab === "today") {
+        if (hasSets && isToday) {
           tg.MainButton.setText("Завершить тренировку");
           tg.MainButton.show();
           tg.MainButton.onClick(finishWorkout);
         } else {
           tg.MainButton.hide();
         }
+
+        el.fallbackFinishBtn.style.display = "none";
+        return;
       }
+
+      el.fallbackFinishBtn.style.display = hasSets && isToday ? "block" : "none";
     }
 
     function addSet() {
@@ -764,6 +819,7 @@
       }
 
       let ex = state.draft.exercises.find(item => item.name.toLowerCase() === name.toLowerCase());
+
       if (!ex) {
         ex = { id: id(), name, sets: [] };
         state.draft.exercises.push(ex);
@@ -774,9 +830,8 @@
 
       el.weightInput.value = "";
       el.repsInput.value = "";
-      el.weightInput.focus();
 
-      startTimer(90);
+      hideKeyboard();
       haptic();
       persistLocal();
       renderAll();
@@ -791,36 +846,162 @@
 
     function getLastSet(name) {
       if (!name) return null;
+
+      const draftEx = state.draft.exercises.find(item => item.name.toLowerCase() === name.toLowerCase());
+      if (draftEx && draftEx.sets.length) return draftEx.sets[draftEx.sets.length - 1];
+
       for (const workout of [...state.workouts].reverse()) {
         const ex = workout.exercises.find(item => item.name.toLowerCase() === name.toLowerCase());
-        if (ex && ex.sets.length) return ex.sets.at(-1);
+        if (ex && ex.sets.length) return ex.sets[ex.sets.length - 1];
       }
-      const draftEx = state.draft.exercises.find(item => item.name.toLowerCase() === name.toLowerCase());
-      return draftEx && draftEx.sets.length ? draftEx.sets.at(-1) : null;
+
+      return null;
     }
 
     function fillLastSet() {
       const name = el.exerciseInput.value.trim();
       const last = getLastSet(name);
+
       if (!last) return;
+
       el.weightInput.value = last.weight;
       el.repsInput.value = last.reps;
       updateForm();
     }
 
-    async function deleteSet(exId, setId) {
+    function deleteSet(exId, setId) {
       const ex = state.draft.exercises.find(item => item.id === exId);
       if (!ex) return;
 
-      const deleted = ex.sets.find(set => set.id === setId);
       ex.sets = ex.sets.filter(set => set.id !== setId);
       state.draft.exercises = state.draft.exercises.filter(item => item.sets.length);
 
       haptic("medium");
       persistLocal();
       renderAll();
-
       toast("Подход удален");
+    }
+
+    function openEditSetModal(exId, setId) {
+      const ex = state.draft.exercises.find(item => item.id === exId);
+      if (!ex) return;
+
+      const set = ex.sets.find(item => item.id === setId);
+      if (!set) return;
+
+      el.modal.classList.add("open");
+
+      if (tg && tg.BackButton) {
+        tg.BackButton.show();
+        tg.BackButton.onClick(closeModal);
+      }
+
+      el.modalBody.replaceChildren();
+
+      const title = make("div", "title", "Редактировать подход");
+      const form = make("div", "modal-form");
+
+      const nameInput = document.createElement("input");
+      nameInput.value = ex.name;
+      nameInput.placeholder = "Упражнение";
+      nameInput.setAttribute("list", "exerciseList");
+      nameInput.setAttribute("enterkeyhint", "next");
+
+      const numbers = make("div", "form-numbers");
+
+      const weightInput = document.createElement("input");
+      weightInput.value = set.weight;
+      weightInput.placeholder = "кг";
+      weightInput.inputMode = "decimal";
+      weightInput.setAttribute("enterkeyhint", "next");
+
+      const repsInput = document.createElement("input");
+      repsInput.value = set.reps;
+      repsInput.placeholder = "раз";
+      repsInput.inputMode = "numeric";
+      repsInput.setAttribute("enterkeyhint", "done");
+
+      numbers.append(weightInput, repsInput);
+
+      const save = make("button", "", "Сохранить");
+      save.type = "button";
+
+      const cancel = make("button", "ghost", "Отмена");
+      cancel.type = "button";
+      cancel.onclick = closeModal;
+
+      save.onclick = () => {
+        const newName = nameInput.value.trim();
+        const newWeight = Number(String(weightInput.value).replace(",", "."));
+        const newReps = Number(repsInput.value);
+
+        if (!newName || !Number.isFinite(newWeight) || newWeight < 0 || !Number.isInteger(newReps) || newReps <= 0) {
+          toast("Проверь упражнение, вес и повторы");
+          return;
+        }
+
+        moveOrUpdateSet(exId, setId, newName, newWeight, newReps);
+        hideKeyboard();
+        closeModal();
+      };
+
+      nameInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          weightInput.focus();
+        }
+      });
+
+      weightInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          repsInput.focus();
+        }
+      });
+
+      repsInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          save.click();
+        }
+      });
+
+      form.append(nameInput, numbers, save, cancel);
+      el.modalBody.append(title, form);
+
+      setTimeout(() => nameInput.focus(), 120);
+    }
+
+    function moveOrUpdateSet(exId, setId, newName, newWeight, newReps) {
+      const oldEx = state.draft.exercises.find(item => item.id === exId);
+      if (!oldEx) return;
+
+      const setIndex = oldEx.sets.findIndex(item => item.id === setId);
+      if (setIndex === -1) return;
+
+      const updatedSet = {
+        ...oldEx.sets[setIndex],
+        weight: newWeight,
+        reps: newReps
+      };
+
+      oldEx.sets.splice(setIndex, 1);
+
+      let targetEx = state.draft.exercises.find(item => item.name.toLowerCase() === newName.toLowerCase());
+
+      if (!targetEx) {
+        targetEx = { id: id(), name: newName, sets: [] };
+        state.draft.exercises.push(targetEx);
+      }
+
+      targetEx.sets.push(updatedSet);
+      state.draft.exercises = state.draft.exercises.filter(item => item.sets.length);
+      state.exercises.add(newName);
+
+      haptic();
+      persistLocal();
+      renderAll();
+      toast("Подход обновлен");
     }
 
     async function finishWorkout() {
@@ -869,6 +1050,7 @@
       const title = make("div", "title", formatDateTitle(workout.finishedAt));
       const stats = workoutStats(workout);
       const meta = make("div", "meta", `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`);
+
       el.modalBody.append(title, meta);
 
       workout.exercises.forEach(ex => {
@@ -886,6 +1068,7 @@
       });
 
       const actions = make("div", "row");
+
       const repeat = make("button", "ghost", "Повторить");
       repeat.onclick = () => repeatWorkout(workout.id);
 
@@ -907,7 +1090,11 @@
         exercises: workout.exercises.map(ex => ({
           id: id(),
           name: ex.name,
-          sets: ex.sets.map(set => ({ id: id(), weight: set.weight, reps: set.reps }))
+          sets: ex.sets.map(set => ({
+            id: id(),
+            weight: set.weight,
+            reps: set.reps
+          }))
         }))
       };
 
@@ -930,7 +1117,6 @@
       const index = state.workouts.findIndex(item => item.id === workoutId);
       if (index === -1) return;
 
-      state.lastDeletedWorkout = state.workouts[index];
       state.workouts.splice(index, 1);
 
       closeModal();
@@ -943,42 +1129,10 @@
     function closeModal() {
       el.modal.classList.remove("open");
       state.selectedWorkoutId = null;
-      if (tg && tg.BackButton) tg.BackButton.hide();
-    }
 
-    function startTimer(seconds) {
-      state.timer.total = seconds;
-      state.timer.left = seconds;
-      state.timer.running = true;
-      clearInterval(state.timer.interval);
-      state.timer.interval = setInterval(() => {
-        state.timer.left -= 1;
-        if (state.timer.left <= 0) {
-          clearInterval(state.timer.interval);
-          state.timer.running = false;
-          state.timer.left = 0;
-          haptic("heavy");
-          toast("Отдых завершен");
-        }
-        updateTimer();
-      }, 1000);
-      updateTimer();
-    }
-
-    function toggleTimer() {
-      if (state.timer.running) {
-        clearInterval(state.timer.interval);
-        state.timer.running = false;
-      } else {
-        startTimer(state.timer.left || 90);
+      if (tg && tg.BackButton) {
+        tg.BackButton.hide();
       }
-      updateTimer();
-    }
-
-    function updateTimer() {
-      const min = String(Math.floor(state.timer.left / 60)).padStart(2, "0");
-      const sec = String(state.timer.left % 60).padStart(2, "0");
-      text(el.timerBtn, `Отдых ${min}:${sec}`);
     }
 
     el.tabs.forEach(tab => {
@@ -994,11 +1148,33 @@
     });
 
     el.exerciseInput.addEventListener("change", fillLastSet);
+
+    el.exerciseInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        el.weightInput.focus();
+      }
+    });
+
+    el.weightInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        el.repsInput.focus();
+      }
+    });
+
+    el.repsInput.addEventListener("keydown", event => {
+      if (event.key === "Enter" && !el.addSetBtn.disabled) {
+        event.preventDefault();
+        addSet();
+      }
+    });
+
     el.addSetBtn.addEventListener("click", addSet);
     el.repeatSetBtn.addEventListener("click", fillLastSet);
-    el.finishBtn.addEventListener("click", finishWorkout);
+    el.fallbackFinishBtn.addEventListener("click", finishWorkout);
     el.progressSelect.addEventListener("change", showProgress);
-    el.timerBtn.addEventListener("click", toggleTimer);
+
     el.modal.addEventListener("click", event => {
       if (event.target === el.modal) closeModal();
     });
@@ -1008,6 +1184,7 @@
         tg.ready();
         tg.expand();
       }
+
       loadData();
     }
 
