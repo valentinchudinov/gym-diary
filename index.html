@@ -11,7 +11,7 @@
         body {
             background: var(--tg-theme-bg-color, #fff);
             color: var(--tg-theme-text-color, #000);
-            padding: 16px 16px 80px 16px;
+            padding: 16px 16px 100px 16px;
             display: flex;
             flex-direction: column;
         }
@@ -41,14 +41,16 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 999;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+            width: auto;
+            min-width: 140px;
+            padding: 14px 24px;
+            border-radius: 16px;
             background: var(--tg-theme-button-color, #007aff);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 12px;
             cursor: pointer;
             transition: all 0.15s ease;
             border: none;
@@ -60,25 +62,28 @@
         .timer-bottom.running {
             background: #34c759;
         }
-        .timer-bottom .timer-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            line-height: 1.2;
-        }
         .timer-bottom .time {
-            font-size: 20px;
+            font-size: 22px;
             font-variant-numeric: tabular-nums;
             letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+        .timer-bottom .ms {
+            font-size: 16px;
+            font-weight: 400;
+            opacity: 0.8;
+            letter-spacing: 0;
         }
         .timer-bottom .action {
-            font-size: 11px;
-            font-weight: 400;
-            opacity: 0.9;
-            margin-top: 2px;
+            font-size: 15px;
+            font-weight: 600;
+            opacity: 0.95;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 14px;
+            border-radius: 20px;
         }
         .timer-bottom.running .action {
-            opacity: 1;
+            background: rgba(255,255,255,0.25);
         }
     </style>
 </head>
@@ -127,12 +132,10 @@
         </div>
     </div>
 
-    <!-- === КНОПКА СЕКУНДОМЕРА ВНИЗУ === -->
+    <!-- === СЕКУНДОМЕР ВНИЗУ === -->
     <div class="timer-bottom" id="timerBtn" onclick="handleTimerClick()">
-        <div class="timer-content">
-            <span class="time" id="timerDisplay">00:00</span>
-            <span class="action" id="timerAction">▶ Старт</span>
-        </div>
+        <span class="time" id="timerDisplay">00:00<span class="ms">.00</span></span>
+        <span class="action" id="timerAction">▶</span>
     </div>
 
     <script>
@@ -141,29 +144,31 @@
         let currentSets = [];
         let allExercises = new Set();
 
-        // ===== СЕКУНДОМЕР =====
+        // ===== СЕКУНДОМЕР С МИЛЛИСЕКУНДАМИ (ПОЛНОСТЬЮ НЕЗАВИСИМЫЙ) =====
+        let milliseconds = 0;
         let seconds = 0;
         let interval = null;
         let isRunning = false;
+        let startTime = 0; // время запуска
 
         const timerBtn = document.getElementById('timerBtn');
         const timerDisplay = document.getElementById('timerDisplay');
-        const timerAction = document.getElementById('timerAction');
 
-        function formatTime(s) {
-            const m = String(Math.floor(s / 60)).padStart(2, '0');
-            const sec = String(s % 60).padStart(2, '0');
-            return `${m}:${sec}`;
+        function formatTime() {
+            const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const s = String(seconds % 60).padStart(2, '0');
+            const ms = String(milliseconds).padStart(2, '0');
+            return `${m}:${s}.<span class="ms">${ms}</span>`;
         }
 
         function updateUI() {
-            timerDisplay.textContent = formatTime(seconds);
+            timerDisplay.innerHTML = formatTime();
             if (isRunning) {
                 timerBtn.className = 'timer-bottom running';
-                timerAction.textContent = '⏹ Стоп';
+                document.getElementById('timerAction').textContent = '⏹';
             } else {
                 timerBtn.className = 'timer-bottom';
-                timerAction.textContent = '▶ Старт';
+                document.getElementById('timerAction').textContent = '▶';
             }
         }
 
@@ -173,31 +178,26 @@
                 clearInterval(interval);
                 interval = null;
                 isRunning = false;
+                milliseconds = 0;
                 seconds = 0;
+                startTime = 0;
             } else {
                 // Запуск с нуля
+                milliseconds = 0;
                 seconds = 0;
+                startTime = Date.now();
                 isRunning = true;
                 interval = setInterval(() => {
-                    seconds++;
-                    timerDisplay.textContent = formatTime(seconds);
-                }, 1000);
+                    const elapsed = Date.now() - startTime;
+                    seconds = Math.floor(elapsed / 1000);
+                    milliseconds = Math.floor((elapsed % 1000) / 10);
+                    timerDisplay.innerHTML = formatTime();
+                }, 20);
             }
             updateUI();
         }
 
-        // Сброс таймера при добавлении подхода
-        function resetTimer() {
-            if (interval) {
-                clearInterval(interval);
-                interval = null;
-            }
-            isRunning = false;
-            seconds = 0;
-            updateUI();
-        }
-
-        // ===== ВСЁ ОСТАЛЬНОЕ =====
+        // ===== ВСЁ ОСТАЛЬНОЕ (НИКАК НЕ ТРОГАЕТ ТАЙМЕР) =====
         function updateExerciseList() {
             const list = document.getElementById('ex-list');
             list.innerHTML = '';
@@ -228,7 +228,7 @@
             document.getElementById('ex-weight').value = '';
             document.getElementById('ex-reps').value = '';
             renderCurrentWorkout();
-            resetTimer(); // Автосброс секундомера
+            // ТАЙМЕР НЕ ТРОГАЕМ!
         }
 
         function renderCurrentWorkout() {
