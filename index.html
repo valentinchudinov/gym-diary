@@ -1,62 +1,78 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Трена</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Святилище ТРЕНЕРА</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    :root {
-      --bg: #0b0b0d;
-      --panel: #151519;
-      --panel-2: #1d1d22;
-      --text: #f4f4f5;
-      --muted: rgba(244, 244, 245, .58);
-      --line: rgba(255, 255, 255, .09);
-      --accent: #ff6418;
-      --accent-2: #ff8b3d;
-      --danger: #ff3b55;
-      --ok: #31d158;
-      --radius: 8px;
-      --shadow: 0 18px 50px rgba(0, 0, 0, .35);
-    }
 
+  <style>
     * {
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #070707;
+      --surface: rgba(255,255,255,.055);
+      --surface-2: rgba(255,255,255,.075);
+      --field: #171717;
+      --line: rgba(255,255,255,.09);
+      --line-strong: rgba(255,255,255,.13);
+      --text: #fff;
+      --muted: rgba(255,255,255,.58);
+      --muted-strong: rgba(255,255,255,.72);
+      --accent: #ff6418;
+      --accent-soft: rgba(255,100,24,.10);
+      --accent-line: rgba(255,100,24,.24);
+      --danger: #ef4444;
+      --danger-soft: rgba(255,70,70,.12);
+      --danger-line: rgba(255,90,90,.28);
+      --danger-text: #ff8a8a;
+      --radius: 18px;
+      --radius-lg: 26px;
+      --shadow: 0 18px 40px rgba(0,0,0,.18);
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
     }
 
     html,
     body {
-      margin: 0;
       min-height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      letter-spacing: 0;
     }
 
     body {
-      padding: env(safe-area-inset-top) 14px env(safe-area-inset-bottom);
-      overflow-x: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 80% 0%, rgba(255,100,24,.18), transparent 36%),
+        linear-gradient(180deg, #12100f 0%, var(--bg) 46%);
+      color: var(--text);
+      padding: max(14px, var(--safe-top)) 14px calc(28px + var(--safe-bottom));
+      font-size: 15px;
     }
 
     button,
     input,
     select {
       font: inherit;
+      color: inherit;
     }
 
     button {
+      min-height: 46px;
       border: 0;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 750;
       cursor: pointer;
-      color: inherit;
-      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
 
     button:disabled {
-      cursor: not-allowed;
-      opacity: .45;
+      opacity: .42;
+      cursor: default;
     }
 
     input,
@@ -64,375 +80,89 @@
       width: 100%;
       min-height: 48px;
       border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: #101014;
-      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: var(--field);
+      color: #fff;
       outline: none;
-      padding: 0 13px;
-      transition: border-color .16s ease, background-color .16s ease, transform .16s ease;
+    }
+
+    input::placeholder {
+      color: rgba(255,255,255,.38);
     }
 
     input:focus,
     select:focus {
-      border-color: rgba(255, 100, 24, .72);
-      background: #141419;
+      border-color: rgba(255,100,24,.75);
+      box-shadow: 0 0 0 3px rgba(255,100,24,.13);
     }
 
     .app {
-      width: min(720px, 100%);
+      max-width: 560px;
       margin: 0 auto;
-      padding: 14px 0 96px;
     }
 
-    .topbar {
+    .top {
       display: flex;
-      align-items: flex-start;
       justify-content: space-between;
+      align-items: flex-start;
       gap: 12px;
-      margin-bottom: 14px;
-      animation: fadeUp .28s ease both;
+      margin-bottom: 16px;
     }
 
     .title {
-      font-size: 26px;
+      font-size: 28px;
+      line-height: 1.08;
       font-weight: 850;
-      line-height: 1.05;
     }
 
-    .meta,
-    .muted,
-    .form-hint,
-    .chart-label {
+    .sheet .title {
+      margin-bottom: 22px;
+    }
+
+    .meta {
+      margin-top: 6px;
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.35;
     }
 
-    .tabs {
-      position: sticky;
-      top: max(8px, env(safe-area-inset-top));
-      z-index: 10;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      padding: 6px;
-      margin-bottom: 14px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: rgba(16, 16, 20, .86);
-      backdrop-filter: blur(18px);
-      animation: fadeUp .32s ease both;
-    }
-
-    .tab {
-      min-height: 40px;
-      border-radius: 7px;
-      background: transparent;
+    .muted {
       color: var(--muted);
-      font-weight: 750;
-      transition: transform .14s ease, background-color .16s ease, color .16s ease;
+      font-size: 13px;
     }
 
-    .tab.active {
-      background: var(--panel-2);
-      color: var(--text);
+    .section {
+      margin-bottom: 16px;
     }
 
-    .tab:active,
-    .btn-card:active,
-    .history-item:active,
-    .icon-square:active {
-      transform: scale(.97);
-    }
-
-    .panel {
-      display: none;
-      animation: panelIn .18s ease both;
-    }
-
-    .panel.active {
-      display: block;
-    }
-
-    .card,
-    .exercise,
-    .history-group,
-    .stat,
-    .progress-chart {
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--panel);
-      box-shadow: 0 10px 28px rgba(0, 0, 0, .16);
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 10px;
     }
 
     .card {
-      padding: 12px;
-      margin-bottom: 12px;
-    }
-
-    .form-grid {
-      display: grid;
-      gap: 10px;
-    }
-
-    .form-numbers {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .actions {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .btn-card {
-      min-height: 48px;
-      padding: 0 14px;
       border-radius: var(--radius);
-      background: var(--panel-2);
-      color: var(--text);
-      font-weight: 800;
-      transition: transform .14s ease, opacity .14s ease, background-color .16s ease, box-shadow .16s ease;
-    }
-
-    .btn-accent {
-      background: linear-gradient(180deg, var(--accent-2), var(--accent));
-      color: #180701;
-      box-shadow: 0 10px 26px rgba(255, 100, 24, .22);
-    }
-
-    .btn-danger {
-      background: rgba(255, 59, 85, .14);
-      color: #ff7b8c;
-    }
-
-    .btn-muted {
-      background: rgba(255, 255, 255, .07);
-      color: var(--text);
-    }
-
-    .icon-square {
-      width: 44px;
-      min-width: 44px;
-      height: 44px;
-      min-height: 44px;
-      padding: 0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .exercise {
-      padding: 12px;
-      animation: pop .22s ease both;
-    }
-
-    .exercise-head,
-    .set-row,
-    .history-row,
-    .modal-set-row,
-    .edit-set-head {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .exercise-head,
-    .modal-set-row {
-      justify-content: space-between;
-    }
-
-    .exercise-name,
-    .history-title,
-    .edit-group-title {
-      font-weight: 850;
-    }
-
-    .set-row {
-      margin-top: 8px;
-      animation: pop .2s ease both;
-    }
-
-    .set-value {
-      flex: 1;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-      padding: 0 12px;
-      border-radius: var(--radius);
-      background: #101014;
-      color: var(--text);
-      font-weight: 750;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: 13px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow);
     }
 
     .empty,
     .progress-empty {
-      min-height: 92px;
-      display: grid;
-      place-items: center;
-      border: 1px dashed var(--line);
-      border-radius: var(--radius);
-      color: var(--muted);
+      padding: 22px 12px;
       text-align: center;
-      padding: 18px;
-      animation: fadeIn .2s ease both;
-    }
-
-    .history-group {
-      padding: 10px;
-      animation: pop .22s ease both;
-    }
-
-    .history-month-title {
-      margin: 2px 2px 10px;
       color: var(--muted);
-      font-size: 13px;
-      font-weight: 800;
-      text-transform: capitalize;
     }
 
-    .history-row {
-      margin-top: 8px;
+    .panel {
+      display: none;
     }
 
-    .history-item {
-      flex: 1;
-      min-height: 58px;
-      text-align: left;
-      padding: 10px 12px;
-      border-radius: var(--radius);
-      background: #101014;
-      transition: transform .14s ease, background-color .16s ease;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin: 12px 0;
-    }
-
-    .stat {
-      padding: 12px;
-      animation: pop .22s ease both;
-    }
-
-    .stat-num {
-      font-size: 22px;
-      font-weight: 900;
-    }
-
-    .progress-chart {
-      height: 210px;
-      padding: 10px;
-      animation: pop .24s ease both;
-    }
-
-    .progress-chart svg {
-      width: 100%;
-      height: 100%;
+    .panel.active {
       display: block;
-    }
-
-    .finish-btn {
-      position: fixed;
-      left: 14px;
-      right: 14px;
-      bottom: max(14px, env(safe-area-inset-bottom));
-      z-index: 20;
-      display: none;
-      max-width: 720px;
-      margin: 0 auto;
-      animation: floatIn .22s ease both;
-    }
-
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: calc(max(18px, env(safe-area-inset-bottom)) + 70px);
-      z-index: 60;
-      display: none;
-      transform: translateX(-50%);
-      max-width: min(520px, calc(100vw - 28px));
-      padding: 11px 14px;
-      border-radius: var(--radius);
-      background: rgba(244, 244, 245, .94);
-      color: #111;
-      font-weight: 800;
-      box-shadow: var(--shadow);
-      animation: toastIn .18s ease both;
-    }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      display: none;
-      align-items: flex-end;
-      background: rgba(0, 0, 0, .55);
-      opacity: 0;
-      transition: opacity .2s ease;
-    }
-
-    .modal.open {
-      display: flex;
-      opacity: 1;
-    }
-
-    .sheet {
-      width: 100%;
-      max-width: 720px;
-      max-height: min(82vh, 760px);
-      margin: 0 auto;
-      overflow: auto;
-      padding: 16px 14px calc(18px + env(safe-area-inset-bottom));
-      border-radius: 14px 14px 0 0;
-      border: 1px solid var(--line);
-      background: #101014;
-      box-shadow: var(--shadow);
-      transform: translateY(22px);
-      opacity: 0;
-      transition: transform .22s ease, opacity .22s ease;
-    }
-
-    .modal.open .sheet {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    .modal-form {
-      display: grid;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .sheet-actions {
-      margin-top: 14px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .edit-exercise-group {
-      display: grid;
-      gap: 8px;
-    }
-
-    .edit-set-card {
-      display: grid;
-      gap: 8px;
-      animation: pop .18s ease both;
     }
 
     .splash {
@@ -440,8 +170,9 @@
       inset: 0;
       z-index: 100;
       display: grid;
-      place-items: center;
-      background: var(--bg);
+      align-items: end;
+      background: #050505;
+      overflow: hidden;
       transition: opacity .35s ease, visibility .35s ease;
     }
 
@@ -451,23 +182,463 @@
       pointer-events: none;
     }
 
-    .loader {
-      width: 180px;
-      text-align: center;
+    .splash-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.02);
+      filter: saturate(.98) brightness(.86) contrast(1.02);
     }
 
-    .loader-title {
-      font-size: 28px;
-      font-weight: 900;
-      margin-bottom: 18px;
+    .splash::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.18) 38%, rgba(0,0,0,.92));
+    }
+
+    .splash-content {
+      position: relative;
+      z-index: 2;
+      padding: 28px 22px calc(34px + var(--safe-bottom));
+    }
+
+    .splash-title {
+      max-width: 360px;
+      font-size: 42px;
+      line-height: 1.05;
+      font-weight: 850;
+    }
+
+    .splash-title span {
+      color: var(--accent);
+    }
+
+    .splash-sub {
+      margin-top: 12px;
+      max-width: 310px;
+      color: rgba(255,255,255,.72);
+      line-height: 1.45;
+    }
+
+    .loader {
+      width: 100%;
+      height: 5px;
+      margin-top: 24px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+      overflow: hidden;
     }
 
     .loader i {
       display: block;
-      height: 5px;
+      width: 42%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+      animation: load 1.5s ease-in-out infinite;
+    }
+
+    @keyframes load {
+      0% {
+        transform: translateX(-120%);
+      }
+
+      100% {
+        transform: translateX(260%);
+      }
+    }
+
+    .tabs-shell {
+      width: 100%;
+      padding: 7px;
+      margin-bottom: 16px;
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.055)),
+        rgba(255,255,255,.075);
+      border: 1px solid var(--line-strong);
+      box-shadow:
+        0 18px 40px rgba(0,0,0,.24),
+        inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .tab {
+      min-height: 50px;
+      border-radius: var(--radius);
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.08);
+      color: rgba(255,255,255,.72);
+      box-shadow: none;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .tab.active {
+      color: var(--accent);
+      background: rgba(255,100,24,.14);
+      border-color: rgba(255,100,24,.32);
+    }
+
+    .tab:active {
+      background: rgba(255,255,255,.08);
+    }
+
+    .tab.active:active {
+      background: rgba(255,100,24,.2);
+    }
+
+    .form-stack,
+    .modal-form {
+      display: grid;
+      gap: 9px;
+    }
+
+    .form-numbers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .row > * {
+      flex: 1;
+    }
+
+    #formHint {
+      text-align: center;
+    }
+
+    .btn-card {
+      min-height: 54px;
+      padding: 0 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      box-shadow: none;
+      font-weight: 750;
+    }
+
+    .btn-muted,
+    .ghost {
+      color: #fff;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+    }
+
+    .btn-accent {
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-line);
+    }
+
+    .btn-danger,
+    .danger {
+      color: var(--danger-text);
+      background: var(--danger-soft);
+      border: 1px solid var(--danger-line);
+    }
+
+    .btn-muted:active,
+    .ghost:active {
+      background: rgba(255,255,255,.09);
+    }
+
+    .btn-accent:active {
+      background: rgba(255,100,24,.16);
+    }
+
+    .btn-danger:active,
+    .danger:active {
+      background: rgba(255,70,70,.18);
+    }
+
+    .icon-square {
+      width: 54px;
+      min-width: 54px;
+      padding: 0;
+      font-size: 18px;
+    }
+
+    #repeatSetBtn,
+    #addSetBtn {
+      min-height: 54px;
+      border-radius: var(--radius);
+      box-shadow: none;
+    }
+
+    #repeatSetBtn {
+      color: #fff;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+    }
+
+    #addSetBtn {
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-line);
+    }
+
+    .fallback-finish {
+      display: none;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .exercise {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .exercise:last-child {
+      border-bottom: 0;
+    }
+
+    .exercise-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .exercise-name {
+      font-size: 16px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .set-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 46px;
+    }
+
+    .set-value {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-height: 54px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    #draftList .set-row {
+      grid-template-columns: 1fr 54px 54px;
+      align-items: stretch;
+      min-height: 54px;
+      margin-bottom: 9px;
+    }
+
+    #draftList .set-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .history-group {
+      margin-bottom: 18px;
+    }
+
+    .history-month-title {
+      margin: 18px 2px 10px;
+      font-size: 15px;
+      font-weight: 850;
+      color: rgba(255,255,255,.78);
+    }
+
+    .history-row {
+      display: grid;
+      grid-template-columns: 1fr 54px 54px;
+      gap: 8px;
+      align-items: stretch;
+      margin-bottom: 9px;
+    }
+
+    .history-item {
+      width: 100%;
+      min-height: 54px;
+      text-align: left;
+      display: block;
+      background: var(--surface);
+      color: #fff;
+      padding: 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .history-title {
+      font-weight: 820;
+      font-size: 17px;
+      margin-bottom: 4px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 10px;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 13px;
+    }
+
+    .stat-num {
+      font-size: 23px;
+      font-weight: 850;
+      color: var(--accent);
+      overflow-wrap: anywhere;
+    }
+
+    .progress-chart {
+      width: 100%;
+      height: 190px;
+      margin-top: 14px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .progress-chart svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .chart-label {
+      margin-top: 8px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + var(--safe-bottom));
+      transform: translateX(-50%);
+      max-width: calc(100vw - 28px);
+      padding: 11px 15px;
       border-radius: 999px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      animation: load 1.25s ease-in-out infinite;
+      background: rgba(20,20,20,.92);
+      border: 1px solid var(--line);
+      color: #fff;
+      font-size: 14px;
+      z-index: 40;
+      display: none;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.64);
+      display: none;
+      align-items: flex-end;
+      z-index: 30;
+      backdrop-filter: blur(8px);
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .sheet {
+      width: 100%;
+      max-width: 560px;
+      max-height: 88vh;
+      margin: 0 auto;
+      overflow: auto;
+      background: #0b0b0b;
+      border: 1px solid var(--line);
+      border-radius: 24px 24px 0 0;
+      padding: 18px 14px calc(28px + var(--safe-bottom));
+    }
+
+    .handle {
+      width: 42px;
+      height: 4px;
+      border-radius: 4px;
+      background: rgba(255,255,255,.22);
+      margin: 0 auto 16px;
+    }
+
+    .sheet-actions {
+      position: sticky;
+      bottom: -14px;
+      padding-top: 12px;
+      margin-top: 12px;
+      background: linear-gradient(180deg, transparent, rgba(11,11,11,.95) 44%, #0b0b0b 90%);
+    }
+
+    .sheet-actions .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .sheet-actions button {
+      min-height: 54px;
+      border-radius: var(--radius);
+      box-shadow: none;
+    }
+
+    .modal-set-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 40px;
+      padding: 8px 0;
+    }
+
+    .edit-exercise-group {
+      margin-top: 14px;
+      padding-top: 2px;
+    }
+
+    .edit-group-title {
+      font-size: 15px;
+      font-weight: 850;
+      color: rgba(255,255,255,.86);
+      margin: 0 2px 8px;
+      overflow-wrap: anywhere;
+    }
+
+    .edit-set-card {
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.045);
+      box-shadow: none;
+    }
+
+    .edit-set-head {
+      display: grid;
+      grid-template-columns: 1fr 54px;
+      gap: 8px;
+      align-items: stretch;
+      margin-bottom: 8px;
     }
 
     .remove-anim {
@@ -476,106 +647,211 @@
       transform: translateY(-6px) scale(.98);
     }
 
-    @keyframes load {
-      0% { transform: translateX(-45%) scaleX(.35); opacity: .35; }
-      50% { transform: translateX(0) scaleX(1); opacity: 1; }
-      100% { transform: translateX(45%) scaleX(.35); opacity: .35; }
+    .top,
+    .tabs-shell,
+    .section,
+    .card,
+    .history-group,
+    .stat,
+    .progress-chart {
+      animation: softIn .24s ease both;
     }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+    .panel.active {
+      animation: panelIn .18s ease both;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .exercise,
+    .set-row,
+    .history-row,
+    .edit-set-card {
+      animation: itemIn .18s ease both;
+    }
+
+    button,
+    .history-item,
+    .set-value,
+    input,
+    select {
+      transition:
+        transform .14s ease,
+        background-color .16s ease,
+        border-color .16s ease,
+        box-shadow .16s ease,
+        opacity .16s ease;
+    }
+
+    button:active,
+    .history-item:active {
+      transform: scale(.975);
+    }
+
+    input:focus,
+    select:focus {
+      transform: translateY(-1px);
+    }
+
+    .toast.show {
+      animation: toastIn .18s ease both;
+    }
+
+    .modal.open {
+      animation: fadeIn .16s ease both;
+    }
+
+    .modal.open .sheet {
+      animation: sheetIn .22s ease both;
+    }
+
+    @keyframes softIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     @keyframes panelIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    @keyframes pop {
-      from { opacity: 0; transform: translateY(7px) scale(.985); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+    @keyframes itemIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px) scale(.985);
+      }
 
-    @keyframes floatIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     @keyframes toastIn {
-      from { opacity: 0; transform: translate(-50%, 8px); }
-      to { opacity: 1; transform: translate(-50%, 0); }
+      from {
+        opacity: 0;
+        transform: translate(-50%, 8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes sheetIn {
+      from {
+        opacity: 0;
+        transform: translateY(22px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
+
 <body>
-  <div id="splash" class="splash">
-    <div class="loader">
-      <div class="loader-title">Трена</div>
-      <i></i>
+  <div class="splash" id="splash">
+    <img class="splash-img" src="loading.jpg" alt="Загрузка" />
+    <div class="splash-content">
+      <div class="splash-title">Святилище<br><span>ТРЕНЕРА</span></div>
+      <div class="splash-sub">всем привет сегодня трена</div>
+      <div class="loader"><i></i></div>
     </div>
   </div>
 
-  <main class="app">
-    <header class="topbar">
+  <div class="app">
+    <header class="top">
       <div>
-        <div id="screenTitle" class="title">Трена</div>
-        <div id="screenMeta" class="meta">Загрузка</div>
+        <div class="title" id="screenTitle">Трена</div>
+        <div class="meta" id="screenMeta">Загрузка данных</div>
       </div>
     </header>
 
-    <nav class="tabs">
-      <button class="tab active" type="button" data-tab="today">Сегодня</button>
-      <button class="tab" type="button" data-tab="history">История</button>
-      <button class="tab" type="button" data-tab="progress">Прогресс</button>
-    </nav>
+    <div class="tabs-shell">
+      <nav class="tabs">
+        <button class="tab active" data-tab="today">Трена</button>
+        <button class="tab" data-tab="history">История</button>
+        <button class="tab" data-tab="progress">Прогресс</button>
+      </nav>
+    </div>
 
-    <section id="todayPanel" class="panel active">
-      <div class="card">
-        <div class="form-grid">
-          <input id="exerciseInput" list="exerciseList" placeholder="Упражнение" autocomplete="off">
-          <datalist id="exerciseList"></datalist>
+    <main>
+      <section class="panel active" id="todayPanel">
+        <section class="section">
+          <div class="section-title">Добавить подход</div>
 
-          <div class="form-numbers">
-            <input id="weightInput" inputmode="decimal" placeholder="Вес, кг">
-            <input id="repsInput" inputmode="numeric" placeholder="Повторы">
+          <div class="card">
+            <div class="form-stack">
+              <input id="exerciseInput" placeholder="Упражнение" list="exerciseList" autocomplete="off" />
+
+              <div class="form-numbers">
+                <input id="weightInput" placeholder="кг" inputmode="decimal" />
+                <input id="repsInput" placeholder="Повторений" inputmode="numeric" />
+              </div>
+
+              <datalist id="exerciseList"></datalist>
+
+              <div class="row">
+                <button id="repeatSetBtn" disabled>Такой же</button>
+                <button id="addSetBtn" disabled>Добавить</button>
+              </div>
+
+              <div class="muted" id="formHint">Выбери упражнение, вес и повторы</div>
+            </div>
           </div>
+        </section>
 
-          <div class="actions">
-            <button id="addSetBtn" class="btn-card btn-accent" type="button" disabled>Добавить</button>
-            <button id="repeatSetBtn" class="btn-card btn-muted icon-square" type="button" disabled title="Повторить прошлый подход">↺</button>
-          </div>
+        <section class="section">
+          <div class="section-title">Текущая тренировка</div>
+          <div class="card" id="draftList"></div>
+          <button id="fallbackFinishBtn" class="fallback-finish btn-card btn-accent">Завершить тренировку</button>
+        </section>
+      </section>
 
-          <div id="formHint" class="form-hint">Выбери упражнение, вес и повторы</div>
+      <section class="panel" id="historyPanel">
+        <div id="historyList"></div>
+      </section>
+
+      <section class="panel" id="progressPanel">
+        <div class="card">
+          <select id="progressSelect"></select>
+          <div id="progressResult"></div>
         </div>
-      </div>
+      </section>
+    </main>
+  </div>
 
-      <div id="draftList" class="list"></div>
-    </section>
+  <div class="toast" id="toast"></div>
 
-    <section id="historyPanel" class="panel">
-      <div id="historyList" class="list"></div>
-    </section>
-
-    <section id="progressPanel" class="panel">
-      <div class="card">
-        <select id="progressSelect"></select>
-        <div id="progressResult"></div>
-      </div>
-    </section>
-  </main>
-
-  <button id="fallbackFinishBtn" class="btn-card btn-accent finish-btn" type="button">Завершить тренировку</button>
-
-  <div id="toast" class="toast"></div>
-
-  <div id="modal" class="modal">
+  <div class="modal" id="modal">
     <div class="sheet">
+      <div class="handle"></div>
       <div id="modalBody"></div>
     </div>
   </div>
@@ -590,11 +866,13 @@
         localDataKey: "trainer_data_v1",
         cloudBaseKey: "trainer_data_v1",
         cloudChunkSize: 3500,
-        splashDelay: 500,
+        splashDelay: 4000,
         toastDelay: 2200
       };
 
-      const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+      const tg = window.Telegram && window.Telegram.WebApp
+        ? window.Telegram.WebApp
+        : null;
 
       const state = {
         tab: "today",
@@ -608,12 +886,14 @@
         splash: document.getElementById("splash"),
         screenTitle: document.getElementById("screenTitle"),
         screenMeta: document.getElementById("screenMeta"),
+
         tabs: [...document.querySelectorAll(".tab")],
         panels: {
           today: document.getElementById("todayPanel"),
           history: document.getElementById("historyPanel"),
           progress: document.getElementById("progressPanel")
         },
+
         exerciseInput: document.getElementById("exerciseInput"),
         weightInput: document.getElementById("weightInput"),
         repsInput: document.getElementById("repsInput"),
@@ -621,18 +901,25 @@
         addSetBtn: document.getElementById("addSetBtn"),
         repeatSetBtn: document.getElementById("repeatSetBtn"),
         formHint: document.getElementById("formHint"),
+
         draftList: document.getElementById("draftList"),
         fallbackFinishBtn: document.getElementById("fallbackFinishBtn"),
+
         historyList: document.getElementById("historyList"),
+
         progressSelect: document.getElementById("progressSelect"),
         progressResult: document.getElementById("progressResult"),
+
         toast: document.getElementById("toast"),
         modal: document.getElementById("modal"),
         modalBody: document.getElementById("modalBody")
       };
 
       function id() {
-        if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
+        if (window.crypto && window.crypto.randomUUID) {
+          return window.crypto.randomUUID();
+        }
+
         return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
       }
 
@@ -646,13 +933,21 @@
       }
 
       function text(node, value) {
-        if (node) node.textContent = value == null ? "" : String(value);
+        if (!node) return;
+        node.textContent = value == null ? "" : String(value);
       }
 
       function make(tag, className, content) {
         const node = document.createElement(tag);
-        if (className) node.className = className;
-        if (content !== undefined) text(node, content);
+
+        if (className) {
+          node.className = className;
+        }
+
+        if (content !== undefined) {
+          text(node, content);
+        }
+
         return node;
       }
 
@@ -772,7 +1067,9 @@
       async function readCloudSnapshot() {
         const meta = safeJsonParse(await cloudGetItem(cloudMetaKey()), null);
 
-        if (!meta || !Number.isInteger(meta.chunks) || meta.chunks <= 0) return null;
+        if (!meta || !Number.isInteger(meta.chunks) || meta.chunks <= 0) {
+          return null;
+        }
 
         const parts = [];
 
@@ -784,7 +1081,9 @@
 
         const snapshot = safeJsonParse(parts.join(""), null);
 
-        if (!snapshot || !Array.isArray(snapshot.workouts) || !snapshot.draft) return null;
+        if (!snapshot || !Array.isArray(snapshot.workouts) || !snapshot.draft) {
+          return null;
+        }
 
         return snapshot;
       }
@@ -882,28 +1181,51 @@
           ? sanitizeWorkout(safeSnapshot.draft)
           : createDraft();
 
-        if (state.draft.status !== "draft") {
-          state.draft.status = "draft";
+        state.draft.status = "draft";
+      }
+
+      function toast(message) {
+        text(el.toast, message);
+        el.toast.style.display = "block";
+        el.toast.classList.remove("show");
+
+        requestAnimationFrame(() => {
+          el.toast.classList.add("show");
+        });
+
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => {
+          el.toast.style.display = "none";
+          el.toast.classList.remove("show");
+        }, CONFIG.toastDelay);
+      }
+
+      function haptic(type = "light") {
+        if (tg && tg.HapticFeedback) {
+          tg.HapticFeedback.impactOccurred(type);
         }
       }
 
-      function persistLocal(snapshot = createSnapshot()) {
-        writeLocalSnapshot(snapshot);
+      function hideKeyboard() {
+        if (document.activeElement && document.activeElement.blur) {
+          document.activeElement.blur();
+        }
       }
 
-      function commit() {
-        rebuildExerciseCatalog();
-
-        const snapshot = createSnapshot();
-
-        persistLocal(snapshot);
-        renderAll();
-
-        if (isCloudAvailable()) {
-          writeCloudSnapshot(snapshot).then(saved => {
-            if (!saved) toast("Не удалось синхронизировать с облаком");
+      function showPopup(message) {
+        if (tg && tg.showPopup) {
+          return new Promise(resolve => {
+            tg.showPopup({
+              message,
+              buttons: [
+                { id: "cancel", type: "cancel", text: "Отмена" },
+                { id: "ok", type: "default", text: "ОК" }
+              ]
+            }, resolve);
           });
         }
+
+        return Promise.resolve(window.confirm(message) ? "ok" : "cancel");
       }
 
       async function loadData() {
@@ -916,7 +1238,6 @@
         renderAll();
 
         const normalizedSnapshot = createSnapshot(Number(selectedSnapshot.updatedAt) || Date.now());
-
         writeLocalSnapshot(normalizedSnapshot);
 
         if (isCloudAvailable() && (!cloudSnapshot || selectedSnapshot === localSnapshot)) {
@@ -928,6 +1249,21 @@
         setTimeout(() => {
           el.splash.classList.add("hide");
         }, CONFIG.splashDelay);
+      }
+
+      function commit() {
+        rebuildExerciseCatalog();
+
+        const snapshot = createSnapshot();
+
+        writeLocalSnapshot(snapshot);
+        renderAll();
+
+        if (isCloudAvailable()) {
+          writeCloudSnapshot(snapshot).then(saved => {
+            if (!saved) toast("Не удалось синхронизировать с облаком");
+          });
+        }
       }
 
       function isValidDraft(value) {
@@ -1026,7 +1362,9 @@
           tab.classList.toggle("active", active);
 
           const panel = el.panels[tab.dataset.tab];
-          if (panel) panel.classList.toggle("active", active);
+          if (panel) {
+            panel.classList.toggle("active", active);
+          }
         });
       }
 
@@ -1163,6 +1501,11 @@
         text(emptyOption, "Выбери упражнение");
         el.progressSelect.appendChild(emptyOption);
 
+        if (!names.length) {
+          el.progressResult.replaceChildren(make("div", "progress-empty", "Пока нечего показывать"));
+          return;
+        }
+
         names.forEach(name => {
           const option = document.createElement("option");
           option.value = name;
@@ -1190,7 +1533,10 @@
           .sort((a, b) => new Date(a.finishedAt) - new Date(b.finishedAt))
           .forEach(workout => {
             const entry = getProgressEntry(workout, name);
-            if (entry) entries.push(entry);
+
+            if (entry) {
+              entries.push(entry);
+            }
           });
 
         if (!entries.length) {
@@ -1211,7 +1557,10 @@
           ["Последний", `${last.weight} кг`]
         ].forEach(([label, value]) => {
           const card = make("div", "stat");
-          card.append(make("div", "stat-num", value), make("div", "muted", label));
+          card.append(
+            make("div", "stat-num", value),
+            make("div", "muted", label)
+          );
           grid.appendChild(card);
         });
 
@@ -1237,7 +1586,9 @@
           });
         });
 
-        if (bestWeight === null) return null;
+        if (bestWeight === null) {
+          return null;
+        }
 
         return {
           date: workout.finishedAt,
@@ -1274,7 +1625,7 @@
             ? height / 2
             : padding + ((max - item.weight) / range) * chartHeight;
 
-          return { x, y };
+          return { x, y, value: item.weight };
         });
 
         const gridLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -1306,6 +1657,22 @@
           svg.appendChild(circle);
         });
 
+        const maxText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        maxText.setAttribute("x", padding);
+        maxText.setAttribute("y", 18);
+        maxText.setAttribute("fill", "rgba(255,255,255,.62)");
+        maxText.setAttribute("font-size", "12");
+        maxText.textContent = `${max} кг`;
+        svg.appendChild(maxText);
+
+        const minText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        minText.setAttribute("x", padding);
+        minText.setAttribute("y", height - 8);
+        minText.setAttribute("fill", "rgba(255,255,255,.42)");
+        minText.setAttribute("font-size", "12");
+        minText.textContent = `${min} кг`;
+        svg.appendChild(minText);
+
         wrap.appendChild(svg);
         return wrap;
       }
@@ -1313,6 +1680,7 @@
       function formatDateTitle(iso) {
         const date = new Date(iso);
         const now = new Date();
+
         const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         const diff = Math.round((startToday - startDate) / 86400000);
@@ -1346,19 +1714,19 @@
 
       function updateMainActions() {
         const hasSets = getWorkoutStats(state.draft).sets > 0;
-        const showFallback = hasSets && state.tab === "today";
+        const visible = hasSets && state.tab === "today";
 
-        el.fallbackFinishBtn.style.display = showFallback ? "block" : "none";
+        el.fallbackFinishBtn.style.display = visible ? "block" : "none";
 
         if (!tg || !tg.MainButton) return;
 
-        if (showFallback) {
+        tg.MainButton.offClick(finishWorkout);
+
+        if (visible) {
           tg.MainButton.setText("Завершить тренировку");
-          tg.MainButton.show();
-          tg.MainButton.offClick(finishWorkout);
           tg.MainButton.onClick(finishWorkout);
+          tg.MainButton.show();
         } else {
-          tg.MainButton.offClick(finishWorkout);
           tg.MainButton.hide();
         }
       }
@@ -1367,7 +1735,11 @@
         let ex = state.draft.exercises.find(item => sameName(item.name, name));
 
         if (!ex) {
-          ex = { id: id(), name, sets: [] };
+          ex = {
+            id: id(),
+            name,
+            sets: []
+          };
           state.draft.exercises.push(ex);
         }
 
@@ -1384,7 +1756,10 @@
         }
 
         const ex = getOrCreateDraftExercise(name);
-        ex.sets.push({ id: id(), ...parsed });
+        ex.sets.push({
+          id: id(),
+          ...parsed
+        });
 
         el.weightInput.value = "";
         el.repsInput.value = "";
@@ -1398,13 +1773,20 @@
         if (!name) return null;
 
         const draftEx = state.draft.exercises.find(item => sameName(item.name, name));
-        if (draftEx && draftEx.sets.length) return draftEx.sets[draftEx.sets.length - 1];
+        if (draftEx && draftEx.sets.length) {
+          return draftEx.sets[draftEx.sets.length - 1];
+        }
 
-        const sortedWorkouts = [...state.workouts].sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt));
+        const sortedWorkouts = [...state.workouts].sort((a, b) => {
+          return new Date(b.finishedAt) - new Date(a.finishedAt);
+        });
 
         for (const workout of sortedWorkouts) {
           const ex = workout.exercises.find(item => sameName(item.name, name));
-          if (ex && ex.sets.length) return ex.sets[ex.sets.length - 1];
+
+          if (ex && ex.sets.length) {
+            return ex.sets[ex.sets.length - 1];
+          }
         }
 
         return null;
@@ -1458,7 +1840,7 @@
 
         const repsInput = document.createElement("input");
         repsInput.value = set.reps;
-        repsInput.placeholder = "Повторы";
+        repsInput.placeholder = "Повторений";
         repsInput.inputMode = "numeric";
 
         nums.append(weightInput, repsInput);
@@ -1493,13 +1875,22 @@
         const setIndex = oldEx.sets.findIndex(item => item.id === setId);
         if (setIndex === -1) return;
 
-        const updatedSet = { ...oldEx.sets[setIndex], weight: newWeight, reps: newReps };
+        const updatedSet = {
+          ...oldEx.sets[setIndex],
+          weight: newWeight,
+          reps: newReps
+        };
+
         oldEx.sets.splice(setIndex, 1);
 
         let targetEx = workout.exercises.find(item => sameName(item.name, newName));
 
         if (!targetEx) {
-          targetEx = { id: id(), name: newName, sets: [] };
+          targetEx = {
+            id: id(),
+            name: newName,
+            sets: []
+          };
           workout.exercises.push(targetEx);
         }
 
@@ -1607,7 +1998,15 @@
             const del = make("button", "btn-card btn-danger icon-square", "×");
             del.type = "button";
             del.title = "Удалить подход";
-            del.onclick = () => animateRemove(card, () => card.remove());
+            del.onclick = () => {
+              animateRemove(card, () => {
+                card.remove();
+
+                if (!group.querySelector(".edit-set-card")) {
+                  group.remove();
+                }
+              });
+            };
 
             head.append(nameInput, del);
 
@@ -1621,7 +2020,7 @@
             const repsInput = document.createElement("input");
             repsInput.value = set.reps;
             repsInput.inputMode = "numeric";
-            repsInput.placeholder = "Повторы";
+            repsInput.placeholder = "Повторений";
 
             nums.append(weightInput, repsInput);
 
@@ -1649,6 +2048,7 @@
 
         grid.append(save, cancel);
         actionsWrap.appendChild(grid);
+
         el.modalBody.append(title, list, actionsWrap);
       }
 
@@ -1667,7 +2067,11 @@
           const key = name.toLowerCase();
 
           if (!map.has(key)) {
-            map.set(key, { id: id(), name, sets: [] });
+            map.set(key, {
+              id: id(),
+              name,
+              sets: []
+            });
           }
 
           map.get(key).sets.push({
@@ -1739,44 +2143,6 @@
         toast("Тренировка удалена");
       }
 
-      function toast(message) {
-        text(el.toast, message);
-        el.toast.style.display = "block";
-
-        clearTimeout(toast.timer);
-        toast.timer = setTimeout(() => {
-          el.toast.style.display = "none";
-        }, CONFIG.toastDelay);
-      }
-
-      function haptic(type = "light") {
-        if (tg && tg.HapticFeedback) {
-          tg.HapticFeedback.impactOccurred(type);
-        }
-      }
-
-      function hideKeyboard() {
-        if (document.activeElement && document.activeElement.blur) {
-          document.activeElement.blur();
-        }
-      }
-
-      function showPopup(message) {
-        if (tg && tg.showPopup) {
-          return new Promise(resolve => {
-            tg.showPopup({
-              message,
-              buttons: [
-                { id: "cancel", type: "cancel", text: "Отмена" },
-                { id: "ok", type: "default", text: "ОК" }
-              ]
-            }, resolve);
-          });
-        }
-
-        return Promise.resolve(window.confirm(message) ? "ok" : "cancel");
-      }
-
       function openSheet() {
         el.modal.classList.add("open");
 
@@ -1798,11 +2164,16 @@
       }
 
       function animateRemove(node, done) {
-        node.classList.add("remove-anim");
+        node.style.opacity = "1";
+        node.style.transform = "translateY(0) scale(1)";
+
+        requestAnimationFrame(() => {
+          node.classList.add("remove-anim");
+        });
 
         setTimeout(() => {
           if (done) done();
-        }, 190);
+        }, 200);
       }
 
       function bindEvents() {
@@ -1847,7 +2218,9 @@
         el.progressSelect.addEventListener("change", showProgress);
 
         el.modal.addEventListener("click", event => {
-          if (event.target === el.modal) closeModal();
+          if (event.target === el.modal) {
+            closeModal();
+          }
         });
       }
 
