@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -44,6 +45,7 @@
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
     }
+
     button:disabled { opacity: .42; cursor: default; }
 
     input, select {
@@ -56,13 +58,14 @@
       color: #fff;
       outline: none;
     }
+
     input::placeholder { color: rgba(255,255,255,.38); }
+
     input:focus, select:focus {
       border-color: rgba(255,100,24,.75);
       box-shadow: 0 0 0 3px rgba(255,100,24,.13);
     }
 
-    /* Splash */
     .splash {
       position: fixed;
       inset: 0;
@@ -73,50 +76,138 @@
       overflow: hidden;
       transition: opacity .35s ease, visibility .35s ease;
     }
-    .splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .splash.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
     .splash-img {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      object-fit: cover; transform: scale(1.02);
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.02);
       filter: saturate(0.98) brightness(0.86) contrast(1.02);
     }
+
     .splash::after {
       content: "";
-      position: absolute; inset: 0;
+      position: absolute;
+      inset: 0;
       background: linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.18) 38%, rgba(0,0,0,.92));
       pointer-events: none;
     }
+
     .splash-content {
       position: relative;
       padding: 28px 22px calc(34px + env(safe-area-inset-bottom));
       z-index: 2;
     }
-    .splash-title { max-width: 320px; font-size: 42px; line-height: 1.05; font-weight: 850; }
+
+    .splash-title {
+      max-width: 320px;
+      font-size: 42px;
+      line-height: 1.05;
+      font-weight: 850;
+    }
+
     .splash-title span { color: var(--accent); }
-    .splash-sub { margin-top: 12px; max-width: 310px; color: rgba(255,255,255,.72); line-height: 1.45; }
-    .loader { width: 100%; height: 5px; margin-top: 24px; border-radius: 999px; background: rgba(255,255,255,.14); overflow: hidden; }
-    .loader i { display: block; width: 42%; height: 100%; border-radius: inherit; background: var(--accent); animation: load 1.5s ease-in-out infinite; }
-    @keyframes load { 0% { transform: translateX(-120%);} 100% { transform: translateX(260%);} }
 
-    .app { max-width: 560px; margin: 0 auto; }
+    .splash-sub {
+      margin-top: 12px;
+      max-width: 310px;
+      color: rgba(255,255,255,.72);
+      line-height: 1.45;
+    }
 
-    .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
-    .title { font-size: 28px; line-height: 1.08; font-weight: 850; letter-spacing: 0; }
-    .meta { margin-top: 6px; color: var(--muted); font-size: 13px; }
+    .loader {
+      width: 100%;
+      height: 5px;
+      margin-top: 24px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.14);
+      overflow: hidden;
+    }
 
-    .tabs {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 7px; padding: 5px; border-radius: 999px;
-      background: rgba(255,255,255,.06); border: 1px solid var(--line);
+    .loader i {
+      display: block;
+      width: 42%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+      animation: load 1.5s ease-in-out infinite;
+    }
+
+    @keyframes load {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(260%); }
+    }
+
+    .app {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
       margin-bottom: 16px;
     }
-    .tab { min-height: 38px; background: transparent; color: rgba(255,255,255,.64); border-radius: 999px; font-size: 14px; font-weight: 700; }
-    .tab.active { background: var(--accent); color: #fff; box-shadow: 0 10px 22px rgba(255,100,24,.28); }
+
+    .title {
+      font-size: 28px;
+      line-height: 1.08;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .meta {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      padding: 5px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      min-height: 38px;
+      background: transparent;
+      color: rgba(255,255,255,.64);
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(255,100,24,.28);
+    }
 
     .panel { display: none; }
     .panel.active { display: block; }
 
     .section { margin-bottom: 16px; }
-    .section-title { font-size: 18px; font-weight: 800; margin-bottom: 10px; }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
 
     .card {
       border-radius: var(--radius);
@@ -127,89 +218,224 @@
       box-shadow: 0 18px 40px rgba(0,0,0,.18);
     }
 
-    .form-stack { display: grid; gap: 9px; }
-    .form-numbers { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-    .row { display: flex; gap: 9px; align-items: center; }
+    .form-stack {
+      display: grid;
+      gap: 9px;
+    }
+
+    .form-numbers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .row {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+    }
+
     .row > * { flex: 1; }
 
-    .ghost { background: rgba(255,255,255,.06); color: #fff; border: 1px solid var(--line); }
-    .danger { background: var(--danger); color: #fff; }
-    .muted { color: var(--muted); font-size: 13px; }
+    .ghost {
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      border: 1px solid var(--line);
+    }
 
-    .exercise { padding: 13px 0; border-bottom: 1px solid var(--line); }
+    .danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .exercise {
+      padding: 13px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
     .exercise:last-child { border-bottom: 0; }
-    .exercise-head { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 9px; }
-    .exercise-name { font-size: 16px; font-weight: 800; overflow-wrap: anywhere; }
+
+    .exercise-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 9px;
+    }
+
+    .exercise-name {
+      font-size: 16px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
 
     .set-row {
-      display: grid; grid-template-columns: 1fr auto auto;
-      gap: 8px; align-items: center; min-height: 46px; border-radius: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 46px;
+      border-radius: 12px;
     }
-    .icon-btn, .edit-set-btn {
-      width: 44px; height: 44px; min-height: 44px; border-radius: 50%;
-      background: rgba(255,255,255,.06); border: 1px solid var(--line); font-size: 18px;
+
+    .icon-btn,
+    .edit-set-btn {
+      width: 44px;
+      height: 44px;
+      min-height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      font-size: 18px;
     }
+
     .edit-set-btn { color: var(--accent); }
     .icon-btn { color: rgba(255,255,255,.68); }
 
-    .empty { padding: 20px 12px; text-align: center; color: var(--muted); }
-    .fallback-finish { display: none; margin-top: 10px; width: 100%; }
-
-    /* History row with inline CSV button */
-    .history-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
-    .history-item {
-      width: 100%; text-align: left; display: block;
-      background: rgba(255,255,255,.055); color: #fff;
-      padding: 14px; border-radius: var(--radius); border: 1px solid var(--line);
+    .empty {
+      padding: 20px 12px;
+      text-align: center;
+      color: var(--muted);
     }
-    .history-title { font-weight: 820; font-size: 17px; margin-bottom: 4px; }
+
+    .fallback-finish {
+      display: none;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .history-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 9px;
+    }
+
+    .history-item {
+      width: 100%;
+      text-align: left;
+      display: block;
+      background: rgba(255,255,255,.055);
+      color: #fff;
+      padding: 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+    }
+
+    .history-title {
+      font-weight: 820;
+      font-size: 17px;
+      margin-bottom: 4px;
+    }
+
     .mini-btn {
-      min-width: 44px; min-height: 44px; padding: 0 12px;
-      border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid var(--line); color: #fff;
+      min-width: 54px;
+      min-height: 46px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      color: #fff;
       font-weight: 700;
     }
 
-    /* Modal and sticky bottom actions */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 10px;
+    }
+
+    .stat {
+      background: rgba(255,255,255,.055);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 13px;
+    }
+
+    .stat-num {
+      font-size: 23px;
+      font-weight: 850;
+      color: var(--accent);
+      overflow-wrap: anywhere;
+    }
+
     .toast {
-      position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom));
-      transform: translateX(-50%); max-width: calc(100vw - 28px);
-      padding: 11px 15px; border-radius: 999px; background: rgba(20,20,20,.92);
-      border: 1px solid var(--line); color: #fff; font-size: 14px;
-      z-index: 40; display: none;
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      max-width: calc(100vw - 28px);
+      padding: 11px 15px;
+      border-radius: 999px;
+      background: rgba(20,20,20,.92);
+      border: 1px solid var(--line);
+      color: #fff;
+      font-size: 14px;
+      z-index: 40;
+      display: none;
     }
 
     .modal {
-      position: fixed; inset: 0; background: rgba(0,0,0,.64);
-      display: none; align-items: flex-end; z-index: 30; backdrop-filter: blur(8px);
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.64);
+      display: none;
+      align-items: flex-end;
+      z-index: 30;
+      backdrop-filter: blur(8px);
     }
+
     .modal.open { display: flex; }
 
     .sheet {
-      width: 100%; max-width: 560px; max-height: 88vh; margin: 0 auto;
-      overflow: auto; background: #0b0b0b; border: 1px solid var(--line);
+      width: 100%;
+      max-width: 560px;
+      max-height: 88vh;
+      margin: 0 auto;
+      overflow: auto;
+      background: #0b0b0b;
+      border: 1px solid var(--line);
       border-radius: 24px 24px 0 0;
       padding: 18px 14px calc(28px + env(safe-area-inset-bottom));
       position: relative;
     }
-    .handle { width: 42px; height: 4px; border-radius: 4px; background: rgba(255,255,255,.22); margin: 0 auto 16px; }
-    .modal-form { display: grid; gap: 10px; margin-top: 14px; }
+
+    .handle {
+      width: 42px;
+      height: 4px;
+      border-radius: 4px;
+      background: rgba(255,255,255,.22);
+      margin: 0 auto 16px;
+    }
+
+    .modal-form {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
 
     .sheet-actions {
-      position: sticky; bottom: -14px;
-      padding-top: 12px; margin-top: 12px;
+      position: sticky;
+      bottom: -14px;
+      padding-top: 12px;
+      margin-top: 12px;
       background: linear-gradient(180deg, transparent, rgba(11,11,11,.95) 44%, #0b0b0b 90%);
     }
-    .sheet-actions .grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
-    }
 
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 10px; }
-    .stat { background: rgba(255,255,255,.055); border: 1px solid var(--line); border-radius: var(--radius); padding: 13px; }
-    .stat-num { font-size: 23px; font-weight: 850; color: var(--accent); overflow-wrap: anywhere; }
+    .sheet-actions .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
   </style>
 </head>
 <body>
-  <!-- Splash with real image -->
   <div class="splash" id="splash">
     <img class="splash-img" src="loading.jpg" alt="Загрузка" />
     <div class="splash-content">
@@ -329,34 +555,120 @@
     function id() {
       return crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
     }
-    function createDraft() { return { id: id(), status: "draft", createdAt: new Date().toISOString(), exercises: [] }; }
-    function text(node, value) { node.textContent = value == null ? "" : String(value); }
-    function make(tag, className, content) { const n = document.createElement(tag); if (className) n.className = className; if (content !== undefined) text(n, content); return n; }
-    function hideKeyboard() { if (document.activeElement && typeof document.activeElement.blur === "function") document.activeElement.blur(); }
-    function haptic(type = "light") { if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred(type); }
-    function toast(msg) { text(el.toast, msg); el.toast.style.display = "block"; clearTimeout(toast.t); toast.t = setTimeout(()=> el.toast.style.display="none", 2200); }
+
+    function createDraft() {
+      return {
+        id: id(),
+        status: "draft",
+        createdAt: new Date().toISOString(),
+        exercises: []
+      };
+    }
+
+    function text(node, value) {
+      node.textContent = value == null ? "" : String(value);
+    }
+
+    function make(tag, className, content) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (content !== undefined) text(node, content);
+      return node;
+    }
+
+    function hideKeyboard() {
+      if (document.activeElement && typeof document.activeElement.blur === "function") {
+        document.activeElement.blur();
+      }
+    }
+
+    function haptic(type = "light") {
+      if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred(type);
+    }
+
+    function toast(message) {
+      text(el.toast, message);
+      el.toast.style.display = "block";
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => {
+        el.toast.style.display = "none";
+      }, 2200);
+    }
+
     function showPopup(message, buttons) {
-      if (tg && tg.showPopup) return new Promise(r => tg.showPopup({ message, buttons }, r));
+      if (tg && tg.showPopup) {
+        return new Promise(resolve => tg.showPopup({ message, buttons }, resolve));
+      }
+
       return Promise.resolve(confirm(message) ? "ok" : "cancel");
     }
+
     async function cloudGet(key) {
       if (!tg || !tg.CloudStorage || !tg.CloudStorage.getItem) return null;
-      return new Promise(resolve => tg.CloudStorage.getItem(key, (err, v) => {
-        if (err || !v) return resolve(null);
-        try { resolve(JSON.parse(v)); } catch { resolve(null); }
-      }));
+
+      return new Promise(resolve => {
+        tg.CloudStorage.getItem(key, (err, value) => {
+          if (err || !value) return resolve(null);
+
+          try {
+            resolve(JSON.parse(value));
+          } catch {
+            resolve(null);
+          }
+        });
+      });
     }
+
     async function cloudSet(key, value) {
       if (!tg || !tg.CloudStorage || !tg.CloudStorage.setItem) return false;
-      return new Promise(resolve => tg.CloudStorage.setItem(key, JSON.stringify(value), err => resolve(!err)));
+
+      return new Promise(resolve => {
+        tg.CloudStorage.setItem(key, JSON.stringify(value), err => resolve(!err));
+      });
     }
-    function safeJson(v){ try{ return v ? JSON.parse(v) : null } catch { return null } }
-    function parseRuDate(value){ const m = String(value||"").match(/(\d{2})\.(\d{2})\.(\d{4})(?:\s+(\d{2}):(\d{2}))?/); if(!m) return null; const[,dd,mm,yyyy,hh="12",min="00"]=m; return new Date(+yyyy, +mm-1, +dd, +hh, +min).toISOString(); }
-    function normalizeWorkout(w){ return { id:w.id||id(), status:"completed", createdAt:w.createdAt||w.finishedAt||new Date().toISOString(), finishedAt:w.finishedAt||w.createdAt||parseRuDate(w.date)||new Date().toISOString(), exercises:(w.exercises||[]).map(ex=>({ id:ex.id||id(), name:String(ex.name||"").trim(), sets:(ex.sets||[]).map(s=>({ id:s.id||id(), weight:Number(s.weight), reps:Number(s.reps) })).filter(s=>Number.isFinite(s.weight)&&s.weight>=0&&Number.isFinite(s.reps)&&s.reps>0) })).filter(ex=>ex.name&&ex.sets.length) }; }
-    function migrateV2(items){ if(!Array.isArray(items)) return []; return items.map(normalizeWorkout).filter(w=>w.exercises.length); }
+
+    function safeJson(value) {
+      try {
+        return value ? JSON.parse(value) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function parseRuDate(value) {
+      const match = String(value || "").match(/(\d{2})\.(\d{2})\.(\d{4})(?:\s+(\d{2}):(\d{2}))?/);
+      if (!match) return null;
+
+      const [, dd, mm, yyyy, hh = "12", min = "00"] = match;
+      return new Date(Number(yyyy), Number(mm) - 1, Number(dd), Number(hh), Number(min)).toISOString();
+    }
+
+    function normalizeWorkout(workout) {
+      return {
+        id: workout.id || id(),
+        status: "completed",
+        createdAt: workout.createdAt || workout.finishedAt || new Date().toISOString(),
+        finishedAt: workout.finishedAt || workout.createdAt || parseRuDate(workout.date) || new Date().toISOString(),
+        exercises: (workout.exercises || []).map(ex => ({
+          id: ex.id || id(),
+          name: String(ex.name || "").trim(),
+          sets: (ex.sets || []).map(set => ({
+            id: set.id || id(),
+            weight: Number(set.weight),
+            reps: Number(set.reps)
+          })).filter(set => Number.isFinite(set.weight) && set.weight >= 0 && Number.isFinite(set.reps) && set.reps > 0)
+        })).filter(ex => ex.name && ex.sets.length)
+      };
+    }
+
+    function migrateV2(items) {
+      if (!Array.isArray(items)) return [];
+      return items.map(normalizeWorkout).filter(workout => workout.exercises.length);
+    }
 
     async function loadData() {
       const started = Date.now();
+
       const cloud = await cloudGet(storageKey);
       const local = safeJson(localStorage.getItem(storageKey));
       const oldV3 = await cloudGet(oldStorageKeyV3) || safeJson(localStorage.getItem(oldStorageKeyV3));
@@ -364,7 +676,7 @@
       const draft = safeJson(localStorage.getItem(draftKey)) || safeJson(localStorage.getItem(oldDraftKey));
 
       const source = Array.isArray(cloud) ? cloud : Array.isArray(local) ? local : Array.isArray(oldV3) ? oldV3 : migrateV2(oldV2);
-      state.workouts = source.map(normalizeWorkout).filter(w => w.exercises.length);
+      state.workouts = source.map(normalizeWorkout).filter(workout => workout.exercises.length);
       state.draft = draft && draft.status === "draft" ? draft : createDraft();
 
       rebuildExerciseCatalog();
@@ -375,18 +687,59 @@
       setTimeout(() => el.splash.classList.add("hide"), left);
     }
 
-    function persistLocal(){ localStorage.setItem(storageKey, JSON.stringify(state.workouts)); localStorage.setItem(draftKey, JSON.stringify(state.draft)); }
-    async function sync(){ persistLocal(); state.syncing = true; updateMeta(); const ok = await cloudSet(storageKey, state.workouts); state.syncing = false; updateMeta(); if(ok) toast("Сохранено"); }
+    function persistLocal() {
+      localStorage.setItem(storageKey, JSON.stringify(state.workouts));
+      localStorage.setItem(draftKey, JSON.stringify(state.draft));
+    }
 
-    function rebuildExerciseCatalog(){ state.exercises = new Set(); state.workouts.forEach(w=>w.exercises.forEach(ex=>state.exercises.add(ex.name))); state.draft.exercises.forEach(ex=>state.exercises.add(ex.name)); }
-    function getWorkoutStats(w){ const exercises=w.exercises.length; const sets=w.exercises.reduce((s,ex)=>s+ex.sets.length,0); const volume=w.exercises.reduce((s,ex)=>s+ex.sets.reduce((x,set)=>x+set.weight*set.reps,0),0); return {exercises,sets,volume}; }
-    function getDraftStats(){ return getWorkoutStats(state.draft); }
+    async function sync() {
+      persistLocal();
+      state.syncing = true;
+      updateMeta();
 
-    function updateMeta(){
+      const ok = await cloudSet(storageKey, state.workouts);
+
+      state.syncing = false;
+      updateMeta();
+
+      if (ok) toast("Сохранено");
+    }
+
+    function rebuildExerciseCatalog() {
+      state.exercises = new Set();
+
+      state.workouts.forEach(workout => {
+        workout.exercises.forEach(ex => state.exercises.add(ex.name));
+      });
+
+      state.draft.exercises.forEach(ex => state.exercises.add(ex.name));
+    }
+
+    function getWorkoutStats(workout) {
+      const exercises = workout.exercises.length;
+      const sets = workout.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
+      const volume = workout.exercises.reduce((sum, ex) => {
+        return sum + ex.sets.reduce((setSum, set) => setSum + set.weight * set.reps, 0);
+      }, 0);
+
+      return { exercises, sets, volume };
+    }
+
+    function getDraftStats() {
+      return getWorkoutStats(state.draft);
+    }
+
+    function updateMeta() {
       text(el.screenTitle, state.tab === "today" ? "Сегодня" : state.tab === "history" ? "История" : "Прогресс");
-      if (state.syncing) { text(el.screenMeta,"Синхронизация"); return; }
+
+      if (state.syncing) {
+        text(el.screenMeta, "Синхронизация");
+        return;
+      }
+
       if (state.tab === "today") {
-        const s = getDraftStats(); text(el.screenMeta, `${s.exercises} упражнений · ${s.sets} подходов · ${Math.round(s.volume)} кг`);
+        const stats = getDraftStats();
+        text(el.screenMeta, `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`);
       } else if (state.tab === "history") {
         text(el.screenMeta, `${state.workouts.length} тренировок сохранено`);
       } else {
@@ -394,349 +747,734 @@
       }
     }
 
-    function renderAll(){
-      updateMeta(); renderTabs(); renderExerciseList(); renderDraft(); renderHistory(); renderProgress(); updateForm(); updateMainActions();
+    function renderAll() {
+      updateMeta();
+      renderTabs();
+      renderExerciseList();
+      renderDraft();
+      renderHistory();
+      renderProgress();
+      updateForm();
+      updateMainActions();
     }
-    function renderTabs(){ el.tabs.forEach(t=>{ const a=t.dataset.tab===state.tab; t.classList.toggle("active",a); el.panels[t.dataset.tab].classList.toggle("active",a); }); }
-    function renderExerciseList(){ el.exerciseList.replaceChildren(); [...state.exercises].sort().forEach(name=>{ const o=document.createElement("option"); o.value=name; el.exerciseList.appendChild(o); }); }
 
-    function renderDraft(){
+    function renderTabs() {
+      el.tabs.forEach(tab => {
+        const active = tab.dataset.tab === state.tab;
+        tab.classList.toggle("active", active);
+        el.panels[tab.dataset.tab].classList.toggle("active", active);
+      });
+    }
+
+    function renderExerciseList() {
+      el.exerciseList.replaceChildren();
+
+      [...state.exercises].sort().forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        el.exerciseList.appendChild(option);
+      });
+    }
+
+    function renderDraft() {
       el.draftList.replaceChildren();
-      if (!state.draft.exercises.length) { el.draftList.appendChild(make("div","empty","Пока нет подходов")); return; }
 
-      state.draft.exercises.forEach(ex=>{
-        const box=make("div","exercise");
-        const head=make("div","exercise-head");
-        const volume=ex.sets.reduce((s,set)=>s+set.weight*set.reps,0);
-        head.append(make("div","exercise-name",ex.name), make("div","muted",`${ex.sets.length} подходов · ${Math.round(volume)} кг`));
+      if (!state.draft.exercises.length) {
+        el.draftList.appendChild(make("div", "empty", "Пока нет подходов"));
+        return;
+      }
+
+      state.draft.exercises.forEach(ex => {
+        const box = make("div", "exercise");
+        const head = make("div", "exercise-head");
+        const volume = ex.sets.reduce((sum, set) => sum + set.weight * set.reps, 0);
+
+        head.append(
+          make("div", "exercise-name", ex.name),
+          make("div", "muted", `${ex.sets.length} подходов · ${Math.round(volume)} кг`)
+        );
+
         box.appendChild(head);
 
-        ex.sets.forEach((set,idx)=>{
-          const row=make("div","set-row");
-          row.appendChild(make("div","",`${idx+1}. ${set.weight} кг × ${set.reps}`));
+        ex.sets.forEach((set, index) => {
+          const row = make("div", "set-row");
+          row.appendChild(make("div", "", `${index + 1}. ${set.weight} кг × ${set.reps}`));
 
-          const edit=make("button","edit-set-btn","✎"); edit.type="button"; edit.onclick=()=>openEditSetModal(ex.id,set.id,"draft");
-          const del=make("button","icon-btn","×"); del.type="button"; del.onclick=()=>deleteDraftSet(ex.id,set.id);
+          const edit = make("button", "edit-set-btn", "✎");
+          edit.type = "button";
+          edit.onclick = () => openEditSetModal(ex.id, set.id, "draft");
 
-          row.append(edit,del); box.appendChild(row);
+          const del = make("button", "icon-btn", "×");
+          del.type = "button";
+          del.onclick = () => deleteDraftSet(ex.id, set.id);
+
+          row.append(edit, del);
+          box.appendChild(row);
         });
 
         el.draftList.appendChild(box);
       });
     }
 
-    function renderHistory(){
+    function renderHistory() {
       el.historyList.replaceChildren();
-      if (!state.workouts.length) { el.historyList.appendChild(make("div","empty","Пока нет сохраненных тренировок")); return; }
 
-      [...state.workouts].sort((a,b)=>new Date(b.finishedAt)-new Date(a.finishedAt)).forEach(workout=>{
-        const stats=getWorkoutStats(workout);
+      if (!state.workouts.length) {
+        el.historyList.appendChild(make("div", "empty", "Пока нет сохраненных тренировок"));
+        return;
+      }
 
-        const row = make("div","history-row");
+      [...state.workouts].sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt)).forEach(workout => {
+        const stats = getWorkoutStats(workout);
 
-        const openBtn = make("button","history-item");
+        const row = make("div", "history-row");
+
+        const openBtn = make("button", "history-item");
         openBtn.type = "button";
         openBtn.onclick = () => openWorkout(workout.id);
         openBtn.append(
-          make("div","history-title",formatDateTitle(workout.finishedAt)),
-          make("div","muted",`${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`)
+          make("div", "history-title", formatDateTitle(workout.finishedAt)),
+          make("div", "muted", `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`)
         );
 
-        const csvBtn = make("button","mini-btn","CSV");
+        const csvBtn = make("button", "mini-btn", "CSV");
         csvBtn.type = "button";
         csvBtn.title = "Выгрузить CSV";
-        csvBtn.onclick = (e)=>{ e.stopPropagation(); exportWorkoutCsv(workout.id); };
+        csvBtn.onclick = event => {
+          event.stopPropagation();
+          exportWorkoutCsv(workout.id);
+        };
 
         row.append(openBtn, csvBtn);
         el.historyList.appendChild(row);
       });
     }
 
-    function renderProgress(){
+    function renderProgress() {
       const selected = el.progressSelect.value;
       el.progressSelect.replaceChildren();
-      const names=[...state.exercises].sort();
-      if(!names.length){
-        const o=document.createElement("option"); o.value=""; text(o,"Нет упражнений"); el.progressSelect.appendChild(o);
-        el.progressResult.replaceChildren(make("div","empty","Добавь первую тренировку")); return;
+
+      const names = [...state.exercises].sort();
+
+      if (!names.length) {
+        const option = document.createElement("option");
+        option.value = "";
+        text(option, "Нет упражнений");
+        el.progressSelect.appendChild(option);
+        el.progressResult.replaceChildren(make("div", "empty", "Добавь первую тренировку"));
+        return;
       }
-      names.forEach(name=>{ const o=document.createElement("option"); o.value=name; text(o,name); el.progressSelect.appendChild(o); });
+
+      names.forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        text(option, name);
+        el.progressSelect.appendChild(option);
+      });
+
       if (selected && names.includes(selected)) el.progressSelect.value = selected;
+
       showProgress();
     }
 
-    function showProgress(){
-      const name=el.progressSelect.value;
-      const entries=[];
-      state.workouts.forEach(w=>w.exercises.forEach(ex=>{ if(ex.name!==name) return; ex.sets.forEach(s=>entries.push({date:w.finishedAt,weight:s.weight,reps:s.reps,volume:s.weight*s.reps})); }));
-      el.progressResult.replaceChildren();
-      if(!entries.length){ el.progressResult.appendChild(make("div","empty","По этому упражнению пока нет подходов")); return; }
-      entries.sort((a,b)=>new Date(a.date)-new Date(b.date));
-      const maxWeight=Math.max(...entries.map(i=>i.weight));
-      const maxVolume=Math.max(...entries.map(i=>i.volume));
-      const last=entries.at(-1);
-      const grid=make("div","stats-grid");
-      [["Макс вес",`${maxWeight} кг`],["Лучший объем",`${Math.round(maxVolume)} кг`],["Подходов",entries.length],["Последний",`${last.weight}×${last.reps}`]].forEach(([l,v])=>{
-        const card=make("div","stat"); card.append(make("div","stat-num",v),make("div","muted",l)); grid.appendChild(card);
+    function showProgress() {
+      const name = el.progressSelect.value;
+      const entries = [];
+
+      state.workouts.forEach(workout => {
+        workout.exercises.forEach(ex => {
+          if (ex.name !== name) return;
+
+          ex.sets.forEach(set => {
+            entries.push({
+              date: workout.finishedAt,
+              weight: set.weight,
+              reps: set.reps,
+              volume: set.weight * set.reps
+            });
+          });
+        });
       });
+
+      el.progressResult.replaceChildren();
+
+      if (!entries.length) {
+        el.progressResult.appendChild(make("div", "empty", "По этому упражнению пока нет подходов"));
+        return;
+      }
+
+      entries.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      const maxWeight = Math.max(...entries.map(item => item.weight));
+      const maxVolume = Math.max(...entries.map(item => item.volume));
+      const last = entries[entries.length - 1];
+
+      const grid = make("div", "stats-grid");
+
+      [
+        ["Макс вес", `${maxWeight} кг`],
+        ["Лучший объем", `${Math.round(maxVolume)} кг`],
+        ["Подходов", entries.length],
+        ["Последний", `${last.weight}×${last.reps}`]
+      ].forEach(([label, value]) => {
+        const card = make("div", "stat");
+        card.append(make("div", "stat-num", value), make("div", "muted", label));
+        grid.appendChild(card);
+      });
+
       el.progressResult.appendChild(grid);
     }
 
-    function formatDateTitle(iso){
-      const d=new Date(iso), now=new Date();
-      const startToday=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-      const startDate=new Date(d.getFullYear(),d.getMonth(),d.getDate());
-      const diff=Math.round((startToday-startDate)/86400000);
-      if(diff===0) return "Сегодня"; if(diff===1) return "Вчера";
-      return d.toLocaleDateString("ru-RU",{day:"numeric",month:"long"});
+    function formatDateTitle(iso) {
+      const date = new Date(iso);
+      const now = new Date();
+
+      const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const diff = Math.round((startToday - startDate) / 86400000);
+
+      if (diff === 0) return "Сегодня";
+      if (diff === 1) return "Вчера";
+
+      return date.toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
     }
 
-    function updateForm(){
-      const name=el.exerciseInput.value.trim();
-      const weight=Number(String(el.weightInput.value).replace(",","."));
-      const reps=Number(el.repsInput.value);
-      const valid=Boolean(name)&&Number.isFinite(weight)&&weight>=0&&Number.isInteger(reps)&&reps>0;
-      el.addSetBtn.disabled=!valid;
-      el.repeatSetBtn.disabled=!getLastSet(name);
+    function updateForm() {
+      const name = el.exerciseInput.value.trim();
+      const weight = Number(String(el.weightInput.value).replace(",", "."));
+      const reps = Number(el.repsInput.value);
+      const valid = Boolean(name) && Number.isFinite(weight) && weight >= 0 && Number.isInteger(reps) && reps > 0;
+
+      el.addSetBtn.disabled = !valid;
+      el.repeatSetBtn.disabled = !getLastSet(name);
+
       text(el.formHint, valid ? "Готово к добавлению" : "Выбери упражнение, вес и повторы");
     }
 
-    function updateMainActions(){
-      const hasSets=getDraftStats().sets>0, isToday=state.tab==="today";
+    function updateMainActions() {
+      const hasSets = getDraftStats().sets > 0;
+      const isToday = state.tab === "today";
+
       if (tg && tg.MainButton) {
-        if (hasSets && isToday) { tg.MainButton.setText("Завершить тренировку"); tg.MainButton.show(); tg.MainButton.onClick(finishWorkout); }
-        else { tg.MainButton.hide(); }
-        el.fallbackFinishBtn.style.display="none"; return;
+        if (hasSets && isToday) {
+          tg.MainButton.setText("Завершить тренировку");
+          tg.MainButton.show();
+          tg.MainButton.onClick(finishWorkout);
+        } else {
+          tg.MainButton.hide();
+        }
+
+        el.fallbackFinishBtn.style.display = "none";
+        return;
       }
-      el.fallbackFinishBtn.style.display=hasSets&&isToday?"block":"none";
+
+      el.fallbackFinishBtn.style.display = hasSets && isToday ? "block" : "none";
     }
 
-    function addSet(){
-      const name=el.exerciseInput.value.trim();
-      const weight=Number(String(el.weightInput.value).replace(",","."));
-      const reps=Number(el.repsInput.value);
-      if(!name||!Number.isFinite(weight)||weight<0||!Number.isInteger(reps)||reps<=0){ toast("Проверь вес и повторы"); return; }
-      let ex=state.draft.exercises.find(i=>i.name.toLowerCase()===name.toLowerCase());
-      if(!ex){ ex={id:id(),name,sets:[]}; state.draft.exercises.push(ex); }
-      ex.sets.push({id:id(),weight,reps});
+    function addSet() {
+      const name = el.exerciseInput.value.trim();
+      const weight = Number(String(el.weightInput.value).replace(",", "."));
+      const reps = Number(el.repsInput.value);
+
+      if (!name || !Number.isFinite(weight) || weight < 0 || !Number.isInteger(reps) || reps <= 0) {
+        toast("Проверь вес и повторы");
+        return;
+      }
+
+      let ex = state.draft.exercises.find(item => item.name.toLowerCase() === name.toLowerCase());
+
+      if (!ex) {
+        ex = { id: id(), name, sets: [] };
+        state.draft.exercises.push(ex);
+      }
+
+      ex.sets.push({ id: id(), weight, reps });
       state.exercises.add(name);
-      el.weightInput.value=""; el.repsInput.value="";
-      hideKeyboard(); haptic(); persistLocal(); renderAll();
+
+      el.weightInput.value = "";
+      el.repsInput.value = "";
+
+      hideKeyboard();
+      haptic();
+      persistLocal();
+      renderAll();
     }
 
-    function getLastSet(name){
-      if(!name) return null;
-      const draftEx=state.draft.exercises.find(i=>i.name.toLowerCase()===name.toLowerCase());
-      if(draftEx&&draftEx.sets.length) return draftEx.sets.at(-1);
-      for(const w of [...state.workouts].reverse()){
-        const ex=w.exercises.find(i=>i.name.toLowerCase()===name.toLowerCase());
-        if(ex&&ex.sets.length) return ex.sets.at(-1);
+    function getLastSet(name) {
+      if (!name) return null;
+
+      const draftEx = state.draft.exercises.find(item => item.name.toLowerCase() === name.toLowerCase());
+      if (draftEx && draftEx.sets.length) return draftEx.sets[draftEx.sets.length - 1];
+
+      for (const workout of [...state.workouts].reverse()) {
+        const ex = workout.exercises.find(item => item.name.toLowerCase() === name.toLowerCase());
+        if (ex && ex.sets.length) return ex.sets[ex.sets.length - 1];
       }
+
       return null;
     }
 
-    function fillLastSet(){
-      const name=el.exerciseInput.value.trim(); const last=getLastSet(name);
-      if(!last) return; el.weightInput.value=last.weight; el.repsInput.value=last.reps; updateForm();
+    function fillLastSet() {
+      const name = el.exerciseInput.value.trim();
+      const last = getLastSet(name);
+
+      if (!last) return;
+
+      el.weightInput.value = last.weight;
+      el.repsInput.value = last.reps;
+      updateForm();
     }
 
-    function deleteDraftSet(exId,setId){
-      const ex=state.draft.exercises.find(i=>i.id===exId); if(!ex) return;
-      ex.sets=ex.sets.filter(s=>s.id!==setId);
-      state.draft.exercises=state.draft.exercises.filter(i=>i.sets.length);
-      haptic("medium"); persistLocal(); renderAll(); toast("Подход удален");
+    function deleteDraftSet(exId, setId) {
+      const ex = state.draft.exercises.find(item => item.id === exId);
+      if (!ex) return;
+
+      ex.sets = ex.sets.filter(set => set.id !== setId);
+      state.draft.exercises = state.draft.exercises.filter(item => item.sets.length);
+
+      haptic("medium");
+      persistLocal();
+      renderAll();
+      toast("Подход удален");
     }
 
-    function openEditSetModal(exId,setId,mode,workoutId){
-      const workout = mode==="history" ? state.workouts.find(i=>i.id===workoutId) : state.draft; if(!workout) return;
-      const ex=workout.exercises.find(i=>i.id===exId); if(!ex) return;
-      const set=ex.sets.find(i=>i.id===setId); if(!set) return;
+    function openEditSetModal(exId, setId, mode, workoutId) {
+      const workout = mode === "history" ? state.workouts.find(item => item.id === workoutId) : state.draft;
+      if (!workout) return;
 
-      openSheet(); el.modalBody.replaceChildren();
-      const title=make("div","title","Редактировать подход");
-      const form=make("div","modal-form");
+      const ex = workout.exercises.find(item => item.id === exId);
+      if (!ex) return;
 
-      const nameInput=document.createElement("input"); nameInput.value=ex.name; nameInput.placeholder="Упражнение"; nameInput.setAttribute("list","exerciseList"); nameInput.setAttribute("enterkeyhint","next");
-      const numbers=make("div","form-numbers");
-      const weightInput=document.createElement("input"); weightInput.value=set.weight; weightInput.placeholder="кг"; weightInput.inputMode="decimal"; weightInput.setAttribute("enterkeyhint","next");
-      const repsInput=document.createElement("input"); repsInput.value=set.reps; repsInput.placeholder="раз"; repsInput.inputMode="numeric"; repsInput.setAttribute("enterkeyhint","done");
-      numbers.append(weightInput,repsInput);
+      const set = ex.sets.find(item => item.id === setId);
+      if (!set) return;
 
-      const save=make("button","", "Сохранить");
-      const cancel=make("button","ghost","Отмена"); cancel.onclick=closeModal;
+      openSheet();
+      el.modalBody.replaceChildren();
 
-      save.onclick=()=>{
-        const newName=nameInput.value.trim();
-        const newWeight=Number(String(weightInput.value).replace(",","."));
-        const newReps=Number(repsInput.value);
-        if(!newName||!Number.isFinite(newWeight)||newWeight<0||!Number.isInteger(newReps)||newReps<=0){ toast("Проверь упражнение, вес и повторы"); return; }
-        moveOrUpdateSet(workout, exId, setId, newName, newWeight, newReps); hideKeyboard(); closeModal();
+      const title = make("div", "title", "Редактировать подход");
+      const form = make("div", "modal-form");
+
+      const nameInput = document.createElement("input");
+      nameInput.value = ex.name;
+      nameInput.placeholder = "Упражнение";
+      nameInput.setAttribute("list", "exerciseList");
+      nameInput.setAttribute("enterkeyhint", "next");
+
+      const numbers = make("div", "form-numbers");
+
+      const weightInput = document.createElement("input");
+      weightInput.value = set.weight;
+      weightInput.placeholder = "кг";
+      weightInput.inputMode = "decimal";
+      weightInput.setAttribute("enterkeyhint", "next");
+
+      const repsInput = document.createElement("input");
+      repsInput.value = set.reps;
+      repsInput.placeholder = "раз";
+      repsInput.inputMode = "numeric";
+      repsInput.setAttribute("enterkeyhint", "done");
+
+      numbers.append(weightInput, repsInput);
+
+      const save = make("button", "", "Сохранить");
+      save.type = "button";
+
+      const cancel = make("button", "ghost", "Отмена");
+      cancel.type = "button";
+      cancel.onclick = closeModal;
+
+      save.onclick = () => {
+        const newName = nameInput.value.trim();
+        const newWeight = Number(String(weightInput.value).replace(",", "."));
+        const newReps = Number(repsInput.value);
+
+        if (!newName || !Number.isFinite(newWeight) || newWeight < 0 || !Number.isInteger(newReps) || newReps <= 0) {
+          toast("Проверь упражнение, вес и повторы");
+          return;
+        }
+
+        moveOrUpdateSet(workout, exId, setId, newName, newWeight, newReps);
+        hideKeyboard();
+        closeModal();
       };
 
-      nameInput.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); weightInput.focus(); } });
-      weightInput.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); repsInput.focus(); } });
-      repsInput.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); save.click(); } });
+      nameInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          weightInput.focus();
+        }
+      });
 
-      form.append(nameInput,numbers,save,cancel);
-      el.modalBody.append(title,form);
-      setTimeout(()=>nameInput.focus(),120);
+      weightInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          repsInput.focus();
+        }
+      });
+
+      repsInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          save.click();
+        }
+      });
+
+      form.append(nameInput, numbers, save, cancel);
+      el.modalBody.append(title, form);
+
+      setTimeout(() => nameInput.focus(), 120);
     }
 
-    function moveOrUpdateSet(workout, exId, setId, newName, newWeight, newReps){
-      const oldEx=workout.exercises.find(i=>i.id===exId); if(!oldEx) return;
-      const idx=oldEx.sets.findIndex(i=>i.id===setId); if(idx===-1) return;
-      const updated={...oldEx.sets[idx], weight:newWeight, reps:newReps};
-      oldEx.sets.splice(idx,1);
-      let target=workout.exercises.find(i=>i.name.toLowerCase()===newName.toLowerCase());
-      if(!target){ target={id:id(),name:newName,sets:[]}; workout.exercises.push(target); }
-      target.sets.push(updated);
-      workout.exercises=workout.exercises.filter(i=>i.sets.length);
+    function moveOrUpdateSet(workout, exId, setId, newName, newWeight, newReps) {
+      const oldEx = workout.exercises.find(item => item.id === exId);
+      if (!oldEx) return;
+
+      const setIndex = oldEx.sets.findIndex(item => item.id === setId);
+      if (setIndex === -1) return;
+
+      const updatedSet = {
+        ...oldEx.sets[setIndex],
+        weight: newWeight,
+        reps: newReps
+      };
+
+      oldEx.sets.splice(setIndex, 1);
+
+      let targetEx = workout.exercises.find(item => item.name.toLowerCase() === newName.toLowerCase());
+
+      if (!targetEx) {
+        targetEx = { id: id(), name: newName, sets: [] };
+        workout.exercises.push(targetEx);
+      }
+
+      targetEx.sets.push(updatedSet);
+      workout.exercises = workout.exercises.filter(item => item.sets.length);
       state.exercises.add(newName);
-      haptic(); renderAll(); sync(); toast("Подход обновлен");
+
+      haptic();
+      renderAll();
+      sync();
+      toast("Подход обновлен");
     }
 
-    async function finishWorkout(){
-      if(!getDraftStats().sets) return;
-      const ans=await showPopup("Завершить тренировку?",[{id:"cancel",type:"cancel",text:"Отмена"},{id:"ok",type:"default",text:"Завершить"}]);
-      if(ans!=="ok") return;
-      state.workouts.push({...state.draft, status:"completed", finishedAt:new Date().toISOString()});
-      state.draft=createDraft();
-      haptic("heavy"); renderAll(); await sync(); toast("Тренировка сохранена");
+    async function finishWorkout() {
+      if (!getDraftStats().sets) return;
+
+      const answer = await showPopup("Завершить тренировку?", [
+        { id: "cancel", type: "cancel", text: "Отмена" },
+        { id: "ok", type: "default", text: "Завершить" }
+      ]);
+
+      if (answer !== "ok") return;
+
+      state.workouts.push({
+        ...state.draft,
+        status: "completed",
+        finishedAt: new Date().toISOString()
+      });
+
+      state.draft = createDraft();
+
+      haptic("heavy");
+      renderAll();
+      await sync();
+      toast("Тренировка сохранена");
     }
 
-    function openWorkout(workoutId){
-      const workout=state.workouts.find(i=>i.id===workoutId); if(!workout) return;
-      openSheet(); renderWorkoutModal(workout);
+    function openWorkout(workoutId) {
+      const workout = state.workouts.find(item => item.id === workoutId);
+      if (!workout) return;
+
+      openSheet();
+      renderWorkoutModal(workout);
     }
 
-    function renderWorkoutModal(workout){
+    function renderWorkoutModal(workout) {
       el.modalBody.replaceChildren();
-      const title=make("div","title",formatDateTitle(workout.finishedAt));
-      const stats=getWorkoutStats(workout);
-      const meta=make("div","meta",`${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`);
-      el.modalBody.append(title,meta);
 
-      workout.exercises.forEach(ex=>{
-        const box=make("div","exercise");
-        box.appendChild(make("div","exercise-name",ex.name));
-        ex.sets.forEach((set,idx)=>{
-          const row=make("div","set-row");
-          row.appendChild(make("div","",`${idx+1}. ${set.weight} кг × ${set.reps}`));
-          row.appendChild(make("div","muted",`${Math.round(set.weight*set.reps)} кг`));
+      const title = make("div", "title", formatDateTitle(workout.finishedAt));
+      const stats = getWorkoutStats(workout);
+      const meta = make("div", "meta", `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`);
+
+      el.modalBody.append(title, meta);
+
+      workout.exercises.forEach(ex => {
+        const box = make("div", "exercise");
+        box.appendChild(make("div", "exercise-name", ex.name));
+
+        ex.sets.forEach((set, index) => {
+          const row = make("div", "set-row");
+          row.appendChild(make("div", "", `${index + 1}. ${set.weight} кг × ${set.reps}`));
+          row.appendChild(make("div", "muted", `${Math.round(set.weight * set.reps)} кг`));
           box.appendChild(row);
         });
+
         el.modalBody.appendChild(box);
       });
 
-      // Sticky actions at the bottom of sheet: only Edit and Delete with large gap
-      const actionsWrap = make("div","sheet-actions");
-      const grid = make("div","grid");
-      const edit = make("button","", "Редактировать");
+      const actionsWrap = make("div", "sheet-actions");
+      const grid = make("div", "grid");
+
+      const edit = make("button", "", "Редактировать");
       edit.onclick = () => openEditWorkoutModal(workout.id);
-      const del = make("button","danger", "Удалить");
+
+      const del = make("button", "danger", "Удалить");
       del.onclick = () => deleteWorkout(workout.id);
+
       grid.append(edit, del);
       actionsWrap.appendChild(grid);
       el.modalBody.appendChild(actionsWrap);
     }
 
-    function openEditWorkoutModal(workoutId){
-      const workout=state.workouts.find(i=>i.id===workoutId); if(!workout) return;
-      openSheet(); el.modalBody.replaceChildren();
-      const title=make("div","title","Редактировать тренировку");
-      const list=make("div","modal-form");
+    function openEditWorkoutModal(workoutId) {
+      const workout = state.workouts.find(item => item.id === workoutId);
+      if (!workout) return;
 
-      workout.exercises.forEach(ex=>{
-        ex.sets.forEach(set=>{
-          const row=make("div","form-numbers");
-          row.dataset.exId=ex.id; row.dataset.setId=set.id;
-          const n=document.createElement("input"); n.value=ex.name; n.placeholder="Упражнение";
-          const w=document.createElement("input"); w.value=set.weight; w.inputMode="decimal"; w.placeholder="кг";
-          const r=document.createElement("input"); r.value=set.reps; r.inputMode="numeric"; r.placeholder="раз";
-          const del=make("button","danger","×"); del.type="button"; del.style.minWidth="44px"; del.onclick=()=>{ row.remove(); row.dataset.deleted="1"; };
-          const wrap=make("div","row"); wrap.append(n); const nums=make("div","form-numbers"); nums.append(w,r); const controls=make("div","row"); controls.append(del);
-          const card=make("div","card"); card.append(wrap, nums, controls); card.dataset.wrap="1"; card.dataset.setId=set.id; card.dataset.exId=ex.id;
-          // store inputs
-          card._name=n; card._weight=w; card._reps=r; card._deleted=false;
-          del.onclick=()=>{ card._deleted=true; card.remove(); };
+      openSheet();
+      el.modalBody.replaceChildren();
+
+      const title = make("div", "title", "Редактировать тренировку");
+      const list = make("div", "modal-form");
+
+      workout.exercises.forEach(ex => {
+        ex.sets.forEach(set => {
+          const card = make("div", "card");
+          card.dataset.setId = set.id;
+
+          const nameRow = make("div", "row");
+          const nameInput = document.createElement("input");
+          nameInput.value = ex.name;
+          nameInput.placeholder = "Упражнение";
+          nameRow.append(nameInput);
+
+          const nums = make("div", "form-numbers");
+          const weightInput = document.createElement("input");
+          weightInput.value = set.weight;
+          weightInput.inputMode = "decimal";
+          weightInput.placeholder = "кг";
+
+          const repsInput = document.createElement("input");
+          repsInput.value = set.reps;
+          repsInput.inputMode = "numeric";
+          repsInput.placeholder = "раз";
+
+          nums.append(weightInput, repsInput);
+
+          const controls = make("div", "row");
+          const del = make("button", "danger", "Удалить подход");
+          del.type = "button";
+          del.onclick = () => {
+            card._deleted = true;
+            card.remove();
+          };
+          controls.append(del);
+
+          card._name = nameInput;
+          card._weight = weightInput;
+          card._reps = repsInput;
+          card._deleted = false;
+
+          card.append(nameRow, nums, controls);
           list.appendChild(card);
         });
       });
 
-      const actionsWrap = make("div","sheet-actions");
-      const grid = make("div","grid");
-      const save=make("button","", "Сохранить изменения");
-      save.onclick=()=>saveWorkoutEdit(workoutId, list);
-      const cancel=make("button","ghost","Отмена");
-      cancel.onclick=()=>renderWorkoutModal(workout);
+      const actionsWrap = make("div", "sheet-actions");
+      const grid = make("div", "grid");
+
+      const save = make("button", "", "Сохранить");
+      save.onclick = () => saveWorkoutEdit(workoutId, list);
+
+      const cancel = make("button", "ghost", "Отмена");
+      cancel.onclick = () => renderWorkoutModal(workout);
+
       grid.append(save, cancel);
       actionsWrap.appendChild(grid);
 
       el.modalBody.append(title, list, actionsWrap);
     }
 
-    function saveWorkoutEdit(workoutId, list){
-      const workout=state.workouts.find(i=>i.id===workoutId); if(!workout) return;
-      const map=new Map();
+    function saveWorkoutEdit(workoutId, list) {
+      const workout = state.workouts.find(item => item.id === workoutId);
+      if (!workout) return;
 
-      [...list.children].forEach(card=>{
-        if(card._deleted) return;
-        const name=card._name.value.trim();
-        const weight=Number(String(card._weight.value).replace(",","."));
-        const reps=Number(card._reps.value);
-        if(!name||!Number.isFinite(weight)||weight<0||!Number.isInteger(reps)||reps<=0) return;
-        const key=name.toLowerCase();
-        if(!map.has(key)) map.set(key,{id:id(),name,sets:[]});
-        map.get(key).sets.push({id:card.dataset.setId||id(),weight,reps});
+      const map = new Map();
+
+      [...list.children].forEach(card => {
+        if (card._deleted) return;
+
+        const name = card._name.value.trim();
+        const weight = Number(String(card._weight.value).replace(",", "."));
+        const reps = Number(card._reps.value);
+
+        if (!name || !Number.isFinite(weight) || weight < 0 || !Number.isInteger(reps) || reps <= 0) return;
+
+        const key = name.toLowerCase();
+
+        if (!map.has(key)) {
+          map.set(key, { id: id(), name, sets: [] });
+        }
+
+        map.get(key).sets.push({
+          id: card.dataset.setId || id(),
+          weight,
+          reps
+        });
+
         state.exercises.add(name);
       });
 
-      const exercises=[...map.values()].filter(ex=>ex.sets.length);
-      if(!exercises.length){ toast("Нужен хотя бы один подход"); return; }
+      const exercises = [...map.values()].filter(ex => ex.sets.length);
 
-      workout.exercises=exercises;
-      hideKeyboard(); haptic(); renderAll(); sync(); renderWorkoutModal(workout); toast("Тренировка обновлена");
+      if (!exercises.length) {
+        toast("Нужен хотя бы один подход");
+        return;
+      }
+
+      workout.exercises = exercises;
+
+      hideKeyboard();
+      haptic();
+      renderAll();
+      sync();
+      renderWorkoutModal(workout);
+      toast("Тренировка обновлена");
     }
 
-    function exportWorkoutCsv(workoutId){
-      const workout=state.workouts.find(i=>i.id===workoutId); if(!workout) return;
-      const rows=[["Дата","Упражнение","Подход","Вес","Повторы","Объем"]];
-      workout.exercises.forEach(ex=>ex.sets.forEach((set,idx)=>{
-        rows.push([new Date(workout.finishedAt).toLocaleString("ru-RU"), ex.name, idx+1, String(set.weight).replace(".",","), set.reps, String(set.weight*set.reps).replace(".",",")]);
-      }));
-      const csv=rows.map(r=>r.map(c=>`"${String(c).replaceAll('"','""')}"`).join(";")).join("\n");
-      const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement("a"); const date=new Date(workout.finishedAt).toISOString().slice(0,10);
-      a.href=url; a.download=`workout-${date}.csv`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    function exportWorkoutCsv(workoutId) {
+      const workout = state.workouts.find(item => item.id === workoutId);
+      if (!workout) return;
+
+      const rows = [
+        ["Дата", "Упражнение", "Подход", "Вес", "Повторы", "Объем"]
+      ];
+
+      workout.exercises.forEach(ex => {
+        ex.sets.forEach((set, index) => {
+          rows.push([
+            new Date(workout.finishedAt).toLocaleString("ru-RU"),
+            ex.name,
+            index + 1,
+            String(set.weight).replace(".", ","),
+            set.reps,
+            String(set.weight * set.reps).replace(".", ",")
+          ]);
+        });
+      });
+
+      const csv = rows.map(row => {
+        return row.map(cell => `"${String(cell).replaceAll('"', '""')}"`).join(";");
+      }).join("\n");
+
+      const blob = new Blob(["\uFEFF" + csv], {
+        type: "text/csv;charset=utf-8"
+      });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const date = new Date(workout.finishedAt).toISOString().slice(0, 10);
+
+      a.href = url;
+      a.download = `workout-${date}.csv`;
+
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(url);
       toast("CSV-файл создан");
     }
 
-    async function deleteWorkout(workoutId){
-      const ans=await showPopup("Удалить тренировку?",[{id:"cancel",type:"cancel",text:"Отмена"},{id:"ok",type:"destructive",text:"Удалить"}]);
-      if(ans!=="ok") return;
-      state.workouts=state.workouts.filter(i=>i.id!==workoutId);
-      closeModal(); haptic("medium"); renderAll(); await sync(); toast("Тренировка удалена");
+    async function deleteWorkout(workoutId) {
+      const answer = await showPopup("Удалить тренировку?", [
+        { id: "cancel", type: "cancel", text: "Отмена" },
+        { id: "ok", type: "destructive", text: "Удалить" }
+      ]);
+
+      if (answer !== "ok") return;
+
+      state.workouts = state.workouts.filter(item => item.id !== workoutId);
+
+      closeModal();
+      haptic("medium");
+      renderAll();
+      await sync();
+      toast("Тренировка удалена");
     }
 
-    function openSheet(){ el.modal.classList.add("open"); if(tg && tg.BackButton){ tg.BackButton.show(); tg.BackButton.onClick(closeModal); } }
-    function closeModal(){ el.modal.classList.remove("open"); hideKeyboard(); if(tg && tg.BackButton) tg.BackButton.hide(); }
+    function openSheet() {
+      el.modal.classList.add("open");
 
-    // UI events
-    el.tabs.forEach(tab=>tab.addEventListener("click",()=>{ state.tab=tab.dataset.tab; haptic(); renderAll(); }));
-    [el.exerciseInput, el.weightInput, el.repsInput].forEach(i=>i.addEventListener("input",updateForm));
-    el.exerciseInput.addEventListener("change",fillLastSet);
-    el.exerciseInput.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); el.weightInput.focus(); } });
-    el.weightInput.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); el.repsInput.focus(); } });
-    el.repsInput.addEventListener("keydown",e=>{ if(e.key==="Enter" && !el.addSetBtn.disabled){ e.preventDefault(); addSet(); } });
-    el.addSetBtn.addEventListener("click",addSet);
-    el.repeatSetBtn.addEventListener("click",fillLastSet);
-    el.fallbackFinishBtn.addEventListener("click",finishWorkout);
-    el.progressSelect.addEventListener("change",showProgress);
-    el.modal.addEventListener("click",e=>{ if(e.target===el.modal) closeModal(); });
+      if (tg && tg.BackButton) {
+        tg.BackButton.show();
+        tg.BackButton.onClick(closeModal);
+      }
+    }
 
-    function init(){ if(tg){ tg.ready(); tg.expand(); } loadData(); }
+    function closeModal() {
+      el.modal.classList.remove("open");
+      hideKeyboard();
+
+      if (tg && tg.BackButton) {
+        tg.BackButton.hide();
+      }
+    }
+
+    el.tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        state.tab = tab.dataset.tab;
+        haptic();
+        renderAll();
+      });
+    });
+
+    [el.exerciseInput, el.weightInput, el.repsInput].forEach(input => {
+      input.addEventListener("input", updateForm);
+    });
+
+    el.exerciseInput.addEventListener("change", fillLastSet);
+
+    el.exerciseInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        el.weightInput.focus();
+      }
+    });
+
+    el.weightInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        el.repsInput.focus();
+      }
+    });
+
+    el.repsInput.addEventListener("keydown", event => {
+      if (event.key === "Enter" && !el.addSetBtn.disabled) {
+        event.preventDefault();
+        addSet();
+      }
+    });
+
+    el.addSetBtn.addEventListener("click", addSet);
+    el.repeatSetBtn.addEventListener("click", fillLastSet);
+    el.fallbackFinishBtn.addEventListener("click", finishWorkout);
+    el.progressSelect.addEventListener("change", showProgress);
+
+    el.modal.addEventListener("click", event => {
+      if (event.target === el.modal) closeModal();
+    });
+
+    function init() {
+      if (tg) {
+        tg.ready();
+        tg.expand();
+      }
+
+      loadData();
+    }
+
     init();
   </script>
 </body>
 </html>
+```
