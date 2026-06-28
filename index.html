@@ -6,7 +6,6 @@
     <title>Дневник тренировок</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* ... весь стиль как в прошлый раз ... */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, system-ui, sans-serif; }
         html, body { height: 100%; }
         body {
@@ -17,13 +16,17 @@
             flex-direction: column;
         }
         #app { flex: 1; display: flex; flex-direction: column; }
+
         .card { background: var(--tg-theme-secondary-bg-color, #f5f5f5); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
         input, button { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 16px; margin-bottom: 10px; }
         input { background: var(--tg-theme-secondary-bg-color, #f0f0f0); color: var(--tg-theme-text-color, #000); }
         button { background: var(--tg-theme-button-color, #007aff); color: var(--tg-theme-button-text-color, #fff); font-weight: 600; cursor: pointer; }
+        .btn-danger { background: #ff3b30; }
+        .btn-success { background: #34c759; }
+        .btn-warning { background: #ff9500; }
         .row { display: flex; gap: 10px; }
         .row input { flex: 1; }
-        .set { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 14px; }
+        .set-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 14px; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .stat-card { background: var(--tg-theme-secondary-bg-color, #f5f5f5); padding: 12px; border-radius: 10px; text-align: center; }
         .stat-card .num { font-size: 24px; font-weight: 700; color: var(--tg-theme-button-color, #007aff); }
@@ -67,6 +70,199 @@
         .sync-status { font-size: 12px; opacity: 0.6; text-align: center; padding: 4px; margin-top: 4px; }
         .sync-status.synced { color: #34c759; }
         .sync-status.syncing { color: #ff9500; }
+
+        /* ===== ИСТОРИЯ СО СВАЙПОМ ===== */
+        .history-wrapper {
+            overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        .history-row {
+            display: flex;
+            transition: transform 0.3s ease;
+            touch-action: pan-y;
+        }
+        .history-row.swiped {
+            transform: translateX(-120px);
+        }
+        .history-card {
+            flex: 1;
+            min-width: 0;
+            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            padding: 14px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.15s;
+        }
+        .history-card:active {
+            background: var(--tg-theme-secondary-bg-color, #e5e5e5);
+        }
+        .history-card .title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .history-card .sub {
+            font-size: 13px;
+            opacity: 0.6;
+            margin-top: 2px;
+        }
+        .history-card .meta {
+            font-size: 12px;
+            opacity: 0.5;
+            margin-top: 4px;
+        }
+        .history-actions {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            flex-shrink: 0;
+            width: 120px;
+            margin-left: -120px;
+        }
+        .history-actions button {
+            width: 60px;
+            height: 100%;
+            min-height: 70px;
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0;
+            margin: 0;
+            padding: 0;
+            flex-shrink: 0;
+        }
+        .history-actions .btn-edit-action {
+            background: #ff9500;
+            border-radius: 12px 0 0 12px;
+        }
+        .history-actions .btn-delete-action {
+            background: #ff3b30;
+            border-radius: 0 12px 12px 0;
+        }
+
+        /* ===== МОДАЛЬНОЕ ОКНО ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            animation: fadeIn 0.25s ease;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--tg-theme-bg-color, #fff);
+            width: 100%;
+            max-width: 500px;
+            max-height: 80vh;
+            border-radius: 20px 20px 0 0;
+            padding: 24px 20px 30px;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+        .modal-content .modal-handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 2px;
+            margin: 0 auto 16px;
+        }
+        .modal-content .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .modal-content .modal-date {
+            font-size: 14px;
+            opacity: 0.6;
+            margin-bottom: 16px;
+        }
+        .modal-content .modal-set {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-size: 15px;
+        }
+        .modal-content .modal-close {
+            margin-top: 16px;
+            background: var(--tg-theme-button-color, #007aff);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Режим редактирования в модалке */
+        .modal-edit-input {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 4px 0;
+        }
+        .modal-edit-input input {
+            width: 60px;
+            padding: 6px 8px;
+            font-size: 14px;
+            margin: 0;
+            border-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            color: var(--tg-theme-text-color, #000);
+        }
+        .modal-edit-input input.ex-name-input {
+            width: 100px;
+        }
+        .modal-edit-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .modal-edit-actions button {
+            padding: 10px 20px;
+            font-size: 14px;
+            width: auto;
+            margin: 0;
+            border-radius: 10px;
+        }
+        .modal-del-set-btn {
+            background: none;
+            border: none;
+            color: #ff3b30;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 8px;
+            width: auto;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -93,15 +289,13 @@
                 <div class="card">
                     <h3 style="margin-bottom:10px;">Текущая тренировка</h3>
                     <div id="current-workout"><p style="opacity:0.5;">Пока ничего нет</p></div>
-                    <button onclick="saveWorkout()" style="background: #34c759; margin-top:10px;">💾 Сохранить</button>
+                    <button onclick="saveWorkout()" class="btn-success">💾 Сохранить</button>
                     <div id="syncStatus" class="sync-status">☁️ Данные в облаке</div>
                 </div>
             </div>
 
             <div id="tab-history" class="hidden">
-                <div class="card" id="history-list">
-                    <p style="opacity:0.5;">История пуста</p>
-                </div>
+                <div id="history-list"></div>
             </div>
 
             <div id="tab-stats" class="hidden">
@@ -121,11 +315,20 @@
         <span class="action" id="timerAction">▶</span>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+        <div class="modal-content" id="modalContent">
+            <div class="modal-handle"></div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
     <script>
         // ===== ОСНОВНЫЕ ДАННЫЕ =====
         let workouts = [];
         let currentSets = [];
         let allExercises = new Set();
+        let editingModalIndex = null;
 
         // ===== CLOUD STORAGE =====
         let cloudStorage = null;
@@ -135,9 +338,6 @@
             if (window.Telegram && Telegram.WebApp) {
                 cloudStorage = Telegram.WebApp.CloudStorage;
                 isCloudReady = true;
-                console.log('☁️ CloudStorage готов');
-            } else {
-                console.warn('⚠️ Telegram WebApp не инициализирован');
             }
         }
 
@@ -150,15 +350,10 @@
                 try {
                     const json = JSON.stringify(data);
                     cloudStorage.setItem(key, json, (error, success) => {
-                        if (error) {
-                            reject(error);
-                        } else {
-                            resolve(success);
-                        }
+                        if (error) reject(error);
+                        else resolve(success);
                     });
-                } catch (e) {
-                    reject(e);
-                }
+                } catch (e) { reject(e); }
             });
         }
 
@@ -169,42 +364,17 @@
                     return;
                 }
                 cloudStorage.getItem(key, (error, value) => {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        try {
-                            resolve(value ? JSON.parse(value) : null);
-                        } catch (e) {
-                            reject(e);
-                        }
-                    }
-                });
-            });
-        }
-
-        function getCloudKeys() {
-            return new Promise((resolve, reject) => {
-                if (!isCloudReady || !cloudStorage) {
-                    reject(new Error('CloudStorage недоступен'));
-                    return;
-                }
-                cloudStorage.getKeys((error, keys) => {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        resolve(keys || []);
+                    if (error) reject(error);
+                    else {
+                        try { resolve(value ? JSON.parse(value) : null); }
+                        catch (e) { reject(e); }
                     }
                 });
             });
         }
 
         // ===== СЕКУНДОМЕР =====
-        let milliseconds = 0;
-        let seconds = 0;
-        let interval = null;
-        let isRunning = false;
-        let startTime = 0;
-
+        let milliseconds = 0, seconds = 0, interval = null, isRunning = false, startTime = 0;
         const timerBtn = document.getElementById('timerBtn');
         const timerDisplay = document.getElementById('timerDisplay');
 
@@ -268,13 +438,8 @@
                     workouts.forEach(w => {
                         w.sets.forEach(s => allExercises.add(s.name));
                     });
-                    console.log(`☁️ Загружено ${workouts.length} тренировок из облака`);
-                } else {
-                    console.log('☁️ В облаке данных нет, начинаем с нуля');
                 }
             } catch (e) {
-                console.warn('⚠️ Не удалось загрузить из облака:', e);
-                // пробуем локальный бэкап
                 try {
                     const local = localStorage.getItem('workouts_backup');
                     if (local) {
@@ -282,15 +447,40 @@
                         workouts.forEach(w => {
                             w.sets.forEach(s => allExercises.add(s.name));
                         });
-                        console.log(`📱 Загружено ${workouts.length} из локального бэкапа`);
                     }
-                } catch (e2) {
-                    console.warn('⚠️ Нет локального бэкапа');
-                }
+                } catch (e2) {}
             }
             updateExerciseList();
             renderHistory();
             renderCurrentWorkout();
+        }
+
+        async function syncToCloud() {
+            const statusEl = document.getElementById('syncStatus');
+            if (statusEl) {
+                statusEl.textContent = '☁️ Синхронизация...';
+                statusEl.className = 'sync-status syncing';
+            }
+            try {
+                await saveToCloud('workouts', workouts);
+                localStorage.setItem('workouts_backup', JSON.stringify(workouts));
+                if (statusEl) {
+                    statusEl.textContent = '✅ Сохранено в облаке';
+                    statusEl.className = 'sync-status synced';
+                }
+            } catch (e) {
+                localStorage.setItem('workouts_backup', JSON.stringify(workouts));
+                if (statusEl) {
+                    statusEl.textContent = '⚠️ Сохранено локально';
+                    statusEl.className = 'sync-status';
+                }
+            }
+            if (statusEl) {
+                setTimeout(() => {
+                    statusEl.textContent = '☁️ Данные в облаке';
+                    statusEl.className = 'sync-status';
+                }, 3000);
+            }
         }
 
         function addSet() {
@@ -314,7 +504,7 @@
                 return;
             }
             div.innerHTML = currentSets.map((s, i) =>
-                `<div class="set"><span>${s.name}</span><span>${s.weight}кг × ${s.reps}</span></div>`
+                `<div class="set-item"><span>${s.name} — ${s.weight}кг × ${s.reps}</span></div>`
             ).join('');
         }
 
@@ -323,48 +513,249 @@
             const now = new Date();
             const date = now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             workouts.push({ date, sets: [...currentSets] });
-
-            const statusEl = document.getElementById('syncStatus');
-            statusEl.textContent = '☁️ Синхронизация...';
-            statusEl.className = 'sync-status syncing';
-
-            try {
-                await saveToCloud('workouts', workouts);
-                // бэкап в localStorage на случай проблем
-                localStorage.setItem('workouts_backup', JSON.stringify(workouts));
-                statusEl.textContent = '✅ Сохранено в облаке';
-                statusEl.className = 'sync-status synced';
-            } catch (e) {
-                console.error('❌ Ошибка сохранения в облако:', e);
-                // сохраняем локально как бэкап
-                localStorage.setItem('workouts_backup', JSON.stringify(workouts));
-                statusEl.textContent = '⚠️ Сохранено локально (ошибка облака)';
-                statusEl.className = 'sync-status';
-            }
-
             currentSets = [];
             renderCurrentWorkout();
             renderHistory();
-            setTimeout(() => {
-                statusEl.textContent = '☁️ Данные в облаке';
-                statusEl.className = 'sync-status';
-            }, 3000);
+            await syncToCloud();
         }
+
+        // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
+        function getDayName(dateStr) {
+            const parts = dateStr.split(' ');
+            const d = parts[0].split('.');
+            const date = new Date(parseInt(d[2]), parseInt(d[1])-1, parseInt(d[0]));
+            const days = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+            return days[date.getDay()];
+        }
+
+        function getExercisesCount(sets) {
+            const unique = new Set(sets.map(s => s.name));
+            return unique.size;
+        }
+
+        function getTotalSets(sets) {
+            return sets.length;
+        }
+
+        // ===== ИСТОРИЯ СО СВАЙПОМ =====
+        let touchStartX = 0;
+        let touchCurrentX = 0;
+        let currentSwipeRow = null;
 
         function renderHistory() {
             const div = document.getElementById('history-list');
             if (workouts.length === 0) {
-                div.innerHTML = '<p style="opacity:0.5;">История пуста</p>';
+                div.innerHTML = '<div class="card"><p style="opacity:0.5;">История пуста</p></div>';
                 return;
             }
-            div.innerHTML = workouts.slice().reverse().map(w =>
-                `<div style="margin-bottom:12px;padding:12px;background:var(--tg-theme-secondary-bg-color,#f5f5f5);border-radius:10px;">
-                    <strong>${w.date}</strong>
-                    ${w.sets.map(s => `<div class="set"><span>${s.name}</span><span>${s.weight}кг × ${s.reps}</span></div>`).join('')}
-                </div>`
-            ).join('');
+
+            let html = '';
+            workouts.slice().reverse().forEach((w, idx) => {
+                const realIndex = workouts.length - 1 - idx;
+                const dayName = getDayName(w.date);
+                const exCount = getExercisesCount(w.sets);
+                const setCount = getTotalSets(w.sets);
+
+                html += `
+                    <div class="history-wrapper" data-index="${realIndex}">
+                        <div class="history-row" id="row-${realIndex}">
+                            <div class="history-card" onclick="openModal(${realIndex})">
+                                <div class="title">🏋️ Тренировка в ${dayName}</div>
+                                <div class="sub">${w.date}</div>
+                                <div class="meta">${exCount} упражнений · ${setCount} подходов</div>
+                            </div>
+                            <div class="history-actions">
+                                <button class="btn-edit-action" onclick="openModal(${realIndex})">✏️</button>
+                                <button class="btn-delete-action" onclick="deleteWorkout(${realIndex})">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            div.innerHTML = html;
+
+            // Добавляем обработчики свайпа
+            document.querySelectorAll('.history-row').forEach(row => {
+                const wrapper = row.closest('.history-wrapper');
+                row.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                    touchCurrentX = touchStartX;
+                    currentSwipeRow = row;
+                }, { passive: true });
+
+                row.addEventListener('touchmove', (e) => {
+                    if (!currentSwipeRow) return;
+                    const deltaX = e.touches[0].clientX - touchStartX;
+                    if (deltaX < -20) {
+                        currentSwipeRow.classList.add('swiped');
+                    } else if (deltaX > 20) {
+                        currentSwipeRow.classList.remove('swiped');
+                    }
+                }, { passive: true });
+
+                row.addEventListener('touchend', () => {
+                    currentSwipeRow = null;
+                }, { passive: true });
+
+                // Для мыши (десктоп)
+                let mouseDownX = 0;
+                let isDragging = false;
+                row.addEventListener('mousedown', (e) => {
+                    mouseDownX = e.clientX;
+                    isDragging = false;
+                });
+                row.addEventListener('mousemove', (e) => {
+                    if (e.buttons === 1) {
+                        const deltaX = e.clientX - mouseDownX;
+                        if (Math.abs(deltaX) > 10) isDragging = true;
+                        if (deltaX < -20) {
+                            row.classList.add('swiped');
+                        } else if (deltaX > 20) {
+                            row.classList.remove('swiped');
+                        }
+                    }
+                });
+                row.addEventListener('mouseup', () => {
+                    if (isDragging) {
+                        isDragging = false;
+                    }
+                });
+            });
         }
 
+        // ===== МОДАЛЬНОЕ ОКНО =====
+        function openModal(index) {
+            editingModalIndex = null;
+            const overlay = document.getElementById('modalOverlay');
+            const body = document.getElementById('modalBody');
+            const w = workouts[index];
+            if (!w) return;
+
+            let setsHtml = w.sets.map((s, si) => `
+                <div class="modal-set">
+                    <span>${s.name}</span>
+                    <span>${s.weight}кг × ${s.reps}</span>
+                </div>
+            `).join('');
+
+            body.innerHTML = `
+                <div class="modal-title">🏋️ Тренировка в ${getDayName(w.date)}</div>
+                <div class="modal-date">${w.date}</div>
+                <div style="margin: 12px 0 4px; font-size: 13px; opacity:0.6;">Упражнения и подходы</div>
+                ${setsHtml}
+                <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn-warning" onclick="openEditModal(${index})" style="flex:1;">✏️ Редактировать</button>
+                    <button class="btn-danger" onclick="deleteWorkout(${index}); closeModal();" style="flex:1;">🗑️ Удалить</button>
+                </div>
+                <button class="modal-close" onclick="closeModal()">Закрыть</button>
+            `;
+
+            overlay.classList.add('open');
+        }
+
+        function openEditModal(index) {
+            editingModalIndex = index;
+            const w = workouts[index];
+            if (!w) return;
+
+            let setsHtml = w.sets.map((s, si) => `
+                <div class="modal-set" style="flex-wrap:wrap; gap:6px;">
+                    <div class="modal-edit-input">
+                        <input type="text" class="ex-name-input" value="${s.name}" data-set="${si}">
+                        <input type="number" class="edit-weight" value="${s.weight}" data-set="${si}">
+                        <span>×</span>
+                        <input type="number" class="edit-reps" value="${s.reps}" data-set="${si}">
+                        <button class="modal-del-set-btn" onclick="deleteSetFromModal(${index}, ${si})">✕</button>
+                    </div>
+                </div>
+            `).join('');
+
+            const body = document.getElementById('modalBody');
+            body.innerHTML = `
+                <div class="modal-title">✏️ Редактирование</div>
+                <div class="modal-date">${w.date}</div>
+                <div style="margin: 12px 0 4px; font-size: 13px; opacity:0.6;">Редактируйте подходы</div>
+                ${setsHtml}
+                <div class="modal-edit-actions">
+                    <button class="btn-success" onclick="saveEditModal(${index})">💾 Сохранить</button>
+                    <button class="btn-danger" onclick="openModal(${index})">↩ Отмена</button>
+                </div>
+                <button class="modal-close" onclick="closeModal()">Закрыть</button>
+            `;
+        }
+
+        function deleteSetFromModal(index, setIdx) {
+            if (workouts[index]) {
+                workouts[index].sets.splice(setIdx, 1);
+                if (workouts[index].sets.length === 0) {
+                    workouts.splice(index, 1);
+                    closeModal();
+                } else {
+                    openEditModal(index);
+                }
+                renderHistory();
+                syncToCloud();
+            }
+        }
+
+        function saveEditModal(index) {
+            const body = document.getElementById('modalBody');
+            const exInputs = body.querySelectorAll('.ex-name-input');
+            const weightInputs = body.querySelectorAll('.edit-weight');
+            const repInputs = body.querySelectorAll('.edit-reps');
+
+            const newSets = [];
+            let valid = true;
+            exInputs.forEach((el, i) => {
+                const name = el.value.trim();
+                const weight = parseFloat(weightInputs[i].value);
+                const reps = parseInt(repInputs[i].value);
+                if (name && weight && reps) {
+                    newSets.push({ name, weight, reps });
+                    allExercises.add(name);
+                } else {
+                    valid = false;
+                }
+            });
+
+            if (!valid || newSets.length === 0) {
+                alert('Заполните все поля корректно');
+                return;
+            }
+
+            workouts[index].sets = newSets;
+            editingModalIndex = null;
+            updateExerciseList();
+            renderHistory();
+            syncToCloud();
+            openModal(index);
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('open');
+            editingModalIndex = null;
+        }
+
+        function closeModalOutside(e) {
+            if (e.target === document.getElementById('modalOverlay')) {
+                closeModal();
+            }
+        }
+
+        // ===== УДАЛЕНИЕ ТРЕНИРОВКИ =====
+        function deleteWorkout(index) {
+            if (confirm('Удалить эту тренировку?')) {
+                workouts.splice(index, 1);
+                renderHistory();
+                syncToCloud();
+                if (document.getElementById('modalOverlay').classList.contains('open')) {
+                    closeModal();
+                }
+            }
+        }
+
+        // ===== ПРОГРЕСС =====
         function showProgress() {
             const exName = document.getElementById('stats-ex').value.trim();
             const div = document.getElementById('stats-result');
@@ -389,6 +780,7 @@
             `;
         }
 
+        // ===== ВКЛАДКИ =====
         function showTab(tab) {
             document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
             document.querySelector(`.tab-bar button:nth-child(${tab === 'training' ? 1 : tab === 'history' ? 2 : 3})`).classList.add('active');
@@ -399,7 +791,6 @@
         }
 
         // ===== ИНИЦИАЛИЗАЦИЯ =====
-        // Ждём загрузки Telegram WebApp
         function initApp() {
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.ready();
@@ -408,12 +799,10 @@
                 loadData();
                 updateUI();
             } else {
-                // Если WebApp не загрузился — пробуем ещё раз через 500ms
                 setTimeout(initApp, 500);
             }
         }
 
-        // Запускаем
         initApp();
     </script>
 </body>
