@@ -446,13 +446,13 @@
   <div class="app">
     <header class="top">
       <div>
-        <div class="title" id="screenTitle">Сегодня</div>
+        <div class="title" id="screenTitle">Трена</div>
         <div class="meta" id="screenMeta">Загрузка данных</div>
       </div>
     </header>
 
     <nav class="tabs">
-      <button class="tab active" data-tab="today">Сегодня</button>
+      <button class="tab active" data-tab="today">Трена</button>
       <button class="tab" data-tab="history">История</button>
       <button class="tab" data-tab="progress">Прогресс</button>
     </nav>
@@ -728,7 +728,7 @@
     }
 
     function updateMeta() {
-      text(el.screenTitle, state.tab === "today" ? "Сегодня" : state.tab === "history" ? "История" : "Прогресс");
+      text(el.screenTitle, state.tab === "today" ? "Трена" : state.tab === "history" ? "История" : "Прогресс");
 
       if (state.syncing) {
         text(el.screenMeta, "Синхронизация");
