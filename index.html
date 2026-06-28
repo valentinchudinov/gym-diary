@@ -248,7 +248,7 @@
     }
     .history-row {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr auto auto;
       gap: 8px;
       align-items: center;
       margin-bottom: 9px;
@@ -752,13 +752,20 @@
           );
 
           const csvBtn = make("button", "mini-btn", "CSV");
-          csvBtn.onclick = event => {
-            event.stopPropagation();
-            exportWorkoutCsv(workout.id);
-          };
+            csvBtn.onclick = event => {
+              event.stopPropagation();
+              exportWorkoutCsv(workout.id);
+            };
 
-          row.append(openBtn, csvBtn);
-          groupNode.appendChild(row);
+            const deleteBtn = make("button", "mini-btn danger", "×");
+            deleteBtn.title = "Удалить тренировку";
+            deleteBtn.onclick = event => {
+              event.stopPropagation();
+              deleteWorkout(workout.id);
+            };
+
+            row.append(openBtn, csvBtn, deleteBtn);
+            groupNode.appendChild(row);
         });
 
         el.historyList.appendChild(groupNode);
