@@ -1,10 +1,9 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Дневник тренировок</title>
+  <title>Святилище ТРЕНЕРА</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -12,7 +11,6 @@
     :root {
       --bg: #070707;
       --panel: #121212;
-      --panel-2: #1a1a1a;
       --line: rgba(255,255,255,.09);
       --text: #ffffff;
       --muted: rgba(255,255,255,.58);
@@ -108,7 +106,7 @@
     }
 
     .splash-title {
-      max-width: 320px;
+      max-width: 360px;
       font-size: 42px;
       line-height: 1.05;
       font-weight: 850;
@@ -439,8 +437,8 @@
   <div class="splash" id="splash">
     <img class="splash-img" src="loading.jpg" alt="Загрузка" />
     <div class="splash-content">
-      <div class="splash-title">Train<br><span>Harder</span></div>
-      <div class="splash-sub">Дневник подходов, веса и прогресса без лишних экранов.</div>
+      <div class="splash-title">Святилище<br><span>ТРЕНЕРА</span></div>
+      <div class="splash-sub">всем привет сегодня трена</div>
       <div class="loader"><i></i></div>
     </div>
   </div>
@@ -683,7 +681,7 @@
       renderAll();
       sync();
 
-      const left = Math.max(0, 1200 - (Date.now() - started));
+      const left = Math.max(0, 2500 - (Date.now() - started));
       setTimeout(() => el.splash.classList.add("hide"), left);
     }
 
@@ -1248,6 +1246,7 @@
           nameRow.append(nameInput);
 
           const nums = make("div", "form-numbers");
+
           const weightInput = document.createElement("input");
           weightInput.value = set.weight;
           weightInput.inputMode = "decimal";
@@ -1267,6 +1266,7 @@
             card._deleted = true;
             card.remove();
           };
+
           controls.append(del);
 
           card._name = nameInput;
@@ -1345,26 +1345,16 @@
       const workout = state.workouts.find(item => item.id === workoutId);
       if (!workout) return;
 
-      const rows = [
-        ["Дата", "Упражнение", "Подход", "Вес", "Повторы", "Объем"]
-      ];
+      const row = workout.exercises.map(ex => {
+        const lines = [
+          ex.name,
+          ...ex.sets.map((set, index) => `${index + 1}й подход ${set.weight}кг х ${set.reps}`)
+        ];
 
-      workout.exercises.forEach(ex => {
-        ex.sets.forEach((set, index) => {
-          rows.push([
-            new Date(workout.finishedAt).toLocaleString("ru-RU"),
-            ex.name,
-            index + 1,
-            String(set.weight).replace(".", ","),
-            set.reps,
-            String(set.weight * set.reps).replace(".", ",")
-          ]);
-        });
+        return lines.join("\n");
       });
 
-      const csv = rows.map(row => {
-        return row.map(cell => `"${String(cell).replaceAll('"', '""')}"`).join(";");
-      }).join("\n");
+      const csv = row.map(cell => `"${String(cell).replaceAll('"', '""')}"`).join(";");
 
       const blob = new Blob(["\uFEFF" + csv], {
         type: "text/csv;charset=utf-8"
@@ -1477,4 +1467,3 @@
   </script>
 </body>
 </html>
-```
