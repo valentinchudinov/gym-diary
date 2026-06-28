@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дневник тренировок</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, system-ui, sans-serif; }
+        body { background: var(--tg-theme-bg-color, #fff); color: var(--tg-theme-text-color, #000); padding: 16px; }
+        .card { background: var(--tg-theme-secondary-bg-color, #f5f5f5); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        input, button { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 16px; margin-bottom: 10px; }
+        input { background: var(--tg-theme-secondary-bg-color, #f0f0f0); color: var(--tg-theme-text-color, #000); }
+        button { background: var(--tg-theme-button-color, #007aff); color: var(--tg-theme-button-text-color, #fff); font-weight: 600; cursor: pointer; }
+        .row { display: flex; gap: 10px; }
+        .row input { flex: 1; }
+        .ex-item { display: flex; justify-content: space-between; padding: 12px; background: var(--tg-theme-secondary-bg-color, #f5f5f5); border-radius: 10px; margin-bottom: 6px; }
+        .set { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 14px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .stat-card { background: var(--tg-theme-secondary-bg-color, #f5f5f5); padding: 12px; border-radius: 10px; text-align: center; }
+        .stat-card .num { font-size: 24px; font-weight: 700; color: var(--tg-theme-button-color, #007aff); }
+        .stat-card .label { font-size: 12px; opacity: 0.6; }
+        .hidden { display: none; }
+        .tab-bar { display: flex; gap: 6px; margin-bottom: 16px; }
+        .tab-bar button { flex: 1; padding: 10px; background: var(--tg-theme-secondary-bg-color, #e5e5e5); color: var(--tg-theme-text-color, #000); border-radius: 10px; font-size: 14px; margin: 0; }
+        .tab-bar button.active { background: var(--tg-theme-button-color, #007aff); color: #fff; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Вкладки -->
+        <div class="tab-bar">
+            <button class="active" onclick="showTab('training')">🏋️ Тренировка</button>
+            <button onclick="showTab('history')">📜 История</button>
+            <button onclick="showTab('stats')">📊 Прогресс</button>
+        </div>
+
+        <!-- Вкладка 1: Тренировка -->
+        <div id="tab-training">
+            <div class="card">
+                <h3 style="margin-bottom:10px;">Добавить подход</h3>
+                <input id="ex-name" placeholder="Упражнение (например: Молотки)" list="ex-list">
+                <datalist id="ex-list"></datalist>
+                <div class="row">
+                    <input id="ex-weight" placeholder="Вес (кг)" type="number">
+                    <input id="ex-reps" placeholder="Повторы" type="number">
+                </div>
+                <button onclick="addSet()">✅ Добавить подход</button>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom:10px;">Текущая тренировка</h3>
+                <div id="current-workout"><p style="opacity:0.5;">Пока ничего нет</p></div>
+                <button onclick="saveWorkout()" style="background: #34c759; margin-top:10px;">💾 Сохранить тренировку</button>
+            </div>
+        </div>
+
+        <!-- Вкладка 2: История -->
+        <div id="tab-history" class="hidden">
+            <div class="card" id="history-list">
+                <p style="opacity:0.5;">История пока пуста</p>
+            </div>
+        </div>
+
+        <!-- Вкладка 3: Прогресс -->
+        <div id="tab-stats" class="hidden">
+            <div class="card">
+                <h3 style="margin-bottom:10px;">Прогресс по упражнению</h3>
+                <input id="stats-ex" placeholder="Введите упражнение" list="ex-list">
+                <button onclick="showProgress()">📈 Показать</button>
+                <div id="stats-result" style="margin-top:12px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === Хранилище ===
+        let workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
+        let currentSets = [];
+        let allExercises = new Set();
+
+        // Обновляем список упражнений
+        function updateExerciseList() {
+            const list = document.getElementById('ex-list');
+            list.innerHTML = '';
+            allExercises.forEach(ex => {
+                const opt = document.createElement('option');
+                opt.value = ex;
+                list.appendChild(opt);
+            });
+        }
+
+        // Загружаем всё
+        function loadData() {
+            workouts.forEach(w => {
+                w.sets.forEach(s => allExercises.add(s.name));
+            });
+            updateExerciseList();
+            renderHistory();
+        }
+
+        // === Добавить подход ===
+        function addSet() {
+            const name = document.getElementById('ex-name').value.trim();
+            const weight = parseFloat(document.getElementById('ex-weight').value);
+            const reps = parseInt(document.getElementById('ex-reps').value);
+            if (!name || !weight || !reps) { alert('Заполните все поля'); return; }
+            currentSets.push({ name, weight, reps });
+            allExercises.add(name);
+            updateExerciseList();
+            document.getElementById('ex-name').value = '';
+            document.getElementById('ex-weight').value = '';
+            document.getElementById('ex-reps').value = '';
+            renderCurrentWorkout();
+        }
+
+        function renderCurrentWorkout() {
+            const div = document.getElementById('current-workout');
+            if (currentSets.length === 0) {
+                div.innerHTML = '<p style="opacity:0.5;">Пока ничего нет</p>';
+                return;
+            }
+            div.innerHTML = currentSets.map((s, i) =>
+                `<div class="set"><span>${s.name}</span><span>${s.weight}кг × ${s.reps}</span></div>`
+            ).join('');
+        }
+
+        // === Сохранить тренировку ===
+        function saveWorkout() {
+            if (currentSets.length === 0) { alert('Нет подходов для сохранения'); return; }
+            const now = new Date();
+            const date = now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+            workouts.push({ date, sets: [...currentSets] });
+            localStorage.setItem('workouts', JSON.stringify(workouts));
+            currentSets = [];
+            renderCurrentWorkout();
+            renderHistory();
+            alert('✅ Тренировка сохранена!');
+        }
+
+        // === История ===
+        function renderHistory() {
+            const div = document.getElementById('history-list');
+            if (workouts.length === 0) {
+                div.innerHTML = '<p style="opacity:0.5;">История пока пуста</p>';
+                return;
+            }
+            div.innerHTML = workouts.slice().reverse().map(w =>
+                `<div style="margin-bottom:12px;padding:12px;background:var(--tg-theme-secondary-bg-color,#f5f5f5);border-radius:10px;">
+                    <strong>${w.date}</strong>
+                    ${w.sets.map(s => `<div class="set"><span>${s.name}</span><span>${s.weight}кг × ${s.reps}</span></div>`).join('')}
+                </div>`
+            ).join('');
+        }
+
+        // === Прогресс ===
+        function showProgress() {
+            const exName = document.getElementById('stats-ex').value.trim();
+            const div = document.getElementById('stats-result');
+            if (!exName) { div.innerHTML = 'Введите упражнение'; return; }
+            const entries = [];
+            workouts.forEach(w => {
+                w.sets.forEach(s => {
+                    if (s.name === exName) entries.push({ date: w.date, weight: s.weight, reps: s.reps });
+                });
+            });
+            if (entries.length === 0) { div.innerHTML = 'Нет данных по этому упражнению'; return; }
+            const last = entries[entries.length - 1];
+            const first = entries[0];
+            const maxWeight = Math.max(...entries.map(e => e.weight));
+            const maxReps = Math.max(...entries.map(e => e.reps));
+            div.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="num">${entries.length}</div><div class="label">Всего подходов</div></div>
+                    <div class="stat-card"><div class="num">${maxWeight}кг</div><div class="label">Макс. вес</div></div>
+                    <div class="stat-card"><div class="num">${maxReps}</div><div class="label">Макс. повторы</div></div>
+                    <div class="stat-card"><div class="num">${entries[entries.length-1].weight}×${entries[entries.length-1].reps}</div><div class="label">Последний</div></div>
+                </div>
+                <div style="margin-top:10px;font-size:12px;opacity:0.6;">Прогресс: ${entries.map(e => `${e.weight}×${e.reps}`).join(' → ')}</div>
+            `;
+        }
+
+        // === Переключение вкладок ===
+        function showTab(tab) {
+            document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.tab-bar button:nth-child(${tab === 'training' ? 1 : tab === 'history' ? 2 : 3})`).classList.add('active');
+            document.getElementById('tab-training').classList.toggle('hidden', tab !== 'training');
+            document.getElementById('tab-history').classList.toggle('hidden', tab !== 'history');
+            document.getElementById('tab-stats').classList.toggle('hidden', tab !== 'stats');
+            if (tab === 'history') renderHistory();
+        }
+
+        // === Инициализация ===
+        loadData();
+        renderCurrentWorkout();
+
+        // Подсказки для ввода упражнений
+        document.getElementById('ex-name').addEventListener('input', function() {
+            const val = this.value.trim();
+            const options = document.querySelectorAll('#ex-list option');
+            let found = false;
+            options.forEach(o => { if (o.value === val) found = true; });
+            // если нет — всё равно сохраним при добавлении
+        });
+
+        // Telegram WebApp — готово
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.expand();
+        }
+    </script>
+</body>
+</html>
