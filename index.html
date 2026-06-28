@@ -71,79 +71,33 @@
         .sync-status.synced { color: #34c759; }
         .sync-status.syncing { color: #ff9500; }
 
-        /* ===== ИСТОРИЯ СО СВАЙПОМ ===== */
-        .history-wrapper {
-            overflow: hidden;
-            border-radius: 12px;
-            margin-bottom: 8px;
-        }
-        .history-row {
-            display: flex;
-            transition: transform 0.3s ease;
-            touch-action: pan-y;
-        }
-        .history-row.swiped {
-            transform: translateX(-120px);
-        }
-        .history-card {
-            flex: 1;
-            min-width: 0;
+        /* ===== ИСТОРИЯ — ПРОСТЫЕ ПЛАШКИ ===== */
+        .history-item {
             background: var(--tg-theme-secondary-bg-color, #f5f5f5);
-            padding: 14px 16px;
             border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
             cursor: pointer;
+            transition: background 0.15s;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            transition: background 0.15s;
         }
-        .history-card:active {
+        .history-item:active {
             background: var(--tg-theme-secondary-bg-color, #e5e5e5);
         }
-        .history-card .title {
+        .history-item .title {
             font-weight: 600;
             font-size: 16px;
         }
-        .history-card .sub {
+        .history-item .sub {
             font-size: 13px;
             opacity: 0.6;
             margin-top: 2px;
         }
-        .history-card .meta {
+        .history-item .meta {
             font-size: 12px;
             opacity: 0.5;
             margin-top: 4px;
-        }
-        .history-actions {
-            display: flex;
-            align-items: center;
-            gap: 0;
-            flex-shrink: 0;
-            width: 120px;
-            margin-left: -120px;
-        }
-        .history-actions button {
-            width: 60px;
-            height: 100%;
-            min-height: 70px;
-            border: none;
-            color: #fff;
-            font-size: 22px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0;
-            margin: 0;
-            padding: 0;
-            flex-shrink: 0;
-        }
-        .history-actions .btn-edit-action {
-            background: #ff9500;
-            border-radius: 12px 0 0 12px;
-        }
-        .history-actions .btn-delete-action {
-            background: #ff3b30;
-            border-radius: 0 12px 12px 0;
         }
 
         /* ===== МОДАЛЬНОЕ ОКНО ===== */
@@ -167,7 +121,7 @@
             background: var(--tg-theme-bg-color, #fff);
             width: 100%;
             max-width: 500px;
-            max-height: 80vh;
+            max-height: 85vh;
             border-radius: 20px 20px 0 0;
             padding: 24px 20px 30px;
             overflow-y: auto;
@@ -193,9 +147,49 @@
         .modal-content .modal-set {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
             font-size: 15px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .modal-content .modal-set .set-info {
+            flex: 1;
+            min-width: 120px;
+        }
+        .modal-content .modal-set .set-edit {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .modal-content .modal-set .set-edit input {
+            width: 55px;
+            padding: 6px 8px;
+            font-size: 14px;
+            margin: 0;
+            border-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            color: var(--tg-theme-text-color, #000);
+        }
+        .modal-content .modal-set .set-edit input.ex-name-input {
+            width: 90px;
+        }
+        .modal-content .modal-set .set-edit .del-btn {
+            background: none;
+            border: none;
+            color: #ff3b30;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 6px;
+            width: auto;
+            margin: 0;
+            line-height: 1;
+        }
+        .modal-content .modal-set .set-edit .del-btn:hover {
+            opacity: 0.7;
         }
         .modal-content .modal-close {
             margin-top: 16px;
@@ -209,6 +203,30 @@
             width: 100%;
             cursor: pointer;
         }
+        .modal-content .modal-add-btn {
+            background: var(--tg-theme-button-color, #007aff);
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .modal-content .modal-save-btn {
+            background: #34c759;
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 12px;
+        }
 
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -217,51 +235,6 @@
         @keyframes slideUp {
             from { transform: translateY(40px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* Режим редактирования в модалке */
-        .modal-edit-input {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin: 4px 0;
-        }
-        .modal-edit-input input {
-            width: 60px;
-            padding: 6px 8px;
-            font-size: 14px;
-            margin: 0;
-            border-radius: 8px;
-            border: 1px solid rgba(0,0,0,0.1);
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            color: var(--tg-theme-text-color, #000);
-        }
-        .modal-edit-input input.ex-name-input {
-            width: 100px;
-        }
-        .modal-edit-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
-        .modal-edit-actions button {
-            padding: 10px 20px;
-            font-size: 14px;
-            width: auto;
-            margin: 0;
-            border-radius: 10px;
-        }
-        .modal-del-set-btn {
-            background: none;
-            border: none;
-            color: #ff3b30;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 0 8px;
-            width: auto;
-            margin: 0;
         }
     </style>
 </head>
@@ -537,11 +510,7 @@
             return sets.length;
         }
 
-        // ===== ИСТОРИЯ СО СВАЙПОМ =====
-        let touchStartX = 0;
-        let touchCurrentX = 0;
-        let currentSwipeRow = null;
-
+        // ===== ИСТОРИЯ — ПРОСТЫЕ ПЛАШКИ БЕЗ КНОПОК =====
         function renderHistory() {
             const div = document.getElementById('history-list');
             if (workouts.length === 0) {
@@ -557,132 +526,63 @@
                 const setCount = getTotalSets(w.sets);
 
                 html += `
-                    <div class="history-wrapper" data-index="${realIndex}">
-                        <div class="history-row" id="row-${realIndex}">
-                            <div class="history-card" onclick="openModal(${realIndex})">
-                                <div class="title">🏋️ Тренировка в ${dayName}</div>
-                                <div class="sub">${w.date}</div>
-                                <div class="meta">${exCount} упражнений · ${setCount} подходов</div>
-                            </div>
-                            <div class="history-actions">
-                                <button class="btn-edit-action" onclick="openModal(${realIndex})">✏️</button>
-                                <button class="btn-delete-action" onclick="deleteWorkout(${realIndex})">🗑️</button>
-                            </div>
-                        </div>
+                    <div class="history-item" onclick="openModal(${realIndex})">
+                        <div class="title">🏋️ Тренировка в ${dayName}</div>
+                        <div class="sub">${w.date}</div>
+                        <div class="meta">${exCount} упражнений · ${setCount} подходов</div>
                     </div>
                 `;
             });
 
             div.innerHTML = html;
-
-            // Добавляем обработчики свайпа
-            document.querySelectorAll('.history-row').forEach(row => {
-                const wrapper = row.closest('.history-wrapper');
-                row.addEventListener('touchstart', (e) => {
-                    touchStartX = e.touches[0].clientX;
-                    touchCurrentX = touchStartX;
-                    currentSwipeRow = row;
-                }, { passive: true });
-
-                row.addEventListener('touchmove', (e) => {
-                    if (!currentSwipeRow) return;
-                    const deltaX = e.touches[0].clientX - touchStartX;
-                    if (deltaX < -20) {
-                        currentSwipeRow.classList.add('swiped');
-                    } else if (deltaX > 20) {
-                        currentSwipeRow.classList.remove('swiped');
-                    }
-                }, { passive: true });
-
-                row.addEventListener('touchend', () => {
-                    currentSwipeRow = null;
-                }, { passive: true });
-
-                // Для мыши (десктоп)
-                let mouseDownX = 0;
-                let isDragging = false;
-                row.addEventListener('mousedown', (e) => {
-                    mouseDownX = e.clientX;
-                    isDragging = false;
-                });
-                row.addEventListener('mousemove', (e) => {
-                    if (e.buttons === 1) {
-                        const deltaX = e.clientX - mouseDownX;
-                        if (Math.abs(deltaX) > 10) isDragging = true;
-                        if (deltaX < -20) {
-                            row.classList.add('swiped');
-                        } else if (deltaX > 20) {
-                            row.classList.remove('swiped');
-                        }
-                    }
-                });
-                row.addEventListener('mouseup', () => {
-                    if (isDragging) {
-                        isDragging = false;
-                    }
-                });
-            });
         }
 
-        // ===== МОДАЛЬНОЕ ОКНО =====
+        // ===== МОДАЛЬНОЕ ОКНО С РЕДАКТИРОВАНИЕМ =====
         function openModal(index) {
-            editingModalIndex = null;
+            editingModalIndex = index;
             const overlay = document.getElementById('modalOverlay');
             const body = document.getElementById('modalBody');
             const w = workouts[index];
             if (!w) return;
 
-            let setsHtml = w.sets.map((s, si) => `
-                <div class="modal-set">
-                    <span>${s.name}</span>
-                    <span>${s.weight}кг × ${s.reps}</span>
-                </div>
-            `).join('');
-
-            body.innerHTML = `
-                <div class="modal-title">🏋️ Тренировка в ${getDayName(w.date)}</div>
-                <div class="modal-date">${w.date}</div>
-                <div style="margin: 12px 0 4px; font-size: 13px; opacity:0.6;">Упражнения и подходы</div>
-                ${setsHtml}
-                <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn-warning" onclick="openEditModal(${index})" style="flex:1;">✏️ Редактировать</button>
-                    <button class="btn-danger" onclick="deleteWorkout(${index}); closeModal();" style="flex:1;">🗑️ Удалить</button>
-                </div>
-                <button class="modal-close" onclick="closeModal()">Закрыть</button>
-            `;
-
+            renderModalBody(index);
             overlay.classList.add('open');
         }
 
-        function openEditModal(index) {
-            editingModalIndex = index;
+        function renderModalBody(index) {
+            const body = document.getElementById('modalBody');
             const w = workouts[index];
             if (!w) return;
 
             let setsHtml = w.sets.map((s, si) => `
-                <div class="modal-set" style="flex-wrap:wrap; gap:6px;">
-                    <div class="modal-edit-input">
-                        <input type="text" class="ex-name-input" value="${s.name}" data-set="${si}">
-                        <input type="number" class="edit-weight" value="${s.weight}" data-set="${si}">
+                <div class="modal-set" data-setindex="${si}">
+                    <div class="set-info">${s.name}</div>
+                    <div class="set-edit">
+                        <input type="text" class="ex-name-input" value="${s.name}" data-set="${si}" placeholder="Упр.">
+                        <input type="number" class="edit-weight" value="${s.weight}" data-set="${si}" placeholder="Вес">
                         <span>×</span>
-                        <input type="number" class="edit-reps" value="${s.reps}" data-set="${si}">
-                        <button class="modal-del-set-btn" onclick="deleteSetFromModal(${index}, ${si})">✕</button>
+                        <input type="number" class="edit-reps" value="${s.reps}" data-set="${si}" placeholder="Повт.">
+                        <button class="del-btn" onclick="deleteSetFromModal(${index}, ${si})">✕</button>
                     </div>
                 </div>
             `).join('');
 
-            const body = document.getElementById('modalBody');
             body.innerHTML = `
                 <div class="modal-title">✏️ Редактирование</div>
                 <div class="modal-date">${w.date}</div>
-                <div style="margin: 12px 0 4px; font-size: 13px; opacity:0.6;">Редактируйте подходы</div>
+                <div style="margin: 8px 0 4px; font-size: 13px; opacity:0.6;">Подходы</div>
                 ${setsHtml}
-                <div class="modal-edit-actions">
-                    <button class="btn-success" onclick="saveEditModal(${index})">💾 Сохранить</button>
-                    <button class="btn-danger" onclick="openModal(${index})">↩ Отмена</button>
-                </div>
+                <button class="modal-add-btn" onclick="addSetToModal(${index})">➕ Добавить подход</button>
+                <button class="modal-save-btn" onclick="saveEditModal(${index})">💾 Сохранить изменения</button>
                 <button class="modal-close" onclick="closeModal()">Закрыть</button>
             `;
+        }
+
+        function addSetToModal(index) {
+            const w = workouts[index];
+            if (!w) return;
+            w.sets.push({ name: 'Новое', weight: 0, reps: 0 });
+            renderModalBody(index);
         }
 
         function deleteSetFromModal(index, setIdx) {
@@ -692,7 +592,7 @@
                     workouts.splice(index, 1);
                     closeModal();
                 } else {
-                    openEditModal(index);
+                    renderModalBody(index);
                 }
                 renderHistory();
                 syncToCloud();
@@ -711,7 +611,7 @@
                 const name = el.value.trim();
                 const weight = parseFloat(weightInputs[i].value);
                 const reps = parseInt(repInputs[i].value);
-                if (name && weight && reps) {
+                if (name && !isNaN(weight) && !isNaN(reps) && weight > 0 && reps > 0) {
                     newSets.push({ name, weight, reps });
                     allExercises.add(name);
                 } else {
@@ -720,7 +620,7 @@
             });
 
             if (!valid || newSets.length === 0) {
-                alert('Заполните все поля корректно');
+                alert('Заполните все поля корректно (название, вес > 0, повторы > 0)');
                 return;
             }
 
@@ -729,7 +629,7 @@
             updateExerciseList();
             renderHistory();
             syncToCloud();
-            openModal(index);
+            renderModalBody(index);
         }
 
         function closeModal() {
@@ -740,18 +640,6 @@
         function closeModalOutside(e) {
             if (e.target === document.getElementById('modalOverlay')) {
                 closeModal();
-            }
-        }
-
-        // ===== УДАЛЕНИЕ ТРЕНИРОВКИ =====
-        function deleteWorkout(index) {
-            if (confirm('Удалить эту тренировку?')) {
-                workouts.splice(index, 1);
-                renderHistory();
-                syncToCloud();
-                if (document.getElementById('modalOverlay').classList.contains('open')) {
-                    closeModal();
-                }
             }
         }
 
