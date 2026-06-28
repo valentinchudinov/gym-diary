@@ -7,79 +7,197 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, system-ui, sans-serif; }
-        body { background: var(--tg-theme-bg-color, #fff); color: var(--tg-theme-text-color, #000); padding: 16px; }
+        html, body { height: 100%; }
+        body {
+            background: var(--tg-theme-bg-color, #fff);
+            color: var(--tg-theme-text-color, #000);
+            padding: 16px 16px 80px 16px;
+            display: flex;
+            flex-direction: column;
+        }
+        #app { flex: 1; display: flex; flex-direction: column; }
+
         .card { background: var(--tg-theme-secondary-bg-color, #f5f5f5); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
         input, button { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 16px; margin-bottom: 10px; }
         input { background: var(--tg-theme-secondary-bg-color, #f0f0f0); color: var(--tg-theme-text-color, #000); }
         button { background: var(--tg-theme-button-color, #007aff); color: var(--tg-theme-button-text-color, #fff); font-weight: 600; cursor: pointer; }
         .row { display: flex; gap: 10px; }
         .row input { flex: 1; }
-        .ex-item { display: flex; justify-content: space-between; padding: 12px; background: var(--tg-theme-secondary-bg-color, #f5f5f5); border-radius: 10px; margin-bottom: 6px; }
         .set { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 14px; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .stat-card { background: var(--tg-theme-secondary-bg-color, #f5f5f5); padding: 12px; border-radius: 10px; text-align: center; }
         .stat-card .num { font-size: 24px; font-weight: 700; color: var(--tg-theme-button-color, #007aff); }
         .stat-card .label { font-size: 12px; opacity: 0.6; }
         .hidden { display: none; }
-        .tab-bar { display: flex; gap: 6px; margin-bottom: 16px; }
+        .tab-bar { display: flex; gap: 6px; margin-bottom: 16px; flex-shrink: 0; }
         .tab-bar button { flex: 1; padding: 10px; background: var(--tg-theme-secondary-bg-color, #e5e5e5); color: var(--tg-theme-text-color, #000); border-radius: 10px; font-size: 14px; margin: 0; }
         .tab-bar button.active { background: var(--tg-theme-button-color, #007aff); color: #fff; }
+        .content { flex: 1; overflow-y: auto; }
+
+        /* === Секундомер ВНИЗУ === */
+        .timer-bottom {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--tg-theme-button-color, #007aff);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .timer-bottom.running {
+            background: #34c759;
+        }
+        .timer-bottom .timer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.2;
+        }
+        .timer-bottom .time {
+            font-size: 20px;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.5px;
+        }
+        .timer-bottom .action {
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+        .timer-bottom.running .action {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
     <div id="app">
-        <!-- Вкладки -->
         <div class="tab-bar">
             <button class="active" onclick="showTab('training')">🏋️ Тренировка</button>
             <button onclick="showTab('history')">📜 История</button>
             <button onclick="showTab('stats')">📊 Прогресс</button>
         </div>
 
-        <!-- Вкладка 1: Тренировка -->
-        <div id="tab-training">
-            <div class="card">
-                <h3 style="margin-bottom:10px;">Добавить подход</h3>
-                <input id="ex-name" placeholder="Упражнение (например: Молотки)" list="ex-list">
-                <datalist id="ex-list"></datalist>
-                <div class="row">
-                    <input id="ex-weight" placeholder="Вес (кг)" type="number">
-                    <input id="ex-reps" placeholder="Повторы" type="number">
+        <div class="content" id="content">
+            <div id="tab-training">
+                <div class="card">
+                    <h3 style="margin-bottom:10px;">Добавить подход</h3>
+                    <input id="ex-name" placeholder="Упражнение" list="ex-list">
+                    <datalist id="ex-list"></datalist>
+                    <div class="row">
+                        <input id="ex-weight" placeholder="Вес (кг)" type="number">
+                        <input id="ex-reps" placeholder="Повторы" type="number">
+                    </div>
+                    <button onclick="addSet()">✅ Добавить подход</button>
                 </div>
-                <button onclick="addSet()">✅ Добавить подход</button>
+
+                <div class="card">
+                    <h3 style="margin-bottom:10px;">Текущая тренировка</h3>
+                    <div id="current-workout"><p style="opacity:0.5;">Пока ничего нет</p></div>
+                    <button onclick="saveWorkout()" style="background: #34c759; margin-top:10px;">💾 Сохранить</button>
+                </div>
             </div>
 
-            <div class="card">
-                <h3 style="margin-bottom:10px;">Текущая тренировка</h3>
-                <div id="current-workout"><p style="opacity:0.5;">Пока ничего нет</p></div>
-                <button onclick="saveWorkout()" style="background: #34c759; margin-top:10px;">💾 Сохранить тренировку</button>
+            <div id="tab-history" class="hidden">
+                <div class="card" id="history-list">
+                    <p style="opacity:0.5;">История пуста</p>
+                </div>
             </div>
-        </div>
 
-        <!-- Вкладка 2: История -->
-        <div id="tab-history" class="hidden">
-            <div class="card" id="history-list">
-                <p style="opacity:0.5;">История пока пуста</p>
-            </div>
-        </div>
-
-        <!-- Вкладка 3: Прогресс -->
-        <div id="tab-stats" class="hidden">
-            <div class="card">
-                <h3 style="margin-bottom:10px;">Прогресс по упражнению</h3>
-                <input id="stats-ex" placeholder="Введите упражнение" list="ex-list">
-                <button onclick="showProgress()">📈 Показать</button>
-                <div id="stats-result" style="margin-top:12px;"></div>
+            <div id="tab-stats" class="hidden">
+                <div class="card">
+                    <h3 style="margin-bottom:10px;">Прогресс</h3>
+                    <input id="stats-ex" placeholder="Упражнение" list="ex-list">
+                    <button onclick="showProgress()">📈 Показать</button>
+                    <div id="stats-result" style="margin-top:12px;"></div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- === КНОПКА СЕКУНДОМЕРА ВНИЗУ === -->
+    <div class="timer-bottom" id="timerBtn" onclick="handleTimerClick()">
+        <div class="timer-content">
+            <span class="time" id="timerDisplay">00:00</span>
+            <span class="action" id="timerAction">▶ Старт</span>
+        </div>
+    </div>
+
     <script>
-        // === Хранилище ===
+        // ===== ОСНОВНЫЕ ДАННЫЕ =====
         let workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
         let currentSets = [];
         let allExercises = new Set();
 
-        // Обновляем список упражнений
+        // ===== СЕКУНДОМЕР =====
+        let seconds = 0;
+        let interval = null;
+        let isRunning = false;
+
+        const timerBtn = document.getElementById('timerBtn');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const timerAction = document.getElementById('timerAction');
+
+        function formatTime(s) {
+            const m = String(Math.floor(s / 60)).padStart(2, '0');
+            const sec = String(s % 60).padStart(2, '0');
+            return `${m}:${sec}`;
+        }
+
+        function updateUI() {
+            timerDisplay.textContent = formatTime(seconds);
+            if (isRunning) {
+                timerBtn.className = 'timer-bottom running';
+                timerAction.textContent = '⏹ Стоп';
+            } else {
+                timerBtn.className = 'timer-bottom';
+                timerAction.textContent = '▶ Старт';
+            }
+        }
+
+        function handleTimerClick() {
+            if (isRunning) {
+                // Остановка и сброс в ноль
+                clearInterval(interval);
+                interval = null;
+                isRunning = false;
+                seconds = 0;
+            } else {
+                // Запуск с нуля
+                seconds = 0;
+                isRunning = true;
+                interval = setInterval(() => {
+                    seconds++;
+                    timerDisplay.textContent = formatTime(seconds);
+                }, 1000);
+            }
+            updateUI();
+        }
+
+        // Сброс таймера при добавлении подхода
+        function resetTimer() {
+            if (interval) {
+                clearInterval(interval);
+                interval = null;
+            }
+            isRunning = false;
+            seconds = 0;
+            updateUI();
+        }
+
+        // ===== ВСЁ ОСТАЛЬНОЕ =====
         function updateExerciseList() {
             const list = document.getElementById('ex-list');
             list.innerHTML = '';
@@ -90,7 +208,6 @@
             });
         }
 
-        // Загружаем всё
         function loadData() {
             workouts.forEach(w => {
                 w.sets.forEach(s => allExercises.add(s.name));
@@ -99,7 +216,6 @@
             renderHistory();
         }
 
-        // === Добавить подход ===
         function addSet() {
             const name = document.getElementById('ex-name').value.trim();
             const weight = parseFloat(document.getElementById('ex-weight').value);
@@ -112,6 +228,7 @@
             document.getElementById('ex-weight').value = '';
             document.getElementById('ex-reps').value = '';
             renderCurrentWorkout();
+            resetTimer(); // Автосброс секундомера
         }
 
         function renderCurrentWorkout() {
@@ -125,9 +242,8 @@
             ).join('');
         }
 
-        // === Сохранить тренировку ===
         function saveWorkout() {
-            if (currentSets.length === 0) { alert('Нет подходов для сохранения'); return; }
+            if (currentSets.length === 0) { alert('Нет подходов'); return; }
             const now = new Date();
             const date = now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             workouts.push({ date, sets: [...currentSets] });
@@ -135,14 +251,13 @@
             currentSets = [];
             renderCurrentWorkout();
             renderHistory();
-            alert('✅ Тренировка сохранена!');
+            alert('✅ Сохранено!');
         }
 
-        // === История ===
         function renderHistory() {
             const div = document.getElementById('history-list');
             if (workouts.length === 0) {
-                div.innerHTML = '<p style="opacity:0.5;">История пока пуста</p>';
+                div.innerHTML = '<p style="opacity:0.5;">История пуста</p>';
                 return;
             }
             div.innerHTML = workouts.slice().reverse().map(w =>
@@ -153,7 +268,6 @@
             ).join('');
         }
 
-        // === Прогресс ===
         function showProgress() {
             const exName = document.getElementById('stats-ex').value.trim();
             const div = document.getElementById('stats-result');
@@ -164,23 +278,20 @@
                     if (s.name === exName) entries.push({ date: w.date, weight: s.weight, reps: s.reps });
                 });
             });
-            if (entries.length === 0) { div.innerHTML = 'Нет данных по этому упражнению'; return; }
-            const last = entries[entries.length - 1];
-            const first = entries[0];
+            if (entries.length === 0) { div.innerHTML = 'Нет данных'; return; }
             const maxWeight = Math.max(...entries.map(e => e.weight));
             const maxReps = Math.max(...entries.map(e => e.reps));
             div.innerHTML = `
                 <div class="stats-grid">
-                    <div class="stat-card"><div class="num">${entries.length}</div><div class="label">Всего подходов</div></div>
-                    <div class="stat-card"><div class="num">${maxWeight}кг</div><div class="label">Макс. вес</div></div>
-                    <div class="stat-card"><div class="num">${maxReps}</div><div class="label">Макс. повторы</div></div>
+                    <div class="stat-card"><div class="num">${entries.length}</div><div class="label">Подходов</div></div>
+                    <div class="stat-card"><div class="num">${maxWeight}кг</div><div class="label">Макс вес</div></div>
+                    <div class="stat-card"><div class="num">${maxReps}</div><div class="label">Макс повторы</div></div>
                     <div class="stat-card"><div class="num">${entries[entries.length-1].weight}×${entries[entries.length-1].reps}</div><div class="label">Последний</div></div>
                 </div>
-                <div style="margin-top:10px;font-size:12px;opacity:0.6;">Прогресс: ${entries.map(e => `${e.weight}×${e.reps}`).join(' → ')}</div>
+                <div style="margin-top:10px;font-size:12px;opacity:0.6;">${entries.map(e => `${e.weight}×${e.reps}`).join(' → ')}</div>
             `;
         }
 
-        // === Переключение вкладок ===
         function showTab(tab) {
             document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
             document.querySelector(`.tab-bar button:nth-child(${tab === 'training' ? 1 : tab === 'history' ? 2 : 3})`).classList.add('active');
@@ -190,20 +301,11 @@
             if (tab === 'history') renderHistory();
         }
 
-        // === Инициализация ===
+        // Инициализация
         loadData();
         renderCurrentWorkout();
+        updateUI();
 
-        // Подсказки для ввода упражнений
-        document.getElementById('ex-name').addEventListener('input', function() {
-            const val = this.value.trim();
-            const options = document.querySelectorAll('#ex-list option');
-            let found = false;
-            options.forEach(o => { if (o.value === val) found = true; });
-            // если нет — всё равно сохраним при добавлении
-        });
-
-        // Telegram WebApp — готово
         if (window.Telegram && Telegram.WebApp) {
             Telegram.WebApp.ready();
             Telegram.WebApp.expand();
