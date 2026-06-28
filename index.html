@@ -269,6 +269,55 @@
     .history-row .mini-btn.danger:active {
       background: rgba(255, 70, 70, .18);
     }
+    #draftList .set-row {
+      grid-template-columns: 1fr 54px 54px;
+      align-items: stretch;
+      gap: 8px;
+      min-height: 54px;
+      margin-bottom: 9px;
+    }
+
+    #draftList .set-row:last-child {
+      margin-bottom: 0;
+    }
+
+    #draftList .set-value {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-height: 54px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.055);
+      border: 1px solid var(--line);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    #draftList .edit-set-btn,
+    #draftList .icon-btn {
+      width: 54px;
+      height: 100%;
+      min-height: 54px;
+      border-radius: var(--radius);
+      align-self: stretch;
+    }
+
+    #draftList .edit-set-btn {
+      color: var(--accent);
+      background: rgba(255,100,24,.10);
+      border-color: rgba(255,100,24,.24);
+    }
+
+    #draftList .icon-btn {
+      color: #ff8a8a;
+      background: rgba(255, 70, 70, .12);
+      border-color: rgba(255, 90, 90, .28);
+    }
+
+    #draftList .icon-btn:active {
+      background: rgba(255, 70, 70, .18);
+    }
     .history-item {
       width: 100%;
       text-align: left;
@@ -708,7 +757,7 @@
 
         ex.sets.forEach((set, index) => {
           const row = make("div", "set-row");
-          row.appendChild(make("div", "", `${index + 1}. ${set.weight} кг × ${set.reps}`));
+          row.appendChild(make("div", "set-value", `${index + 1}. ${set.weight} кг × ${set.reps}`));
 
           const edit = make("button", "edit-set-btn", "✎");
           edit.onclick = () => openEditSetModal(ex.id, set.id);
