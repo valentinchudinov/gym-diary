@@ -197,7 +197,7 @@
       font-size: 13px;
     }
     .exercise {
-      padding: 13px 0;
+      padding: 16px 0; /* чуть больше вертикальный отступ */
       border-bottom: 1px solid var(--line);
     }
     .exercise:last-child { border-bottom: 0; }
@@ -205,7 +205,7 @@
       display: flex;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 9px;
+      margin-bottom: 16px; /* больше воздуха между названием и подходами */
     }
     .exercise-name {
       font-size: 16px;
@@ -346,6 +346,7 @@
       gap: 16px;
     }
 
+    /* Группы при редактировании истории */
     .edit-exercise-group {
       margin-top: 14px;
       padding-top: 2px;
@@ -561,7 +562,8 @@
       rebuildExerciseCatalog();
       renderAll();
 
-      setTimeout(() => el.splash.classList.add("hide"), 1200);
+      // 1) увеличить время загрузки до 4 сек
+      setTimeout(() => el.splash.classList.add("hide"), 4000);
     }
 
     function persistLocal() {
@@ -651,7 +653,10 @@
           edit.onclick = () => openEditSetModal(ex.id, set.id);
 
           const del = make("button", "icon-btn", "×");
-          del.onclick = () => deleteDraftSet(ex.id, set.id);
+          // 3) микро-анимация при удалении в первом табе
+          del.onclick = () => {
+            animateRemove(row, () => deleteDraftSet(ex.id, set.id));
+          };
 
           row.append(edit, del);
           box.appendChild(row);
@@ -1025,12 +1030,14 @@
           const del = make("button", "delete-set-small", "×");
           del.type = "button";
           del.title = "Удалить подход";
+          // 3) микро-анимация при удалении в истории
           del.onclick = () => {
-            card.remove();
-
-            if (!group.querySelector(".edit-set-card")) {
-              group.remove();
-            }
+            animateRemove(card, () => {
+              card.remove();
+              if (!group.querySelector(".edit-set-card")) {
+                group.remove();
+              }
+            });
           };
 
           head.append(nameInput, del);
@@ -1180,6 +1187,22 @@
       }
     }
 
+    // Микро-анимация удаления (универсальная)
+    function animateRemove(node, done) {
+      node.style.transition = "opacity .18s ease, transform .18s ease";
+      node.style.opacity = "1";
+      node.style.transform = "translateY(0) scale(1)";
+      // async frame to ensure transition applies
+      requestAnimationFrame(() => {
+        node.style.opacity = "0";
+        node.style.transform = "translateY(-6px) scale(0.98)";
+      });
+      const timer = setTimeout(() => {
+        clearTimeout(timer);
+        done && done();
+      }, 200);
+    }
+
     el.tabs.forEach(tab => {
       tab.addEventListener("click", () => {
         state.tab = tab.dataset.tab;
@@ -1229,7 +1252,6 @@
         tg.ready();
         tg.expand();
       }
-
       loadData();
     }
 
