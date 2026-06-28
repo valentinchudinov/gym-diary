@@ -71,11 +71,14 @@
         .sync-status.synced { color: #34c759; }
         .sync-status.syncing { color: #ff9500; }
 
-        /* ===== ИСТОРИЯ — ПРОСТЫЕ ПЛАШКИ ===== */
+        /* ===== ИСТОРИЯ — ПЛАШКИ С КНОПКОЙ УДАЛИТЬ ===== */
         .history-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             background: var(--tg-theme-secondary-bg-color, #f5f5f5);
             border-radius: 12px;
-            padding: 14px 16px;
+            padding: 12px 16px;
             margin-bottom: 8px;
             cursor: pointer;
             transition: background 0.15s;
@@ -84,6 +87,10 @@
         }
         .history-item:active {
             background: var(--tg-theme-secondary-bg-color, #e5e5e5);
+        }
+        .history-item .info {
+            flex: 1;
+            min-width: 0;
         }
         .history-item .title {
             font-weight: 600;
@@ -98,6 +105,26 @@
             font-size: 12px;
             opacity: 0.5;
             margin-top: 4px;
+        }
+        .history-item .delete-btn {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 59, 48, 0.15);
+            border: none;
+            color: #ff3b30;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+            padding: 0;
+            margin: 0;
+        }
+        .history-item .delete-btn:active {
+            background: rgba(255, 59, 48, 0.3);
         }
 
         /* ===== МОДАЛЬНОЕ ОКНО ===== */
@@ -156,8 +183,13 @@
         }
         .modal-content .modal-set .set-info {
             flex: 1;
-            min-width: 120px;
+            min-width: 100px;
         }
+        /* Режим просмотра */
+        .modal-content .modal-set.view-mode .set-info {
+            font-weight: 500;
+        }
+        /* Режим редактирования */
         .modal-content .modal-set .set-edit {
             display: flex;
             gap: 6px;
@@ -188,9 +220,6 @@
             margin: 0;
             line-height: 1;
         }
-        .modal-content .modal-set .set-edit .del-btn:hover {
-            opacity: 0.7;
-        }
         .modal-content .modal-close {
             margin-top: 16px;
             background: var(--tg-theme-button-color, #007aff);
@@ -203,6 +232,38 @@
             width: 100%;
             cursor: pointer;
         }
+        .modal-content .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .modal-content .modal-actions button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .modal-content .modal-actions .btn-edit {
+            background: #ff9500;
+            color: #fff;
+        }
+        .modal-content .modal-actions .btn-delete {
+            background: #ff3b30;
+            color: #fff;
+        }
+        .modal-content .modal-actions .btn-save {
+            background: #34c759;
+            color: #fff;
+            flex: 1;
+        }
+        .modal-content .modal-actions .btn-cancel-edit {
+            background: var(--tg-theme-secondary-bg-color, #e5e5e5);
+            color: var(--tg-theme-text-color, #000);
+            flex: 1;
+        }
         .modal-content .modal-add-btn {
             background: var(--tg-theme-button-color, #007aff);
             color: #fff;
@@ -210,18 +271,6 @@
             padding: 12px;
             border-radius: 12px;
             font-size: 15px;
-            font-weight: 600;
-            width: 100%;
-            cursor: pointer;
-            margin-top: 8px;
-        }
-        .modal-content .modal-save-btn {
-            background: #34c759;
-            color: #fff;
-            border: none;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 16px;
             font-weight: 600;
             width: 100%;
             cursor: pointer;
@@ -236,6 +285,9 @@
             from { transform: translateY(40px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
+
+        .edit-hidden { display: none; }
+        .view-hidden { display: none; }
     </style>
 </head>
 <body>
@@ -301,7 +353,8 @@
         let workouts = [];
         let currentSets = [];
         let allExercises = new Set();
-        let editingModalIndex = null;
+        let currentModalIndex = null;
+        let isEditMode = false;
 
         // ===== CLOUD STORAGE =====
         let cloudStorage = null;
@@ -510,7 +563,7 @@
             return sets.length;
         }
 
-        // ===== ИСТОРИЯ — ПРОСТЫЕ ПЛАШКИ БЕЗ КНОПОК =====
+        // ===== ИСТОРИЯ — ПЛАШКИ С КНОПКОЙ УДАЛИТЬ =====
         function renderHistory() {
             const div = document.getElementById('history-list');
             if (workouts.length === 0) {
@@ -526,10 +579,13 @@
                 const setCount = getTotalSets(w.sets);
 
                 html += `
-                    <div class="history-item" onclick="openModal(${realIndex})">
-                        <div class="title">🏋️ Тренировка в ${dayName}</div>
-                        <div class="sub">${w.date}</div>
-                        <div class="meta">${exCount} упражнений · ${setCount} подходов</div>
+                    <div class="history-item">
+                        <div class="info" onclick="openModal(${realIndex})">
+                            <div class="title">🏋️ Тренировка в ${dayName}</div>
+                            <div class="sub">${w.date}</div>
+                            <div class="meta">${exCount} упражнений · ${setCount} подходов</div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteWorkout(${realIndex})">🗑️</button>
                     </div>
                 `;
             });
@@ -537,14 +593,11 @@
             div.innerHTML = html;
         }
 
-        // ===== МОДАЛЬНОЕ ОКНО С РЕДАКТИРОВАНИЕМ =====
+        // ===== МОДАЛЬНОЕ ОКНО =====
         function openModal(index) {
-            editingModalIndex = index;
+            currentModalIndex = index;
+            isEditMode = false;
             const overlay = document.getElementById('modalOverlay');
-            const body = document.getElementById('modalBody');
-            const w = workouts[index];
-            if (!w) return;
-
             renderModalBody(index);
             overlay.classList.add('open');
         }
@@ -554,28 +607,67 @@
             const w = workouts[index];
             if (!w) return;
 
-            let setsHtml = w.sets.map((s, si) => `
-                <div class="modal-set" data-setindex="${si}">
-                    <div class="set-info">${s.name}</div>
-                    <div class="set-edit">
-                        <input type="text" class="ex-name-input" value="${s.name}" data-set="${si}" placeholder="Упр.">
-                        <input type="number" class="edit-weight" value="${s.weight}" data-set="${si}" placeholder="Вес">
-                        <span>×</span>
-                        <input type="number" class="edit-reps" value="${s.reps}" data-set="${si}" placeholder="Повт.">
-                        <button class="del-btn" onclick="deleteSetFromModal(${index}, ${si})">✕</button>
+            let setsHtml = w.sets.map((s, si) => {
+                if (isEditMode) {
+                    // Режим редактирования
+                    return `
+                        <div class="modal-set" data-setindex="${si}">
+                            <div class="set-edit">
+                                <input type="text" class="ex-name-input" value="${s.name}" data-set="${si}" placeholder="Упр.">
+                                <input type="number" class="edit-weight" value="${s.weight}" data-set="${si}" placeholder="Вес">
+                                <span>×</span>
+                                <input type="number" class="edit-reps" value="${s.reps}" data-set="${si}" placeholder="Повт.">
+                                <button class="del-btn" onclick="deleteSetFromModal(${index}, ${si})">✕</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Режим просмотра
+                    return `
+                        <div class="modal-set view-mode">
+                            <div class="set-info">${s.name}</div>
+                            <div class="set-info" style="text-align:right;font-weight:500;">${s.weight}кг × ${s.reps}</div>
+                        </div>
+                    `;
+                }
+            }).join('');
+
+            let actionsHtml = '';
+            if (isEditMode) {
+                actionsHtml = `
+                    <button class="modal-add-btn" onclick="addSetToModal(${index})">➕ Добавить подход</button>
+                    <div class="modal-actions">
+                        <button class="btn-save" onclick="saveEditModal(${index})">💾 Сохранить</button>
+                        <button class="btn-cancel-edit" onclick="switchToViewMode(${index})">↩ Отмена</button>
                     </div>
-                </div>
-            `).join('');
+                `;
+            } else {
+                actionsHtml = `
+                    <div class="modal-actions">
+                        <button class="btn-edit" onclick="switchToEditMode(${index})">✏️ Редактировать</button>
+                        <button class="btn-delete" onclick="deleteWorkout(${index}); closeModal();">🗑️ Удалить</button>
+                    </div>
+                `;
+            }
 
             body.innerHTML = `
-                <div class="modal-title">✏️ Редактирование</div>
+                <div class="modal-title">🏋️ Тренировка в ${getDayName(w.date)}</div>
                 <div class="modal-date">${w.date}</div>
-                <div style="margin: 8px 0 4px; font-size: 13px; opacity:0.6;">Подходы</div>
+                <div style="margin: 8px 0 4px; font-size: 13px; opacity:0.6;">${isEditMode ? '✏️ Редактирование подходов' : '📋 Подходы'}</div>
                 ${setsHtml}
-                <button class="modal-add-btn" onclick="addSetToModal(${index})">➕ Добавить подход</button>
-                <button class="modal-save-btn" onclick="saveEditModal(${index})">💾 Сохранить изменения</button>
+                ${actionsHtml}
                 <button class="modal-close" onclick="closeModal()">Закрыть</button>
             `;
+        }
+
+        function switchToEditMode(index) {
+            isEditMode = true;
+            renderModalBody(index);
+        }
+
+        function switchToViewMode(index) {
+            isEditMode = false;
+            renderModalBody(index);
         }
 
         function addSetToModal(index) {
@@ -591,9 +683,11 @@
                 if (workouts[index].sets.length === 0) {
                     workouts.splice(index, 1);
                     closeModal();
-                } else {
-                    renderModalBody(index);
+                    renderHistory();
+                    syncToCloud();
+                    return;
                 }
+                renderModalBody(index);
                 renderHistory();
                 syncToCloud();
             }
@@ -625,21 +719,34 @@
             }
 
             workouts[index].sets = newSets;
-            editingModalIndex = null;
             updateExerciseList();
             renderHistory();
             syncToCloud();
+            isEditMode = false;
             renderModalBody(index);
         }
 
         function closeModal() {
             document.getElementById('modalOverlay').classList.remove('open');
-            editingModalIndex = null;
+            currentModalIndex = null;
+            isEditMode = false;
         }
 
         function closeModalOutside(e) {
             if (e.target === document.getElementById('modalOverlay')) {
                 closeModal();
+            }
+        }
+
+        // ===== УДАЛЕНИЕ ТРЕНИРОВКИ =====
+        function deleteWorkout(index) {
+            if (confirm('Удалить эту тренировку?')) {
+                workouts.splice(index, 1);
+                renderHistory();
+                syncToCloud();
+                if (document.getElementById('modalOverlay').classList.contains('open')) {
+                    closeModal();
+                }
             }
         }
 
