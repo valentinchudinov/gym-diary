@@ -163,7 +163,36 @@
       function renderProgress(){const selected=el.progressSelect.value;const names=[...state.exercises].sort((a,b)=>a.localeCompare(b,"ru"));el.progressSelect.replaceChildren();const empty=document.createElement("option");empty.value="";text(empty,"Выбери упражнение");el.progressSelect.appendChild(empty);names.forEach(n=>{const o=document.createElement("option");o.value=n;text(o,n);el.progressSelect.appendChild(o)});el.progressSelect.value=selected&&names.includes(selected)?selected:"";showProgress()}
       function showProgress(){const name=el.progressSelect.value;el.progressResult.replaceChildren();if(!name){el.progressResult.appendChild(make("div","progress-empty","Выбери упражнение, чтобы увидеть график"));return}const entries=[];state.workouts.slice().sort((a,b)=>new Date(a.finishedAt)-new Date(b.finishedAt)).forEach(w=>{let best=null,volume=0;w.exercises.forEach(e=>{if(!sameName(e.name,name))return;e.sets.forEach(s=>{best=best===null?s.weight:Math.max(best,s.weight);volume=Math.max(volume,s.weight*s.reps)})});if(best!==null)entries.push({date:w.finishedAt,weight:best,volume})});if(!entries.length){el.progressResult.appendChild(make("div","progress-empty","По этому упражнению пока нет данных"));return}const maxW=Math.max(...entries.map(e=>e.weight));const maxV=Math.max(...entries.map(e=>e.volume));const grid=make("div","stats-grid");[["Макс вес",`${maxW} кг`],["Лучший объем",`${Math.round(maxV)} кг`],["Тренировок",entries.length],["Последний",`${entries.at(-1).weight} кг`]].forEach(([l,v])=>{const c=make("div","stat");c.append(make("div","stat-num",v),make("div","muted",l));grid.appendChild(c)});el.progressResult.append(grid,make("div","chart-label","График показывает лучший вес по тренировкам"))}
       function formatDateTitle(iso){const d=new Date(iso);const now=new Date();const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());const day=new Date(d.getFullYear(),d.getMonth(),d.getDate());const diff=Math.round((today-day)/86400000);if(diff===0)return"Сегодня";if(diff===1)return"Вчера";return d.toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}
-      function openWorkout(workoutId){const w=state.workouts.find(x=>x.id===workoutId);if(!w)return;openSheet();el.modalBody.replaceChildren();const s=getStats(w);el.modalBody.append(make("div","title",formatDateTitle(w.finishedAt)),make("div","meta",`${s.exercises} упражнений · ${s.sets} подходов · ${Math.round(s.volume)} кг`));w.exercises.forEach(e=>{const box=make("div","exercise");box.appendChild(make("div","exercise-name",e.name));e.sets.forEach((set,i)=>{const row=make("div","modal-set-row");row.append(make("div","",`${i+1}. ${set.weight} кг × ${set.reps}`),make("div","muted",`${Math.round(set.weight*set.reps)} кг`));box.appendChild(row)});el.modalBody.appendChild(box)});const actions=make("div","sheet-actions");const grid=make("div","grid");const edit=make("button","btn-card btn-accent","Редактировать");edit.onclick=()=>openEditWorkout(workoutId);const del=make("button","btn-card btn-danger icon-square","×");del.onclick=()=>confirmDeleteWorkout(workoutId);grid.append(edit,del);actions.appendChild(grid);el.modalBody.appendChild(actions)}
+
+      function openWorkout(workoutId){
+        const w=state.workouts.find(x=>x.id===workoutId);
+        if(!w)return;
+        openSheet();
+        el.modalBody.replaceChildren();
+        const s=getStats(w);
+        el.modalBody.append(
+          make("div","title",formatDateTitle(w.finishedAt)),
+          make("div","meta",`${s.exercises} упражнений · ${s.sets} подходов · ${Math.round(s.volume)} кг`)
+        );
+        w.exercises.forEach(e=>{
+          const box=make("div","exercise");
+          box.appendChild(make("div","exercise-name",e.name));
+          e.sets.forEach((set,i)=>{
+            const row=make("div","modal-set-row");
+            row.append(
+              make("div","",`${i+1}. ${set.weight} кг × ${set.reps}`),
+              make("div","muted",`${Math.round(set.weight*set.reps)} кг`)
+            );
+            box.appendChild(row);
+          });
+          el.modalBody.appendChild(box);
+        });
+        const actions=make("div","sheet-actions");
+        const edit=make("button","btn-card btn-accent","Редактировать");
+        edit.onclick=()=>openEditWorkout(workoutId);
+        actions.append(edit);
+        el.modalBody.appendChild(actions);
+      }
 
       function openEditWorkout(workoutId){
         const w=state.workouts.find(x=>x.id===workoutId);
@@ -201,13 +230,9 @@
           form.appendChild(group);
         });
         const actions=make("div","sheet-actions");
-        const grid=make("div","grid");
         const save=make("button","btn-card btn-accent","Сохранить");
         save.onclick=()=>saveWorkoutEdit(workoutId,form);
-        const del=make("button","btn-card btn-danger icon-square","×");
-        del.onclick=()=>confirmDeleteWorkout(workoutId);
-        grid.append(save,del);
-        actions.appendChild(grid);
+        actions.append(save);
         el.modalBody.append(form,actions);
       }
 
