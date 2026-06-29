@@ -228,21 +228,42 @@
       }
 
       // Helpers to create editable blocks for Edit Workout modal
+      function removeEditSetCard(card){
+        const group=card.closest(".edit-exercise-group");
+        if(!group){
+          animateRemove(card,()=>card.remove());
+          return;
+        }
+
+        const cards=[...group.querySelectorAll(".edit-set-card")];
+        if(cards.length<=1){
+          animateRemove(group,()=>group.remove());
+          return;
+        }
+
+        animateRemove(card,()=>card.remove());
+      }
+
       function createEditSetCard(weightValue="", repsValue=""){
         const card=make("div","edit-set-card");
         const nums=make("div","form-numbers");
+
         const weight=make("input","");
         weight.value=weightValue;
         weight.inputMode="decimal";
         weight.dataset.kind="weight";
+
         const reps=make("input","");
         reps.value=repsValue;
         reps.inputMode="numeric";
         reps.dataset.kind="reps";
+
         nums.append(weight,reps);
+
         const del=make("button","btn-card btn-danger icon-square","×");
         del.type="button";
-        del.onclick=()=>animateRemove(card,()=>card.remove());
+        del.onclick=()=>removeEditSetCard(card);
+
         card.append(nums,del);
         return card;
       }
@@ -300,7 +321,7 @@
             nums.append(weight,reps);
             const del=make("button","btn-card btn-danger icon-square","×");
             del.type="button";
-            del.onclick=()=>animateRemove(card,()=>card.remove());
+            del.onclick=()=>removeEditSetCard(card);
             card.append(nums,del);
             group.appendChild(card);
           });
