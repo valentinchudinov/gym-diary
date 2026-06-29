@@ -1715,10 +1715,11 @@
       function updateMainActions() {
         const hasSets = getWorkoutStats(state.draft).sets > 0;
         const visible = hasSets && state.tab === "today";
+        const hasTelegramMainButton = Boolean(tg && tg.MainButton);
 
-        el.fallbackFinishBtn.style.display = visible ? "block" : "none";
+        el.fallbackFinishBtn.style.display = visible && !hasTelegramMainButton ? "block" : "none";
 
-        if (!tg || !tg.MainButton) return;
+        if (!hasTelegramMainButton) return;
 
         tg.MainButton.offClick(finishWorkout);
 
