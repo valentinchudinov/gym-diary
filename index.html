@@ -51,7 +51,9 @@
     .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:13px}.stat-num{font-size:23px;font-weight:850;color:var(--accent);overflow-wrap:anywhere}.progress-chart{width:100%;height:190px;margin-top:14px;border-radius:var(--radius);background:rgba(255,255,255,.04);border:1px solid var(--line);overflow:hidden}.progress-chart svg{display:block;width:100%;height:100%}.chart-label{margin-top:8px;text-align:center;color:var(--muted);font-size:13px}
     .toast{position:fixed;left:50%;bottom:calc(18px + var(--safe-bottom));transform:translateX(-50%);max-width:calc(100vw - 28px);padding:11px 15px;border-radius:999px;background:rgba(20,20,20,.92);border:1px solid var(--line);z-index:40;display:none}
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.64);display:none;align-items:flex-end;z-index:30;backdrop-filter:blur(8px)}.modal.open{display:flex;animation:fadeIn .16s ease both}.sheet{width:100%;max-width:560px;max-height:88vh;margin:0 auto;overflow:auto;background:#0b0b0b;border:1px solid var(--line);border-radius:24px 24px 0 0;padding:18px 14px calc(28px + var(--safe-bottom));animation:sheetIn .24s cubic-bezier(.2,.9,.2,1) both}.handle{width:42px;height:4px;border-radius:4px;background:rgba(255,255,255,.22);margin:0 auto 16px}
-    .sheet-actions{position:sticky;bottom:-14px;padding-top:12px;margin-top:12px;background:linear-gradient(180deg,transparent,rgba(11,11,11,.95) 44%,#0b0b0b 90%)}.sheet-actions .grid{display:grid;grid-template-columns:1fr 54px;gap:8px}.modal-set-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;min-height:40px;padding:8px 0}.edit-exercise-group{margin-top:14px}.edit-set-card{padding:10px;margin-bottom:8px;border-radius:14px;background:rgba(255,255,255,.045);box-shadow:none}
+    .sheet-actions{position:sticky;bottom:-14px;padding-top:12px;margin-top:12px;background:linear-gradient(180deg,transparent,rgba(11,11,11,.95) 44%,#0b0b0b 90%)}.sheet-actions .grid{display:grid;grid-template-columns:1fr 54px;gap:8px}.modal-set-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;min-height:40px;padding:8px 0}
+    .edit-exercise-group{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.edit-exercise-group:first-child{margin-top:0;padding-top:0;border-top:0}.edit-exercise-group>input{margin-bottom:12px}
+    .edit-set-card{display:grid;grid-template-columns:1fr 54px;gap:8px;align-items:stretch;padding:10px;margin-bottom:8px;border-radius:14px;background:rgba(255,255,255,.045);box-shadow:none;overflow:hidden}.edit-set-card .form-numbers{min-width:0}
     .remove-anim{opacity:0!important;transform:translateX(18px) scale(.96)!important;max-height:0!important;margin-top:0!important;margin-bottom:0!important;padding-top:0!important;padding-bottom:0!important;transition:opacity .22s ease,transform .22s ease,max-height .24s ease,margin .24s ease,padding .24s ease}
     .flash{animation:flash .42s ease both}
     button,.history-item,.set-value,input,select{transition:transform .14s ease,background-color .16s ease,border-color .16s ease,box-shadow .16s ease,opacity .16s ease}button:active,.history-item:active{transform:scale(.975)}.toast.show{animation:toastIn .18s ease both}
@@ -85,138 +87,166 @@
   <script>
     (() => {
       "use strict";
-
-      const CONFIG = { storageKey:"workouts_v4", draftKey:"draft_workout_v4", localDataKey:"trainer_data_v1", splashDelay:4000, toastDelay:2200 };
-      const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-      const state = { tab:"today", workouts:[], draft:createDraft(), exercises:new Set() };
-      const tabOrder = ["today","history","progress"];
-      const el = {
-        splash:document.getElementById("splash"), screenTitle:document.getElementById("screenTitle"), screenMeta:document.getElementById("screenMeta"), tabsNav:document.getElementById("tabsNav"),
-        tabs:[...document.querySelectorAll(".tab")], panels:{today:document.getElementById("todayPanel"),history:document.getElementById("historyPanel"),progress:document.getElementById("progressPanel")},
-        exerciseInput:document.getElementById("exerciseInput"), weightInput:document.getElementById("weightInput"), repsInput:document.getElementById("repsInput"), exerciseList:document.getElementById("exerciseList"),
-        addSetBtn:document.getElementById("addSetBtn"), repeatSetBtn:document.getElementById("repeatSetBtn"), formHint:document.getElementById("formHint"), draftList:document.getElementById("draftList"), fallbackFinishBtn:document.getElementById("fallbackFinishBtn"),
-        historyList:document.getElementById("historyList"), progressSelect:document.getElementById("progressSelect"), progressResult:document.getElementById("progressResult"), toast:document.getElementById("toast"), modal:document.getElementById("modal"), modalBody:document.getElementById("modalBody")
+      const CONFIG={storageKey:"workouts_v4",draftKey:"draft_workout_v4",localDataKey:"trainer_data_v1",splashDelay:4000,toastDelay:2200};
+      const tg=window.Telegram&&window.Telegram.WebApp?window.Telegram.WebApp:null;
+      const state={tab:"today",workouts:[],draft:createDraft(),exercises:new Set()};
+      const tabOrder=["today","history","progress"];
+      const el={
+        splash:document.getElementById("splash"),screenTitle:document.getElementById("screenTitle"),screenMeta:document.getElementById("screenMeta"),tabsNav:document.getElementById("tabsNav"),
+        tabs:[...document.querySelectorAll(".tab")],panels:{today:document.getElementById("todayPanel"),history:document.getElementById("historyPanel"),progress:document.getElementById("progressPanel")},
+        exerciseInput:document.getElementById("exerciseInput"),weightInput:document.getElementById("weightInput"),repsInput:document.getElementById("repsInput"),exerciseList:document.getElementById("exerciseList"),
+        addSetBtn:document.getElementById("addSetBtn"),repeatSetBtn:document.getElementById("repeatSetBtn"),formHint:document.getElementById("formHint"),draftList:document.getElementById("draftList"),fallbackFinishBtn:document.getElementById("fallbackFinishBtn"),
+        historyList:document.getElementById("historyList"),progressSelect:document.getElementById("progressSelect"),progressResult:document.getElementById("progressResult"),toast:document.getElementById("toast"),modal:document.getElementById("modal"),modalBody:document.getElementById("modalBody")
       };
 
-      function id(){return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`}
-      function createDraft(){return {id:id(),status:"draft",createdAt:new Date().toISOString(),exercises:[]}}
-      function text(node,value){if(node) node.textContent=value == null ? "" : String(value)}
-      function make(tag,cls,content){const n=document.createElement(tag); if(cls)n.className=cls; if(content!==undefined)text(n,content); return n}
+      function id(){return crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(16).slice(2)}`}
+      function createDraft(){return{id:id(),status:"draft",createdAt:new Date().toISOString(),exercises:[]}}
+      function text(node,value){if(node)node.textContent=value==null?"":String(value)}
+      function make(tag,cls,content){const n=document.createElement(tag);if(cls)n.className=cls;if(content!==undefined)text(n,content);return n}
       function sameName(a,b){return String(a||"").trim().toLowerCase()===String(b||"").trim().toLowerCase()}
       function normalizeNumber(v){return Number(String(v).trim().replace(",","."))}
-      function parseSetInput(w,r){const weight=normalizeNumber(w); const reps=Number(String(r).trim()); if(!Number.isFinite(weight)||weight<0)return null; if(!Number.isInteger(reps)||reps<=0)return null; return {weight,reps}}
+      function parseSetInput(w,r){const weight=normalizeNumber(w);const reps=Number(String(r).trim());if(!Number.isFinite(weight)||weight<0)return null;if(!Number.isInteger(reps)||reps<=0)return null;return{weight,reps}}
       function safeJsonParse(v,f=null){try{return v?JSON.parse(v):f}catch{return f}}
       function safeStorageGet(k){try{return localStorage.getItem(k)}catch{return null}}
       function safeStorageSet(k,v){try{localStorage.setItem(k,v);return true}catch{toast("Не удалось сохранить данные");return false}}
-      function getStats(w){const exercises=w.exercises.length; const sets=w.exercises.reduce((s,e)=>s+e.sets.length,0); const volume=w.exercises.reduce((s,e)=>s+e.sets.reduce((x,set)=>x+set.weight*set.reps,0),0); return {exercises,sets,volume}}
+      function getStats(w){const exercises=w.exercises.length;const sets=w.exercises.reduce((s,e)=>s+e.sets.length,0);const volume=w.exercises.reduce((s,e)=>s+e.sets.reduce((x,set)=>x+set.weight*set.reps,0),0);return{exercises,sets,volume}}
       function isValidDraft(v){return v&&v.status==="draft"&&Array.isArray(v.exercises)}
       function capitalize(value){return String(value||"").replace(/^./,ch=>ch.toUpperCase())}
-      function sanitizeWorkout(w){return {id:w.id||id(),status:w.status||"completed",createdAt:w.createdAt||new Date().toISOString(),finishedAt:w.finishedAt,exercises:(w.exercises||[]).filter(e=>e&&e.name&&Array.isArray(e.sets)).map(e=>({id:e.id||id(),name:String(e.name).trim(),sets:e.sets.map(s=>({id:s.id||id(),weight:Number(s.weight),reps:Number(s.reps)})).filter(s=>Number.isFinite(s.weight)&&s.weight>=0&&Number.isInteger(s.reps)&&s.reps>0)})).filter(e=>e.name&&e.sets.length)}}
-      function rebuildCatalog(){state.exercises=new Set(); state.workouts.forEach(w=>w.exercises.forEach(e=>state.exercises.add(e.name))); state.draft.exercises.forEach(e=>state.exercises.add(e.name))}
-      function toast(msg){text(el.toast,msg); el.toast.style.display="block"; el.toast.classList.remove("show"); requestAnimationFrame(()=>el.toast.classList.add("show")); clearTimeout(toast.timer); toast.timer=setTimeout(()=>{el.toast.style.display="none";el.toast.classList.remove("show")},CONFIG.toastDelay)}
+      function sanitizeWorkout(w){return{id:w.id||id(),status:w.status||"completed",createdAt:w.createdAt||new Date().toISOString(),finishedAt:w.finishedAt,exercises:(w.exercises||[]).filter(e=>e&&e.name&&Array.isArray(e.sets)).map(e=>({id:e.id||id(),name:String(e.name).trim(),sets:e.sets.map(s=>({id:s.id||id(),weight:Number(s.weight),reps:Number(s.reps)})).filter(s=>Number.isFinite(s.weight)&&s.weight>=0&&Number.isInteger(s.reps)&&s.reps>0)})).filter(e=>e.name&&e.sets.length)}}
+      function rebuildCatalog(){state.exercises=new Set();state.workouts.forEach(w=>w.exercises.forEach(e=>state.exercises.add(e.name)));state.draft.exercises.forEach(e=>state.exercises.add(e.name))}
+      function toast(msg){text(el.toast,msg);el.toast.style.display="block";el.toast.classList.remove("show");requestAnimationFrame(()=>el.toast.classList.add("show"));clearTimeout(toast.timer);toast.timer=setTimeout(()=>{el.toast.style.display="none";el.toast.classList.remove("show")},CONFIG.toastDelay)}
       function haptic(type="light"){if(tg&&tg.HapticFeedback)tg.HapticFeedback.impactOccurred(type)}
       function hideKeyboard(){if(document.activeElement&&document.activeElement.blur)document.activeElement.blur()}
-      function showPopup(message){if(tg&&tg.showPopup)return new Promise(resolve=>tg.showPopup({message,buttons:[{id:"cancel",type:"cancel",text:"Отмена"},{id:"ok",type:"default",text:"ОК"}]},resolve)); return Promise.resolve(confirm(message)?"ok":"cancel")}
+      function showPopup(message){if(tg&&tg.showPopup)return new Promise(resolve=>tg.showPopup({message,buttons:[{id:"cancel",type:"cancel",text:"Отмена"},{id:"ok",type:"default",text:"ОК"}]},resolve));return Promise.resolve(confirm(message)?"ok":"cancel")}
 
       function loadData(){
         const snapshot=safeJsonParse(safeStorageGet(CONFIG.localDataKey),null);
-        if(snapshot&&Array.isArray(snapshot.workouts)&&snapshot.draft){state.workouts=snapshot.workouts.map(sanitizeWorkout).filter(w=>w.exercises.length); state.draft=isValidDraft(snapshot.draft)?sanitizeWorkout(snapshot.draft):createDraft(); state.draft.status="draft"}
-        else{state.workouts=safeJsonParse(safeStorageGet(CONFIG.storageKey),[]).map(sanitizeWorkout).filter(w=>w.exercises.length); const d=safeJsonParse(safeStorageGet(CONFIG.draftKey),null); state.draft=isValidDraft(d)?sanitizeWorkout(d):createDraft(); state.draft.status="draft"}
-        rebuildCatalog(); renderAll(); commit(false); setTimeout(()=>el.splash.classList.add("hide"),CONFIG.splashDelay)
+        if(snapshot&&Array.isArray(snapshot.workouts)&&snapshot.draft){state.workouts=snapshot.workouts.map(sanitizeWorkout).filter(w=>w.exercises.length);state.draft=isValidDraft(snapshot.draft)?sanitizeWorkout(snapshot.draft):createDraft();state.draft.status="draft"}
+        else{state.workouts=safeJsonParse(safeStorageGet(CONFIG.storageKey),[]).map(sanitizeWorkout).filter(w=>w.exercises.length);const d=safeJsonParse(safeStorageGet(CONFIG.draftKey),null);state.draft=isValidDraft(d)?sanitizeWorkout(d):createDraft();state.draft.status="draft"}
+        rebuildCatalog();renderAll();commit(false);setTimeout(()=>el.splash.classList.add("hide"),CONFIG.splashDelay)
       }
-
-      function commit(render=true){
-        rebuildCatalog();
-        const snapshot={updatedAt:Date.now(),workouts:state.workouts,draft:state.draft};
-        safeStorageSet(CONFIG.localDataKey,JSON.stringify(snapshot));
-        safeStorageSet(CONFIG.storageKey,JSON.stringify(state.workouts));
-        safeStorageSet(CONFIG.draftKey,JSON.stringify(state.draft));
-        if(render)renderAll();
-      }
-
+      function commit(render=true){rebuildCatalog();const snapshot={updatedAt:Date.now(),workouts:state.workouts,draft:state.draft};safeStorageSet(CONFIG.localDataKey,JSON.stringify(snapshot));safeStorageSet(CONFIG.storageKey,JSON.stringify(state.workouts));safeStorageSet(CONFIG.draftKey,JSON.stringify(state.draft));if(render)renderAll()}
       function renderAll(){updateMeta();renderTabs();renderExerciseList();renderDraft();renderHistory();renderProgress();updateForm();updateMainActions()}
-      function updateMeta(){const s=getStats(state.draft); text(el.screenTitle,{today:"Трена",history:"История",progress:"Прогресс"}[state.tab]); if(state.tab==="today")text(el.screenMeta,`${s.exercises} упражнений · ${s.sets} подходов · ${Math.round(s.volume)} кг`); else if(state.tab==="history")text(el.screenMeta,`${state.workouts.length} тренировок сохранено`); else text(el.screenMeta,"Лучшие веса и объем")}
-      function renderTabs(){el.tabsNav.dataset.active=String(tabOrder.indexOf(state.tab)); el.tabs.forEach(t=>{const active=t.dataset.tab===state.tab; t.classList.toggle("active",active); el.panels[t.dataset.tab].classList.toggle("active",active)})}
-      function renderExerciseList(){el.exerciseList.replaceChildren(); [...state.exercises].sort((a,b)=>a.localeCompare(b,"ru")).forEach(name=>{const o=document.createElement("option"); o.value=name; el.exerciseList.appendChild(o)})}
-
-      function updateMainActions(){
-        const hasSets=getStats(state.draft).sets>0;
-        const shouldShow=hasSets && state.tab==="today";
-        const mainButton=tg&&tg.MainButton?tg.MainButton:null;
-        el.fallbackFinishBtn.style.display=shouldShow&&!mainButton?"block":"none";
-        if(!mainButton)return;
-        mainButton.offClick(finishWorkout);
-        if(!shouldShow){mainButton.hide();return}
-        mainButton.setText("Завершить тренировку");
-        mainButton.setParams({color:"#ff6418",text_color:"#ffffff"});
-        mainButton.onClick(finishWorkout);
-        mainButton.show();
-      }
-
-      function updateForm(){const name=el.exerciseInput.value.trim(); const parsed=parseSetInput(el.weightInput.value,el.repsInput.value); const valid=Boolean(name)&&Boolean(parsed); el.addSetBtn.disabled=!valid; el.repeatSetBtn.disabled=!getLastSet(name); text(el.formHint,valid?"Готово к добавлению":"Выбери упражнение, вес и повторы")}
-      function getOrCreateDraftExercise(name){let ex=state.draft.exercises.find(e=>sameName(e.name,name)); if(!ex){ex={id:id(),name,sets:[]}; state.draft.exercises.push(ex)} return ex}
-      function addSet(){const name=el.exerciseInput.value.trim(); const parsed=parseSetInput(el.weightInput.value,el.repsInput.value); if(!name||!parsed){toast("Проверь вес и повторы");return} getOrCreateDraftExercise(name).sets.push({id:id(),...parsed}); el.weightInput.value=""; el.repsInput.value=""; hideKeyboard(); haptic(); commit(); el.draftList.classList.remove("flash"); requestAnimationFrame(()=>el.draftList.classList.add("flash"))}
-      function getLastSet(name){if(!name)return null; const d=state.draft.exercises.find(e=>sameName(e.name,name)); if(d&&d.sets.length)return d.sets[d.sets.length-1]; for(const w of [...state.workouts].sort((a,b)=>new Date(b.finishedAt)-new Date(a.finishedAt))){const e=w.exercises.find(x=>sameName(x.name,name)); if(e&&e.sets.length)return e.sets[e.sets.length-1]} return null}
-      function fillLastSet(){const last=getLastSet(el.exerciseInput.value.trim()); if(!last)return; el.weightInput.value=last.weight; el.repsInput.value=last.reps; updateForm()}
+      function updateMeta(){const s=getStats(state.draft);text(el.screenTitle,{today:"Трена",history:"История",progress:"Прогресс"}[state.tab]);if(state.tab==="today")text(el.screenMeta,`${s.exercises} упражнений · ${s.sets} подходов · ${Math.round(s.volume)} кг`);else if(state.tab==="history")text(el.screenMeta,`${state.workouts.length} тренировок сохранено`);else text(el.screenMeta,"Лучшие веса и объем")}
+      function renderTabs(){el.tabsNav.dataset.active=String(tabOrder.indexOf(state.tab));el.tabs.forEach(t=>{const active=t.dataset.tab===state.tab;t.classList.toggle("active",active);el.panels[t.dataset.tab].classList.toggle("active",active)})}
+      function renderExerciseList(){el.exerciseList.replaceChildren();[...state.exercises].sort((a,b)=>a.localeCompare(b,"ru")).forEach(name=>{const o=document.createElement("option");o.value=name;el.exerciseList.appendChild(o)})}
+      function updateMainActions(){const hasSets=getStats(state.draft).sets>0;const shouldShow=hasSets&&state.tab==="today";const mainButton=tg&&tg.MainButton?tg.MainButton:null;el.fallbackFinishBtn.style.display=shouldShow&&!mainButton?"block":"none";if(!mainButton)return;mainButton.offClick(finishWorkout);if(!shouldShow){mainButton.hide();return}mainButton.setText("Завершить тренировку");mainButton.setParams({color:"#ff6418",text_color:"#ffffff"});mainButton.onClick(finishWorkout);mainButton.show()}
+      function updateForm(){const name=el.exerciseInput.value.trim();const parsed=parseSetInput(el.weightInput.value,el.repsInput.value);const valid=Boolean(name)&&Boolean(parsed);el.addSetBtn.disabled=!valid;el.repeatSetBtn.disabled=!getLastSet(name);text(el.formHint,valid?"Готово к добавлению":"Выбери упражнение, вес и повторы")}
+      function getOrCreateDraftExercise(name){let ex=state.draft.exercises.find(e=>sameName(e.name,name));if(!ex){ex={id:id(),name,sets:[]};state.draft.exercises.push(ex)}return ex}
+      function addSet(){const name=el.exerciseInput.value.trim();const parsed=parseSetInput(el.weightInput.value,el.repsInput.value);if(!name||!parsed){toast("Проверь вес и повторы");return}getOrCreateDraftExercise(name).sets.push({id:id(),...parsed});el.weightInput.value="";el.repsInput.value="";hideKeyboard();haptic();commit();el.draftList.classList.remove("flash");requestAnimationFrame(()=>el.draftList.classList.add("flash"))}
+      function getLastSet(name){if(!name)return null;const d=state.draft.exercises.find(e=>sameName(e.name,name));if(d&&d.sets.length)return d.sets[d.sets.length-1];for(const w of [...state.workouts].sort((a,b)=>new Date(b.finishedAt)-new Date(a.finishedAt))){const e=w.exercises.find(x=>sameName(x.name,name));if(e&&e.sets.length)return e.sets[e.sets.length-1]}return null}
+      function fillLastSet(){const last=getLastSet(el.exerciseInput.value.trim());if(!last)return;el.weightInput.value=last.weight;el.repsInput.value=last.reps;updateForm()}
 
       function renderDraft(){
         el.draftList.replaceChildren();
         if(!state.draft.exercises.length){el.draftList.appendChild(make("div","empty","Пока нет подходов"));return}
-        state.draft.exercises.forEach(ex=>{const box=make("div","exercise"); const volume=ex.sets.reduce((s,set)=>s+set.weight*set.reps,0); const head=make("div","exercise-head"); head.append(make("div","exercise-name",ex.name),make("div","muted",`${ex.sets.length} подходов · ${Math.round(volume)} кг`)); box.appendChild(head);
-          ex.sets.forEach((set,i)=>{const row=make("div","set-row"); row.appendChild(make("div","set-value",`${i+1}. ${set.weight} кг × ${set.reps}`)); const edit=make("button","btn-card btn-accent icon-square","✎"); edit.onclick=()=>openEditSetModal(ex.id,set.id); const del=make("button","btn-card btn-danger icon-square","×"); del.onclick=()=>animateRemove(row,()=>deleteDraftSet(ex.id,set.id)); row.append(edit,del); box.appendChild(row)});
+        state.draft.exercises.forEach(ex=>{const box=make("div","exercise");const volume=ex.sets.reduce((s,set)=>s+set.weight*set.reps,0);const head=make("div","exercise-head");head.append(make("div","exercise-name",ex.name),make("div","muted",`${ex.sets.length} подходов · ${Math.round(volume)} кг`));box.appendChild(head);
+          ex.sets.forEach((set,i)=>{const row=make("div","set-row");row.appendChild(make("div","set-value",`${i+1}. ${set.weight} кг × ${set.reps}`));const edit=make("button","btn-card btn-accent icon-square","✎");edit.onclick=()=>openEditSetModal(ex.id,set.id);const del=make("button","btn-card btn-danger icon-square","×");del.onclick=()=>animateRemove(row,()=>deleteDraftSet(ex.id,set.id));row.append(edit,del);box.appendChild(row)});
           el.draftList.appendChild(box);
         });
       }
-
-      function deleteDraftSet(exId,setId){const ex=state.draft.exercises.find(e=>e.id===exId); if(!ex)return; ex.sets=ex.sets.filter(s=>s.id!==setId); state.draft.exercises=state.draft.exercises.filter(e=>e.sets.length); haptic("medium"); commit(); toast("Подход удален")}
-      function openEditSetModal(exId,setId){const ex=state.draft.exercises.find(e=>e.id===exId); const set=ex&&ex.sets.find(s=>s.id===setId); if(!set)return; openSheet(); el.modalBody.replaceChildren(); const title=make("div","title","Редактировать подход"); const form=make("div","modal-form"); const name=document.createElement("input"); name.value=ex.name; const nums=make("div","form-numbers"); const w=document.createElement("input"); w.value=set.weight; w.inputMode="decimal"; const r=document.createElement("input"); r.value=set.reps; r.inputMode="numeric"; nums.append(w,r); const save=make("button","btn-card btn-accent","Сохранить"); save.onclick=()=>{const parsed=parseSetInput(w.value,r.value); if(!name.value.trim()||!parsed){toast("Проверь упражнение, вес и повторы");return} moveOrUpdateSet(state.draft,exId,setId,name.value.trim(),parsed.weight,parsed.reps); closeModal()}; const cancel=make("button","btn-card btn-muted","Отмена"); cancel.onclick=closeModal; form.append(name,nums,save,cancel); el.modalBody.append(title,form)}
-      function moveOrUpdateSet(workout,exId,setId,newName,weight,reps){const old=workout.exercises.find(e=>e.id===exId); if(!old)return; const idx=old.sets.findIndex(s=>s.id===setId); if(idx<0)return; const updated={...old.sets[idx],weight,reps}; old.sets.splice(idx,1); let target=workout.exercises.find(e=>sameName(e.name,newName)); if(!target){target={id:id(),name:newName,sets:[]}; workout.exercises.push(target)} target.sets.push(updated); workout.exercises=workout.exercises.filter(e=>e.sets.length); haptic(); commit(); toast("Подход обновлен")}
-
-      async function finishWorkout(){if(!getStats(state.draft).sets)return; const answer=await showPopup("Завершить тренировку?"); if(answer!=="ok")return; state.workouts.push({...state.draft,status:"completed",finishedAt:new Date().toISOString()}); state.draft=createDraft(); haptic("heavy"); commit(); toast("Тренировка сохранена")}
+      function deleteDraftSet(exId,setId){const ex=state.draft.exercises.find(e=>e.id===exId);if(!ex)return;ex.sets=ex.sets.filter(s=>s.id!==setId);state.draft.exercises=state.draft.exercises.filter(e=>e.sets.length);haptic("medium");commit();toast("Подход удален")}
+      function openEditSetModal(exId,setId){const ex=state.draft.exercises.find(e=>e.id===exId);const set=ex&&ex.sets.find(s=>s.id===setId);if(!set)return;openSheet();el.modalBody.replaceChildren();const title=make("div","title","Редактировать подход");const form=make("div","modal-form");const name=document.createElement("input");name.value=ex.name;const nums=make("div","form-numbers");const w=document.createElement("input");w.value=set.weight;w.inputMode="decimal";const r=document.createElement("input");r.value=set.reps;r.inputMode="numeric";nums.append(w,r);const save=make("button","btn-card btn-accent","Сохранить");save.onclick=()=>{const parsed=parseSetInput(w.value,r.value);if(!name.value.trim()||!parsed){toast("Проверь упражнение, вес и повторы");return}moveOrUpdateSet(state.draft,exId,setId,name.value.trim(),parsed.weight,parsed.reps);closeModal()};const cancel=make("button","btn-card btn-muted","Отмена");cancel.onclick=closeModal;form.append(name,nums,save,cancel);el.modalBody.append(title,form)}
+      function moveOrUpdateSet(workout,exId,setId,newName,weight,reps){const old=workout.exercises.find(e=>e.id===exId);if(!old)return;const idx=old.sets.findIndex(s=>s.id===setId);if(idx<0)return;const updated={...old.sets[idx],weight,reps};old.sets.splice(idx,1);let target=workout.exercises.find(e=>sameName(e.name,newName));if(!target){target={id:id(),name:newName,sets:[]};workout.exercises.push(target)}target.sets.push(updated);workout.exercises=workout.exercises.filter(e=>e.sets.length);haptic();commit();toast("Подход обновлен")}
+      async function finishWorkout(){if(!getStats(state.draft).sets)return;const answer=await showPopup("Завершить тренировку?");if(answer!=="ok")return;state.workouts.push({...state.draft,status:"completed",finishedAt:new Date().toISOString()});state.draft=createDraft();haptic("heavy");commit();toast("Тренировка сохранена")}
 
       function renderHistory(){
         el.historyList.replaceChildren();
         if(!state.workouts.length){el.historyList.appendChild(make("div","empty","Пока нет сохраненных тренировок"));return}
         let currentMonthKey="";
         [...state.workouts].sort((a,b)=>new Date(b.finishedAt)-new Date(a.finishedAt)).forEach(w=>{
-          const date=new Date(w.finishedAt);
-          const monthKey=`${date.getFullYear()}-${date.getMonth()}`;
-          if(monthKey!==currentMonthKey){
-            currentMonthKey=monthKey;
-            const monthTitle=date.toLocaleDateString("ru-RU",{month:"long",year:"numeric"});
-            el.historyList.appendChild(make("div","history-month-title",capitalize(monthTitle)));
-          }
-          const s=getStats(w);
-          const row=make("div","history-row");
-          row.dataset.id=w.id;
-          const open=make("button","history-item");
-          open.onclick=()=>openWorkout(w.id);
-          open.append(make("div","history-title",formatDateTitle(w.finishedAt)),make("div","muted",`${s.exercises} упражнений · ${s.sets} подходов · ${Math.round(s.volume)} кг`));
-          const csv=make("button","btn-card btn-accent icon-square","CSV");
-          csv.onclick=()=>exportWorkoutCsv(w.id);
-          const del=make("button","btn-card btn-danger icon-square","×");
-          del.onclick=()=>confirmDeleteWorkout(w.id,row);
-          row.append(open,csv,del);
-          el.historyList.appendChild(row);
+          const date=new Date(w.finishedAt);const monthKey=`${date.getFullYear()}-${date.getMonth()}`;
+          if(monthKey!==currentMonthKey){currentMonthKey=monthKey;const monthTitle=date.toLocaleDateString("ru-RU",{month:"long",year:"numeric"});el.historyList.appendChild(make("div","history-month-title",capitalize(monthTitle)))}
+          const s=getStats(w);const row=make("div","history-row");row.dataset.id=w.id;const open=make("button","history-item");open.onclick=()=>openWorkout(w.id);open.append(make("div","history-title",formatDateTitle(w.finishedAt)),make("div","muted",`${s.exercises} упражнений · ${s.sets} подходов · ${Math.round(s.volume)} кг`));const csv=make("button","btn-card btn-accent icon-square","CSV");csv.onclick=()=>exportWorkoutCsv(w.id);const del=make("button","btn-card btn-danger icon-square","×");del.onclick=()=>confirmDeleteWorkout(w.id,row);row.append(open,csv,del);el.historyList.appendChild(row)
         });
       }
+      function renderProgress(){const selected=el.progressSelect.value;const names=[...state.exercises].sort((a,b)=>a.localeCompare(b,"ru"));el.progressSelect.replaceChildren();const empty=document.createElement("option");empty.value="";text(empty,"Выбери упражнение");el.progressSelect.appendChild(empty);names.forEach(n=>{const o=document.createElement("option");o.value=n;text(o,n);el.progressSelect.appendChild(o)});el.progressSelect.value=selected&&names.includes(selected)?selected:"";showProgress()}
+      function showProgress(){const name=el.progressSelect.value;el.progressResult.replaceChildren();if(!name){el.progressResult.appendChild(make("div","progress-empty","Выбери упражнение, чтобы увидеть график"));return}const entries=[];state.workouts.slice().sort((a,b)=>new Date(a.finishedAt)-new Date(b.finishedAt)).forEach(w=>{let best=null,volume=0;w.exercises.forEach(e=>{if(!sameName(e.name,name))return;e.sets.forEach(s=>{best=best===null?s.weight:Math.max(best,s.weight);volume=Math.max(volume,s.weight*s.reps)})});if(best!==null)entries.push({date:w.finishedAt,weight:best,volume})});if(!entries.length){el.progressResult.appendChild(make("div","progress-empty","По этому упражнению пока нет данных"));return}const maxW=Math.max(...entries.map(e=>e.weight));const maxV=Math.max(...entries.map(e=>e.volume));const grid=make("div","stats-grid");[["Макс вес",`${maxW} кг`],["Лучший объем",`${Math.round(maxV)} кг`],["Тренировок",entries.length],["Последний",`${entries.at(-1).weight} кг`]].forEach(([l,v])=>{const c=make("div","stat");c.append(make("div","stat-num",v),make("div","muted",l));grid.appendChild(c)});el.progressResult.append(grid,make("div","chart-label","График показывает лучший вес по тренировкам"))}
+      function formatDateTitle(iso){const d=new Date(iso);const now=new Date();const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());const day=new Date(d.getFullYear(),d.getMonth(),d.getDate());const diff=Math.round((today-day)/86400000);if(diff===0)return"Сегодня";if(diff===1)return"Вчера";return d.toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}
+      function openWorkout(workoutId){const w=state.workouts.find(x=>x.id===workoutId);if(!w)return;openSheet();el.modalBody.replaceChildren();const s=getStats(w);el.modalBody.append(make("div","title",formatDateTitle(w.finishedAt)),make("div","meta",`${s.exercises} упражнений · ${s.sets} подходов · ${Math.round(s.volume)} кг`));w.exercises.forEach(e=>{const box=make("div","exercise");box.appendChild(make("div","exercise-name",e.name));e.sets.forEach((set,i)=>{const row=make("div","modal-set-row");row.append(make("div","",`${i+1}. ${set.weight} кг × ${set.reps}`),make("div","muted",`${Math.round(set.weight*set.reps)} кг`));box.appendChild(row)});el.modalBody.appendChild(box)});const actions=make("div","sheet-actions");const grid=make("div","grid");const edit=make("button","btn-card btn-accent","Редактировать");edit.onclick=()=>openEditWorkout(workoutId);const del=make("button","btn-card btn-danger icon-square","×");del.onclick=()=>confirmDeleteWorkout(workoutId);grid.append(edit,del);actions.appendChild(grid);el.modalBody.appendChild(actions)}
 
-      function renderProgress(){const selected=el.progressSelect.value; const names=[...state.exercises].sort((a,b)=>a.localeCompare(b,"ru")); el.progressSelect.replaceChildren(); const empty=document.createElement("option"); empty.value=""; text(empty,"Выбери упражнение"); el.progressSelect.appendChild(empty); names.forEach(n=>{const o=document.createElement("option"); o.value=n; text(o,n); el.progressSelect.appendChild(o)}); el.progressSelect.value=selected&&names.includes(selected)?selected:""; showProgress()}
-      function showProgress(){const name=el.progressSelect.value; el.progressResult.replaceChildren(); if(!name){el.progressResult.appendChild(make("div","progress-empty","Выбери упражнение, чтобы увидеть график"));return} const entries=[]; state.workouts.slice().sort((a,b)=>new Date(a.finishedAt)-new Date(b.finishedAt)).forEach(w=>{let best=null,volume=0; w.exercises.forEach(e=>{if(!sameName(e.name,name))return; e.sets.forEach(s=>{best=best===null?s.weight:Math.max(best,s.weight); volume=Math.max(volume,s.weight*s.reps)})}); if(best!==null)entries.push({date:w.finishedAt,weight:best,volume})}); if(!entries.length){el.progressResult.appendChild(make("div","progress-empty","По этому упражнению пока нет данных"));return} const maxW=Math.max(...entries.map(e=>e.weight)); const maxV=Math.max(...entries.map(e=>e.volume)); const grid=make("div","stats-grid"); [["Макс вес",`${maxW} кг`],["Лучший объем",`${Math.round(maxV)} кг`],["Тренировок",entries.length],["Последний",`${entries.at(-1).weight} кг`]].forEach(([l,v])=>{const c=make("div","stat"); c.append(make("div","stat-num",v),make("div","muted",l)); grid.appendChild(c)}); el.progressResult.append(grid,make("div","chart-label","График показывает лучший вес по тренировкам"))}
+      function openEditWorkout(workoutId){
+        const w=state.workouts.find(x=>x.id===workoutId);
+        if(!w)return;
+        openSheet();
+        el.modalBody.replaceChildren();
+        el.modalBody.append(make("div","title","Редактировать тренировку"));
+        const form=make("div","modal-form");
+        w.exercises.forEach(ex=>{
+          const group=make("div","edit-exercise-group");
+          group.dataset.exId=ex.id;
+          const name=make("input","");
+          name.value=ex.name;
+          name.dataset.exId=ex.id;
+          group.appendChild(name);
+          ex.sets.forEach(set=>{
+            const card=make("div","edit-set-card");
+            card.dataset.setId=set.id;
+            const nums=make("div","form-numbers");
+            const weight=make("input","");
+            weight.value=set.weight;
+            weight.inputMode="decimal";
+            weight.dataset.kind="weight";
+            const reps=make("input","");
+            reps.value=set.reps;
+            reps.inputMode="numeric";
+            reps.dataset.kind="reps";
+            nums.append(weight,reps);
+            const del=make("button","btn-card btn-danger icon-square","×");
+            del.type="button";
+            del.onclick=()=>animateRemove(card,()=>card.remove());
+            card.append(nums,del);
+            group.appendChild(card);
+          });
+          form.appendChild(group);
+        });
+        const actions=make("div","sheet-actions");
+        const grid=make("div","grid");
+        const save=make("button","btn-card btn-accent","Сохранить");
+        save.onclick=()=>saveWorkoutEdit(workoutId,form);
+        const del=make("button","btn-card btn-danger icon-square","×");
+        del.onclick=()=>confirmDeleteWorkout(workoutId);
+        grid.append(save,del);
+        actions.appendChild(grid);
+        el.modalBody.append(form,actions);
+      }
 
-      function formatDateTitle(iso){const d=new Date(iso); const now=new Date(); const today=new Date(now.getFullYear(),now.getMonth(),now.getDate()); const day=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const diff=Math.round((today-day)/86400000); if(diff===0)return"Сегодня"; if(diff===1)return"Вчера"; return d.toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}
-      function openWorkout(id){const w=state.workouts.find(x=>x.id===id); if(!w)return; openSheet(); el.modalBody.replaceChildren(); const s=getStats(w); el.modalBody.append(make("div","title",formatDateTitle(w.finishedAt)),make("div","meta",`${s.exercises} упражнений · ${s.sets} подходов · ${Math.round(s.volume)} кг`)); w.exercises.forEach(e=>{const box=make("div","exercise"); box.appendChild(make("div","exercise-name",e.name)); e.sets.forEach((set,i)=>{const row=make("div","modal-set-row"); row.append(make("div","",`${i+1}. ${set.weight} кг × ${set.reps}`),make("div","muted",`${Math.round(set.weight*set.reps)} кг`)); box.appendChild(row)}); el.modalBody.appendChild(box)}); const actions=make("div","sheet-actions"); const grid=make("div","grid"); const edit=make("button","btn-card btn-accent","Редактировать"); edit.onclick=()=>openEditWorkout(id); const del=make("button","btn-card btn-danger icon-square","×"); del.onclick=()=>confirmDeleteWorkout(id); grid.append(edit,del); actions.appendChild(grid); el.modalBody.appendChild(actions)}
-      function openEditWorkout(id){const w=state.workouts.find(x=>x.id===id); if(!w)return; openSheet(); el.modalBody.replaceChildren(); el.modalBody.append(make("div","title","Редактировать тренировку")); const form=make("div","modal-form"); w.exercises.forEach(ex=>{const group=make("div","edit-exercise-group"); const name=make("input",""); name.value=ex.name; name.dataset.exId=ex.id; group.appendChild(name); ex.sets.forEach(set=>{const card=make("div","edit-set-card"); card.dataset.setId=set.id; const nums=make("div","form-numbers"); const weight=make("input",""); weight.value=set.weight; weight.inputMode="decimal"; weight.dataset.kind="weight"; const reps=make("input",""); reps.value=set.reps; reps.inputMode="numeric"; reps.dataset.kind="reps"; nums.append(weight,reps); card.appendChild(nums); group.appendChild(card)}); form.appendChild(group)}); const actions=make("div","sheet-actions"); const grid=make("div","grid"); const save=make("button","btn-card btn-accent","Сохранить"); save.onclick=()=>saveWorkoutEdit(id,form); const del=make("button","btn-card btn-danger icon-square","×"); del.onclick=()=>confirmDeleteWorkout(id); grid.append(save,del); actions.appendChild(grid); el.modalBody.append(form,actions)}
-      function saveWorkoutEdit(id,form){const w=state.workouts.find(x=>x.id===id); if(!w)return; const groups=[...form.querySelectorAll(".edit-exercise-group")]; for(const group of groups){const nameInput=group.querySelector("input[data-ex-id]"); const ex=w.exercises.find(e=>e.id===nameInput.dataset.exId); if(!ex||!nameInput.value.trim()){toast("Проверь название упражнения");return} ex.name=nameInput.value.trim(); for(const card of [...group.querySelectorAll(".edit-set-card")]){const set=ex.sets.find(s=>s.id===card.dataset.setId); const parsed=parseSetInput(card.querySelector('[data-kind="weight"]').value,card.querySelector('[data-kind="reps"]').value); if(!set||!parsed){toast("Проверь вес и повторы");return} set.weight=parsed.weight; set.reps=parsed.reps}} haptic(); commit(); closeModal(); toast("Тренировка обновлена")}
-      function exportWorkoutCsv(id){const w=state.workouts.find(x=>x.id===id); if(!w)return; const csv=w.exercises.map(e=>`"${[e.name,...e.sets.map((s,i)=>`${i+1}й подход ${s.weight}кг х ${s.reps}`)].join("\n").replace(/"/g,'""')}"`).join(";"); const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`workout-${new Date(w.finishedAt).toISOString().slice(0,10)}.csv`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); toast("CSV-файл создан")}
-      async function confirmDeleteWorkout(id,node){const answer=await showPopup("Удалить тренировку?"); if(answer!=="ok")return; const row=node||el.historyList.querySelector(`[data-id="${id}"]`); if(row)animateRemove(row,()=>deleteWorkout(id)); else deleteWorkout(id)}
-      function deleteWorkout(id){state.workouts=state.workouts.filter(w=>w.id!==id); closeModal(); haptic("medium"); commit(); toast("Тренировка удалена")}
-      function openSheet(){el.modal.classList.add("open"); if(tg&&tg.BackButton){tg.BackButton.offClick(closeModal);tg.BackButton.onClick(closeModal);tg.BackButton.show()}}
-      function closeModal(){el.modal.classList.remove("open"); hideKeyboard(); if(tg&&tg.BackButton){tg.BackButton.offClick(closeModal);tg.BackButton.hide()}}
-      function animateRemove(node,done){node.style.maxHeight=node.scrollHeight+"px"; node.style.overflow="hidden"; requestAnimationFrame(()=>node.classList.add("remove-anim")); setTimeout(()=>done&&done(),260)}
-      function bindEvents(){el.tabs.forEach(tab=>tab.addEventListener("click",()=>{state.tab=tab.dataset.tab;haptic();renderAll()})); [el.exerciseInput,el.weightInput,el.repsInput].forEach(i=>i.addEventListener("input",updateForm)); el.exerciseInput.addEventListener("change",fillLastSet); el.addSetBtn.addEventListener("click",addSet); el.repeatSetBtn.addEventListener("click",fillLastSet); el.fallbackFinishBtn.addEventListener("click",finishWorkout); el.progressSelect.addEventListener("change",showProgress); el.modal.addEventListener("click",e=>{if(e.target===el.modal)closeModal()}); el.repsInput.addEventListener("keydown",e=>{if(e.key==="Enter"&&!el.addSetBtn.disabled){e.preventDefault();addSet()}})}
-      function initTelegram(){if(!tg)return; tg.ready(); tg.expand(); if(tg.MainButton){tg.MainButton.offClick(finishWorkout);tg.MainButton.setParams({color:"#ff6418",text_color:"#ffffff"});tg.MainButton.hide()}}
-      function init(){initTelegram(); bindEvents(); loadData()}
+      function saveWorkoutEdit(workoutId,form){
+        const w=state.workouts.find(x=>x.id===workoutId);
+        if(!w)return;
+        const nextExercises=[];
+        const groups=[...form.querySelectorAll(".edit-exercise-group")];
+        for(const group of groups){
+          const nameInput=group.querySelector("input[data-ex-id]");
+          const name=nameInput?nameInput.value.trim():"";
+          if(!name){toast("Проверь название упражнения");return}
+          const cards=[...group.querySelectorAll(".edit-set-card")];
+          if(!cards.length)continue;
+          const sets=[];
+          for(const card of cards){
+            const parsed=parseSetInput(card.querySelector('[data-kind="weight"]').value,card.querySelector('[data-kind="reps"]').value);
+            if(!parsed){toast("Проверь вес и повторы");return}
+            sets.push({id:card.dataset.setId||id(),weight:parsed.weight,reps:parsed.reps});
+          }
+          nextExercises.push({id:group.dataset.exId||id(),name,sets});
+        }
+        if(!nextExercises.length){toast("Нельзя сохранить пустую тренировку");return}
+        w.exercises=nextExercises;
+        haptic();
+        commit();
+        closeModal();
+        toast("Тренировка обновлена");
+      }
+
+      function exportWorkoutCsv(workoutId){const w=state.workouts.find(x=>x.id===workoutId);if(!w)return;const csv=w.exercises.map(e=>`"${[e.name,...e.sets.map((s,i)=>`${i+1}й подход ${s.weight}кг х ${s.reps}`)].join("\n").replace(/"/g,'""')}"`).join(";");const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`workout-${new Date(w.finishedAt).toISOString().slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast("CSV-файл создан")}
+      async function confirmDeleteWorkout(workoutId,node){const answer=await showPopup("Удалить тренировку?");if(answer!=="ok")return;const row=node||el.historyList.querySelector(`[data-id="${workoutId}"]`);if(row)animateRemove(row,()=>deleteWorkout(workoutId));else deleteWorkout(workoutId)}
+      function deleteWorkout(workoutId){state.workouts=state.workouts.filter(w=>w.id!==workoutId);closeModal();haptic("medium");commit();toast("Тренировка удалена")}
+      function openSheet(){el.modal.classList.add("open");if(tg&&tg.BackButton){tg.BackButton.offClick(closeModal);tg.BackButton.onClick(closeModal);tg.BackButton.show()}}
+      function closeModal(){el.modal.classList.remove("open");hideKeyboard();if(tg&&tg.BackButton){tg.BackButton.offClick(closeModal);tg.BackButton.hide()}}
+      function animateRemove(node,done){node.style.maxHeight=node.scrollHeight+"px";node.style.overflow="hidden";requestAnimationFrame(()=>node.classList.add("remove-anim"));setTimeout(()=>done&&done(),260)}
+      function bindEvents(){el.tabs.forEach(tab=>tab.addEventListener("click",()=>{state.tab=tab.dataset.tab;haptic();renderAll()}));[el.exerciseInput,el.weightInput,el.repsInput].forEach(i=>i.addEventListener("input",updateForm));el.exerciseInput.addEventListener("change",fillLastSet);el.addSetBtn.addEventListener("click",addSet);el.repeatSetBtn.addEventListener("click",fillLastSet);el.fallbackFinishBtn.addEventListener("click",finishWorkout);el.progressSelect.addEventListener("change",showProgress);el.modal.addEventListener("click",e=>{if(e.target===el.modal)closeModal()});el.repsInput.addEventListener("keydown",e=>{if(e.key==="Enter"&&!el.addSetBtn.disabled){e.preventDefault();addSet()}})}
+      function initTelegram(){if(!tg)return;tg.ready();tg.expand();if(tg.MainButton){tg.MainButton.offClick(finishWorkout);tg.MainButton.setParams({color:"#ff6418",text_color:"#ffffff"});tg.MainButton.hide()}}
+      function init(){initTelegram();bindEvents();loadData()}
       init();
     })();
   </script>
