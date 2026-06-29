@@ -46,11 +46,12 @@
     .fallback-finish{display:none;width:100%;margin-top:10px;background:#ff6418;color:#fff;border-color:rgba(255,100,24,.55)}
     .exercise{padding:16px 0;border-bottom:1px solid var(--line);animation:itemIn .2s cubic-bezier(.2,.8,.2,1) both}.exercise:last-child{border-bottom:0}.exercise-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:16px}.exercise-name{font-size:16px;font-weight:800;overflow-wrap:anywhere}
     .set-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;min-height:46px;animation:itemIn .2s cubic-bezier(.2,.8,.2,1) both;overflow:hidden}.set-value{display:flex;align-items:center;width:100%;min-height:54px;padding:14px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line);font-weight:700}#draftList .set-row{grid-template-columns:1fr 54px 54px;align-items:stretch;min-height:54px;margin-bottom:9px}
+    .history-month-title{margin:18px 2px 10px;font-size:15px;font-weight:850;color:rgba(255,255,255,.78);animation:itemIn .2s cubic-bezier(.2,.8,.2,1) both}
     .history-row{display:grid;grid-template-columns:1fr 54px 54px;gap:8px;align-items:stretch;margin-bottom:9px;overflow:hidden;animation:itemIn .2s cubic-bezier(.2,.8,.2,1) both}.history-item{width:100%;min-height:54px;text-align:left;display:block;background:var(--surface);padding:14px;border-radius:var(--radius);border:1px solid var(--line);box-shadow:none}.history-title{font-weight:820;font-size:17px;margin-bottom:4px}
     .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:13px}.stat-num{font-size:23px;font-weight:850;color:var(--accent);overflow-wrap:anywhere}.progress-chart{width:100%;height:190px;margin-top:14px;border-radius:var(--radius);background:rgba(255,255,255,.04);border:1px solid var(--line);overflow:hidden}.progress-chart svg{display:block;width:100%;height:100%}.chart-label{margin-top:8px;text-align:center;color:var(--muted);font-size:13px}
     .toast{position:fixed;left:50%;bottom:calc(18px + var(--safe-bottom));transform:translateX(-50%);max-width:calc(100vw - 28px);padding:11px 15px;border-radius:999px;background:rgba(20,20,20,.92);border:1px solid var(--line);z-index:40;display:none}
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.64);display:none;align-items:flex-end;z-index:30;backdrop-filter:blur(8px)}.modal.open{display:flex;animation:fadeIn .16s ease both}.sheet{width:100%;max-width:560px;max-height:88vh;margin:0 auto;overflow:auto;background:#0b0b0b;border:1px solid var(--line);border-radius:24px 24px 0 0;padding:18px 14px calc(28px + var(--safe-bottom));animation:sheetIn .24s cubic-bezier(.2,.9,.2,1) both}.handle{width:42px;height:4px;border-radius:4px;background:rgba(255,255,255,.22);margin:0 auto 16px}
-    .sheet-actions{position:sticky;bottom:-14px;padding-top:12px;margin-top:12px;background:linear-gradient(180deg,transparent,rgba(11,11,11,.95) 44%,#0b0b0b 90%)}.sheet-actions .grid{display:grid;grid-template-columns:1fr 54px;gap:8px}.modal-set-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;min-height:40px;padding:8px 0}.edit-exercise-group{margin-top:14px}.edit-group-title{font-size:15px;font-weight:850;color:rgba(255,255,255,.86);margin:0 2px 8px;overflow-wrap:anywhere}.edit-set-card{padding:10px;margin-bottom:8px;border-radius:14px;background:rgba(255,255,255,.045);box-shadow:none}.edit-set-head{display:grid;grid-template-columns:1fr 54px;gap:8px;margin-bottom:8px}
+    .sheet-actions{position:sticky;bottom:-14px;padding-top:12px;margin-top:12px;background:linear-gradient(180deg,transparent,rgba(11,11,11,.95) 44%,#0b0b0b 90%)}.sheet-actions .grid{display:grid;grid-template-columns:1fr 54px;gap:8px}.modal-set-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;min-height:40px;padding:8px 0}.edit-exercise-group{margin-top:14px}.edit-set-card{padding:10px;margin-bottom:8px;border-radius:14px;background:rgba(255,255,255,.045);box-shadow:none}
     .remove-anim{opacity:0!important;transform:translateX(18px) scale(.96)!important;max-height:0!important;margin-top:0!important;margin-bottom:0!important;padding-top:0!important;padding-bottom:0!important;transition:opacity .22s ease,transform .22s ease,max-height .24s ease,margin .24s ease,padding .24s ease}
     .flash{animation:flash .42s ease both}
     button,.history-item,.set-value,input,select{transition:transform .14s ease,background-color .16s ease,border-color .16s ease,box-shadow .16s ease,opacity .16s ease}button:active,.history-item:active{transform:scale(.975)}.toast.show{animation:toastIn .18s ease both}
@@ -109,6 +110,7 @@
       function safeStorageSet(k,v){try{localStorage.setItem(k,v);return true}catch{toast("Не удалось сохранить данные");return false}}
       function getStats(w){const exercises=w.exercises.length; const sets=w.exercises.reduce((s,e)=>s+e.sets.length,0); const volume=w.exercises.reduce((s,e)=>s+e.sets.reduce((x,set)=>x+set.weight*set.reps,0),0); return {exercises,sets,volume}}
       function isValidDraft(v){return v&&v.status==="draft"&&Array.isArray(v.exercises)}
+      function capitalize(value){return String(value||"").replace(/^./,ch=>ch.toUpperCase())}
       function sanitizeWorkout(w){return {id:w.id||id(),status:w.status||"completed",createdAt:w.createdAt||new Date().toISOString(),finishedAt:w.finishedAt,exercises:(w.exercises||[]).filter(e=>e&&e.name&&Array.isArray(e.sets)).map(e=>({id:e.id||id(),name:String(e.name).trim(),sets:e.sets.map(s=>({id:s.id||id(),weight:Number(s.weight),reps:Number(s.reps)})).filter(s=>Number.isFinite(s.weight)&&s.weight>=0&&Number.isInteger(s.reps)&&s.reps>0)})).filter(e=>e.name&&e.sets.length)}}
       function rebuildCatalog(){state.exercises=new Set(); state.workouts.forEach(w=>w.exercises.forEach(e=>state.exercises.add(e.name))); state.draft.exercises.forEach(e=>state.exercises.add(e.name))}
       function toast(msg){text(el.toast,msg); el.toast.style.display="block"; el.toast.classList.remove("show"); requestAnimationFrame(()=>el.toast.classList.add("show")); clearTimeout(toast.timer); toast.timer=setTimeout(()=>{el.toast.style.display="none";el.toast.classList.remove("show")},CONFIG.toastDelay)}
@@ -175,7 +177,28 @@
       function renderHistory(){
         el.historyList.replaceChildren();
         if(!state.workouts.length){el.historyList.appendChild(make("div","empty","Пока нет сохраненных тренировок"));return}
-        [...state.workouts].sort((a,b)=>new Date(b.finishedAt)-new Date(a.finishedAt)).forEach(w=>{const s=getStats(w); const row=make("div","history-row"); row.dataset.id=w.id; const open=make("button","history-item"); open.onclick=()=>openWorkout(w.id); open.append(make("div","history-title",formatDateTitle(w.finishedAt)),make("div","muted",`${s.exercises} упражнений · ${s.sets} подходов · ${Math.round(s.volume)} кг`)); const csv=make("button","btn-card btn-accent icon-square","CSV"); csv.onclick=()=>exportWorkoutCsv(w.id); const del=make("button","btn-card btn-danger icon-square","×"); del.onclick=()=>confirmDeleteWorkout(w.id,row); row.append(open,csv,del); el.historyList.appendChild(row)})
+        let currentMonthKey="";
+        [...state.workouts].sort((a,b)=>new Date(b.finishedAt)-new Date(a.finishedAt)).forEach(w=>{
+          const date=new Date(w.finishedAt);
+          const monthKey=`${date.getFullYear()}-${date.getMonth()}`;
+          if(monthKey!==currentMonthKey){
+            currentMonthKey=monthKey;
+            const monthTitle=date.toLocaleDateString("ru-RU",{month:"long",year:"numeric"});
+            el.historyList.appendChild(make("div","history-month-title",capitalize(monthTitle)));
+          }
+          const s=getStats(w);
+          const row=make("div","history-row");
+          row.dataset.id=w.id;
+          const open=make("button","history-item");
+          open.onclick=()=>openWorkout(w.id);
+          open.append(make("div","history-title",formatDateTitle(w.finishedAt)),make("div","muted",`${s.exercises} упражнений · ${s.sets} подходов · ${Math.round(s.volume)} кг`));
+          const csv=make("button","btn-card btn-accent icon-square","CSV");
+          csv.onclick=()=>exportWorkoutCsv(w.id);
+          const del=make("button","btn-card btn-danger icon-square","×");
+          del.onclick=()=>confirmDeleteWorkout(w.id,row);
+          row.append(open,csv,del);
+          el.historyList.appendChild(row);
+        });
       }
 
       function renderProgress(){const selected=el.progressSelect.value; const names=[...state.exercises].sort((a,b)=>a.localeCompare(b,"ru")); el.progressSelect.replaceChildren(); const empty=document.createElement("option"); empty.value=""; text(empty,"Выбери упражнение"); el.progressSelect.appendChild(empty); names.forEach(n=>{const o=document.createElement("option"); o.value=n; text(o,n); el.progressSelect.appendChild(o)}); el.progressSelect.value=selected&&names.includes(selected)?selected:""; showProgress()}
