@@ -2,382 +2,2007 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
   <title>Святилище ТРЕНЕРА</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#070707;--surface:rgba(255,255,255,.055);--field:#171717;--line:rgba(255,255,255,.09);--text:#fff;--muted:rgba(255,255,255,.58);--accent:#ff6418;--accent-soft:rgba(255,100,24,.10);--accent-line:rgba(255,100,24,.24);--danger-soft:rgba(255,70,70,.12);--danger-line:rgba(255,90,90,.28);--danger-text:#ff8a8a;--radius:18px;--safe-top:env(safe-area-inset-top);--safe-bottom:env(safe-area-inset-bottom);--tab-index:0}
-    html,body{min-height:100%}
-    body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui,sans-serif;background:radial-gradient(circle at 80% 0%,rgba(255,100,24,.18),transparent 36%),linear-gradient(180deg,#12100f 0%,var(--bg) 46%);color:var(--text);padding:max(14px,var(--safe-top)) 14px calc(28px + var(--safe-bottom));font-size:15px}
-    button,input,select{font:inherit;color:inherit}
-    button{min-height:46px;border:0;border-radius:999px;background:var(--accent);color:#fff;font-weight:750;cursor:pointer;-webkit-tap-highlight-color:transparent}
-    button:disabled{opacity:.42;cursor:default}
-    input,select{width:100%;min-height:48px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--field);color:#fff;outline:none}
-    input::placeholder{color:rgba(255,255,255,.38)}
-    input:focus,select:focus{border-color:rgba(255,100,24,.75);box-shadow:0 0 0 3px rgba(255,100,24,.13)}
-    .app{max-width:560px;margin:0 auto}
-    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px;animation:softIn .24s ease both}
-    .title{font-size:28px;line-height:1.08;font-weight:850}
-    .title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
-    .sheet .title{margin-bottom:0}
-    .meta{margin-top:6px;color:var(--muted);font-size:13px}
-    .muted{color:var(--muted);font-size:13px}
-    .section{margin-bottom:16px;animation:softIn .24s ease both}
-    .section-title{font-size:18px;font-weight:800;margin-bottom:10px}
-    .card{border-radius:var(--radius);background:var(--surface);border:1px solid var(--line);padding:13px;margin-bottom:10px;box-shadow:0 18px 40px rgba(0,0,0,.18);animation:softIn .24s ease both}
-    .empty,.progress-empty{padding:22px 12px;text-align:center;color:var(--muted)}
-    .panel{display:none}.panel.active{display:block;animation:panelSlide .22s cubic-bezier(.2,.8,.2,1) both}
-    .splash{position:fixed;inset:0;z-index:100;display:grid;align-items:end;background:#050505;overflow:hidden;transition:opacity .35s ease,visibility .35s ease}
-    .splash.hide{opacity:0;visibility:hidden;pointer-events:none}
-    .splash-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.02);filter:saturate(.98) brightness(.86) contrast(1.02)}
-    .splash:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.18) 38%,rgba(0,0,0,.92))}
-    .splash-content{position:relative;z-index:2;padding:28px 22px calc(34px + var(--safe-bottom))}
-    .splash-title{max-width:360px;font-size:42px;line-height:1.05;font-weight:850}.splash-title span{color:var(--accent)}
-    .splash-sub{margin-top:12px;max-width:310px;color:rgba(255,255,255,.72);line-height:1.45}
-    .loader{width:100%;height:5px;margin-top:24px;border-radius:999px;background:rgba(255,255,255,.14);overflow:hidden}.loader i{display:block;width:42%;height:100%;border-radius:inherit;background:var(--accent);animation:load 1.5s ease-in-out infinite}
-    .tabs-shell{width:100%;padding:7px;margin-bottom:16px;border-radius:26px;background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.055)),rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.13);box-shadow:0 18px 40px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.08);animation:softIn .24s ease both}
-    .tabs{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-    .tabs:before{content:"";position:absolute;z-index:0;top:0;bottom:0;left:0;width:calc((100% - 16px)/3);border-radius:18px;background:rgba(255,100,24,.14);border:1px solid rgba(255,100,24,.32);box-shadow:0 10px 22px rgba(255,100,24,.12);transform:translateX(calc(var(--tab-index) * (100% + 8px)));transition:transform .28s cubic-bezier(.2,.9,.2,1),box-shadow .28s ease;box-sizing:border-box}
-    .tabs[data-active="0"]{--tab-index:0}.tabs[data-active="1"]{--tab-index:1}.tabs[data-active="2"]{--tab-index:2}
-    .tab{position:relative;z-index:1;min-height:50px;border-radius:18px;background:transparent;border:1px solid transparent;color:rgba(255,255,255,.72);box-shadow:none;font-size:14px;transition:color .2s ease,transform .16s ease}.tab.active{color:var(--accent)}
-    .form-stack,.modal-form{display:grid;gap:9px}.form-numbers{display:grid;grid-template-columns:1fr 1fr;gap:9px}.row{display:flex;gap:8px}.row>*{flex:1}#formHint{text-align:center}
-    .btn-card{min-height:54px;padding:0 14px;border-radius:var(--radius);border:1px solid var(--line);box-shadow:none;font-weight:750}.btn-muted{background:rgba(255,255,255,.06)}.btn-accent{color:var(--accent);background:var(--accent-soft);border-color:var(--accent-line)}.btn-danger{color:var(--danger-text);background:var(--danger-soft);border-color:var(--danger-line)}
-    .icon-square{width:54px;min-width:54px;padding:0;font-size:18px}#repeatSetBtn,#addSetBtn{min-height:54px;border-radius:var(--radius);box-shadow:none}#repeatSetBtn{background:rgba(255,255,255,.06);border:1px solid var(--line)}#addSetBtn{color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-line)}
-    .fallback-finish{display:none;width:100%;margin-top:10px;background:#ff6418;color:#fff;border-color:rgba(255,100,24,.55)}
-    .exercise{padding:16px 0;border-bottom:1px solid var(--line);animation:itemIn .2s cubic-bezier(.2,.8,.2,1) both}.exercise:last-child{border-bottom:0}.exercise-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:16px}.exercise-name{font-size:16px;font-weight:800;overflow-wrap:anywhere}
-    .set-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;min-height:46px;animation:itemIn .2s cubic-bezier(.2,.8,.2,1) both;overflow:hidden}.set-value{display:flex;align-items:center;width:100%;min-height:54px;padding:14px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line);font-weight:700}#draftList .set-row{grid-template-columns:1fr 54px 54px;align-items:stretch;min-height:54px;margin-bottom:9px}
-    .history-month-title{margin:18px 2px 10px;font-size:15px;font-weight:850;color:rgba(255,255,255,.78);animation:itemIn .2s cubic-bezier(.2,.8,.2,1) both}
-    .history-row{display:grid;grid-template-columns:1fr 54px 54px;gap:8px;align-items:stretch;margin-bottom:9px;overflow:hidden;animation:itemIn .2s cubic-bezier(.2,.8,.2,1) both}.history-item{width:100%;min-height:54px;text-align:left;display:block;background:var(--surface);padding:14px;border-radius:var(--radius);border:1px solid var(--line);box-shadow:none}.history-title{font-weight:820;font-size:17px;margin-bottom:4px}
-    .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:13px}.stat-num{font-size:23px;font-weight:850;color:var(--accent);overflow-wrap:anywhere}.progress-chart{width:100%;height:190px;margin-top:14px;border-radius:var(--radius);background:rgba(255,255,255,.04);border:1px solid var(--line);overflow:hidden}.progress-chart svg{display:block;width:100%;height:100%}.chart-label{margin-top:8px;text-align:center;color:var(--muted);font-size:13px}
-    .toast{position:fixed;left:50%;bottom:calc(18px + var(--safe-bottom));transform:translateX(-50%);max-width:calc(100vw - 28px);padding:11px 15px;border-radius:999px;background:rgba(20,20,20,.92);border:1px solid var(--line);z-index:40;display:none}
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.64);display:none;align-items:flex-end;z-index:30;backdrop-filter:blur(8px)}.modal.open{display:flex;animation:fadeIn .16s ease both}.sheet{width:100%;max-width:560px;max-height:88vh;margin:0 auto;overflow:auto;background:#0b0b0b;border:1px solid var(--line);border-radius:24px 24px 0 0;padding:18px 14px calc(28px + var(--safe-bottom));animation:sheetIn .24s cubic-bezier(.2,.9,.2,1) both}.handle{width:42px;height:4px;border-radius:4px;background:rgba(255,255,255,.22);margin:0 auto 16px}
-    .sheet-actions{position:sticky;bottom:-14px;padding-top:12px;margin-top:12px;background:linear-gradient(180deg,transparent,rgba(11,11,11,.95) 44%,#0b0b0b 90%)}.sheet-actions>.btn-card{width:100%;display:block}
-    .sheet-actions .grid{display:grid;grid-template-columns:1fr 54px;gap:8px}
-    .modal-set-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;min-height:40px;padding:8px 0}
-    .edit-exercise-group{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.edit-exercise-group:first-child{margin-top:0;padding-top:0;border-top:0}.edit-exercise-group>input{margin-bottom:12px}
-    .edit-set-card{display:grid;grid-template-columns:1fr 54px;gap:8px;align-items:stretch;padding:10px;margin-bottom:8px;border-radius:14px;background:rgba(255,255,255,.045);box-shadow:none;overflow:hidden}.edit-set-card .form-numbers{min-width:0}
-    .remove-anim{opacity:0!important;transform:translateX(18px) scale(.96)!important;max-height:0!important;margin-top:0!important;margin-bottom:0!important;padding-top:0!important;padding-bottom:0!important;transition:opacity .22s ease,transform .22s ease,max-height .24s ease,margin .24s ease,padding .24s ease}
-    .flash{animation:flash .42s ease both}
-    button,.history-item,.set-value,input,select{transition:transform .14s ease,background-color .16s ease,border-color .16s.ease,box-shadow .16s ease,opacity .16s.ease}button:active,.history-item:active{transform:scale(.975)}.toast.show{animation:toastIn .18s.ease both}
-    @keyframes load{0%{transform:translateX(-120%)}100%{transform:translateX(260%)}}
-    @keyframes softIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes panelSlide{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
-    @keyframes itemIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
-    @keyframes toastIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
-    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    @keyframes sheetIn{from{opacity:0;transform:translateY(26px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
-    @keyframes flash{0%{box-shadow:0 0 0 rgba(255,100,24,0)}35%{box-shadow:0 0 0 3px rgba(255,100,24,.18),0 18px 44px rgba(255,100,24,.12)}100%{box-shadow:0 18px 40px rgba(0,0,0,.18)}}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #070707;
+      --surface: rgba(255, 255, 255, 0.055);
+      --field: #171717;
+      --line: rgba(255, 255, 255, 0.09);
+      --text: #fff;
+      --muted: rgba(255, 255, 255, 0.58);
+      --accent: #ff6418;
+      --accent-soft: rgba(255, 100, 24, 0.10);
+      --accent-line: rgba(255, 100, 24, 0.24);
+      --danger-soft: rgba(255, 70, 70, 0.12);
+      --danger-line: rgba(255, 90, 90, 0.28);
+      --danger-text: #ff8a8a;
+      --radius: 18px;
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+      --tab-index: 0;
+    }
+
+    html, body { min-height: 100%; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 80% 0%, rgba(255, 100, 24, 0.18), transparent 36%),
+        linear-gradient(180deg, #12100f 0%, var(--bg) 46%);
+      color: var(--text);
+      padding: max(14px, var(--safe-top)) 14px calc(28px + var(--safe-bottom));
+      font-size: 15px;
+    }
+
+    button, input, select { font: inherit; color: inherit; }
+
+    button {
+      min-height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 750;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:disabled {
+      opacity: 0.42;
+      cursor: default;
+    }
+
+    input, select {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: var(--field);
+      color: #fff;
+      outline: none;
+    }
+
+    input::placeholder { color: rgba(255, 255, 255, 0.38); }
+
+    input:focus, select:focus {
+      border-color: rgba(255, 100, 24, 0.75);
+      box-shadow: 0 0 0 3px rgba(255, 100, 24, 0.13);
+    }
+
+    .app {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-right: 136px;
+      animation: softIn 0.24s ease both;
+    }
+
+    .top-copy {
+      min-width: 0;
+    }
+
+    .title {
+      font-size: 28px;
+      line-height: 1.08;
+      font-weight: 850;
+      overflow-wrap: anywhere;
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .sheet .title {
+      margin-bottom: 0;
+    }
+
+    .meta {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .section {
+      margin-bottom: 16px;
+      animation: softIn 0.24s ease both;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .card {
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: 13px;
+      margin-bottom: 10px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+      animation: softIn 0.24s ease both;
+    }
+
+    .empty, .progress-empty {
+      padding: 22px 12px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .panel { display: none; }
+    .panel.active {
+      display: block;
+      animation: panelSlide 0.22s cubic-bezier(.2, .8, .2, 1) both;
+    }
+
+    .splash {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      align-items: end;
+      background: #050505;
+      overflow: hidden;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    .splash.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .splash-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.02);
+      filter: saturate(0.98) brightness(0.86) contrast(1.02);
+    }
+
+    .splash::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.08),
+        rgba(0, 0, 0, 0.18) 38%,
+        rgba(0, 0, 0, 0.92)
+      );
+    }
+
+    .splash-content {
+      position: relative;
+      z-index: 2;
+      padding: 28px 22px calc(34px + var(--safe-bottom));
+    }
+
+    .splash-title {
+      max-width: 360px;
+      font-size: 42px;
+      line-height: 1.05;
+      font-weight: 850;
+    }
+
+    .splash-title span { color: var(--accent); }
+
+    .splash-sub {
+      margin-top: 12px;
+      max-width: 310px;
+      color: rgba(255, 255, 255, 0.72);
+      line-height: 1.45;
+    }
+
+    .loader {
+      width: 100%;
+      height: 5px;
+      margin-top: 24px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      overflow: hidden;
+    }
+
+    .loader i {
+      display: block;
+      width: 42%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+      animation: load 1.5s ease-in-out infinite;
+    }
+
+    .tabs-shell {
+      width: 100%;
+      padding: 7px;
+      margin-bottom: 16px;
+      border-radius: 26px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.055)),
+        rgba(255, 255, 255, 0.075);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      animation: softIn 0.24s ease both;
+    }
+
+    .tabs {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .tabs::before {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: calc((100% - 16px) / 3);
+      border-radius: 18px;
+      background: rgba(255, 100, 24, 0.14);
+      border: 1px solid rgba(255, 100, 24, 0.32);
+      box-shadow: 0 10px 22px rgba(255, 100, 24, 0.12);
+      transform: translateX(calc(var(--tab-index) * (100% + 8px)));
+      transition: transform 0.28s cubic-bezier(.2, .9, .2, 1), box-shadow 0.28s ease;
+      box-sizing: border-box;
+    }
+
+    .tabs[data-active="0"] { --tab-index: 0; }
+    .tabs[data-active="1"] { --tab-index: 1; }
+    .tabs[data-active="2"] { --tab-index: 2; }
+
+    .tab {
+      position: relative;
+      z-index: 1;
+      min-height: 50px;
+      border-radius: 18px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: rgba(255, 255, 255, 0.72);
+      box-shadow: none;
+      font-size: 14px;
+      transition: color 0.2s ease, transform 0.16s ease;
+    }
+
+    .tab.active { color: var(--accent); }
+
+    .form-stack, .modal-form {
+      display: grid;
+      gap: 9px;
+    }
+
+    .form-numbers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .row > * { flex: 1; }
+
+    #formHint { text-align: center; }
+
+    .btn-card {
+      min-height: 54px;
+      padding: 0 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      box-shadow: none;
+      font-weight: 750;
+    }
+
+    .btn-muted {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .btn-accent {
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-color: var(--accent-line);
+    }
+
+    .btn-danger {
+      color: var(--danger-text);
+      background: var(--danger-soft);
+      border-color: var(--danger-line);
+    }
+
+    .icon-square {
+      width: 54px;
+      min-width: 54px;
+      padding: 0;
+      font-size: 18px;
+    }
+
+    #repeatSetBtn, #addSetBtn {
+      min-height: 54px;
+      border-radius: var(--radius);
+      box-shadow: none;
+    }
+
+    #repeatSetBtn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--line);
+    }
+
+    #addSetBtn {
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-line);
+    }
+
+    .fallback-finish {
+      display: none;
+      width: 100%;
+      margin-top: 10px;
+      background: #ff6418;
+      color: #fff;
+      border-color: rgba(255, 100, 24, 0.55);
+    }
+
+    .exercise {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--line);
+      animation: itemIn 0.2s cubic-bezier(.2, .8, .2, 1) both;
+    }
+
+    .exercise:last-child { border-bottom: 0; }
+
+    .exercise-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .exercise-name {
+      font-size: 16px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .set-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 46px;
+      animation: itemIn 0.2s cubic-bezier(.2, .8, .2, 1) both;
+      overflow: hidden;
+    }
+
+    .set-value {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-height: 54px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    #draftList .set-row {
+      grid-template-columns: 1fr 54px 54px;
+      align-items: stretch;
+      min-height: 54px;
+      margin-bottom: 9px;
+    }
+
+    .history-month-title {
+      margin: 18px 2px 10px;
+      font-size: 15px;
+      font-weight: 850;
+      color: rgba(255, 255, 255, 0.78);
+      animation: itemIn 0.2s cubic-bezier(.2, .8, .2, 1) both;
+    }
+
+    .history-row {
+      display: grid;
+      grid-template-columns: 1fr 54px 54px;
+      gap: 8px;
+      align-items: stretch;
+      margin-bottom: 9px;
+      overflow: hidden;
+      animation: itemIn 0.2s cubic-bezier(.2, .8, .2, 1) both;
+    }
+
+    .history-item {
+      width: 100%;
+      min-height: 54px;
+      text-align: left;
+      display: block;
+      background: var(--surface);
+      padding: 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .history-title {
+      font-weight: 820;
+      font-size: 17px;
+      margin-bottom: 4px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 10px;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 13px;
+    }
+
+    .stat-num {
+      font-size: 23px;
+      font-weight: 850;
+      color: var(--accent);
+      overflow-wrap: anywhere;
+    }
+
+    .progress-empty {
+      padding: 24px 12px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + var(--safe-bottom));
+      transform: translateX(-50%);
+      max-width: calc(100vw - 28px);
+      padding: 11px 15px;
+      border-radius: 999px;
+      background: rgba(20, 20, 20, 0.92);
+      border: 1px solid var(--line);
+      z-index: 40;
+      display: none;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.64);
+      display: none;
+      align-items: flex-end;
+      z-index: 30;
+      backdrop-filter: blur(8px);
+    }
+
+    .modal.open {
+      display: flex;
+      animation: fadeIn 0.16s ease both;
+    }
+
+    .sheet {
+      width: 100%;
+      max-width: 560px;
+      max-height: 88vh;
+      margin: 0 auto;
+      overflow: auto;
+      background: #0b0b0b;
+      border: 1px solid var(--line);
+      border-radius: 24px 24px 0 0;
+      padding: 18px 14px calc(28px + var(--safe-bottom));
+      animation: sheetIn 0.24s cubic-bezier(.2, .9, .2, 1) both;
+    }
+
+    .handle {
+      width: 42px;
+      height: 4px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.22);
+      margin: 0 auto 16px;
+    }
+
+    .sheet-actions {
+      position: sticky;
+      bottom: -14px;
+      padding-top: 12px;
+      margin-top: 12px;
+      background: linear-gradient(
+        180deg,
+        transparent,
+        rgba(11, 11, 11, 0.95) 44%,
+        #0b0b0b 90%
+      );
+    }
+
+    .sheet-actions > .btn-card {
+      width: 100%;
+      display: block;
+    }
+
+    .sheet-actions .grid {
+      display: grid;
+      grid-template-columns: 1fr 54px;
+      gap: 8px;
+    }
+
+    .modal-set-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 40px;
+      padding: 8px 0;
+    }
+
+    .edit-exercise-group {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .edit-exercise-group:first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .edit-exercise-group > input {
+      margin-bottom: 12px;
+    }
+
+    .edit-set-card {
+      display: grid;
+      grid-template-columns: 1fr 54px;
+      gap: 8px;
+      align-items: stretch;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.045);
+      box-shadow: none;
+      overflow: hidden;
+    }
+
+    .edit-set-card .form-numbers {
+      min-width: 0;
+    }
+
+    .remove-anim {
+      opacity: 0 !important;
+      transform: translateX(18px) scale(0.96) !important;
+      max-height: 0 !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      transition:
+        opacity 0.22s ease,
+        transform 0.22s ease,
+        max-height 0.24s ease,
+        margin 0.24s ease,
+        padding 0.24s ease;
+    }
+
+    .flash {
+      animation: flash 0.42s ease both;
+    }
+
+    .global-timer {
+      position: fixed;
+      top: calc(max(14px, var(--safe-top)) + 2px);
+      right: max(16px, calc((100vw - 560px) / 2 + 16px));
+      z-index: 60;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .timer-widget {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      min-height: 26px;
+    }
+
+    .timer-widget button {
+      min-height: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      box-shadow: none;
+      color: inherit;
+      font: inherit;
+      font-weight: inherit;
+      pointer-events: auto;
+    }
+
+    .timer-idle,
+    .timer-live {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .timer-idle {
+      padding: 6px 0 6px 6px;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 14px;
+      font-weight: 760;
+      letter-spacing: 0.01em;
+      pointer-events: auto;
+    }
+
+    .timer-icon {
+      width: 13px;
+      height: 13px;
+      display: block;
+      flex: none;
+      color: var(--accent);
+    }
+
+    .timer-live {
+      pointer-events: none;
+      color: rgba(255, 255, 255, 0.94);
+    }
+
+    .timer-readout {
+      font-size: 18px;
+      line-height: 1;
+      font-weight: 820;
+      letter-spacing: 0.04em;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1;
+      text-shadow: 0 1px 10px rgba(0, 0, 0, 0.28);
+    }
+
+    .timer-stop {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      color: var(--accent);
+      opacity: 0.9;
+      pointer-events: auto;
+    }
+
+    .timer-stop svg {
+      width: 11px;
+      height: 11px;
+      display: block;
+    }
+
+    .timer-widget.running .timer-idle { display: none; }
+    .timer-widget:not(.running) .timer-live { display: none; }
+
+    .timer-idle,
+    .timer-live,
+    .timer-stop {
+      transition: opacity 0.18s ease, transform 0.18s ease, color 0.18s ease;
+    }
+
+    .timer-widget.running .timer-live,
+    .timer-widget:not(.running) .timer-idle {
+      animation: softIn 0.18s ease both;
+    }
+
+    button,
+    .history-item,
+    .set-value,
+    input,
+    select {
+      transition:
+        transform 0.14s ease,
+        background-color 0.16s ease,
+        border-color 0.16s ease,
+        box-shadow 0.16s ease,
+        opacity 0.16s ease;
+    }
+
+    button:active,
+    .history-item:active {
+      transform: scale(0.975);
+    }
+
+    .toast.show {
+      animation: toastIn 0.18s ease both;
+    }
+
+    @keyframes load {
+      0%   { transform: translateX(-120%); }
+      100% { transform: translateX(260%); }
+    }
+
+    @keyframes softIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes panelSlide {
+      from { opacity: 0; transform: translateX(14px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes itemIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.985); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translate(-50%, 8px); }
+      to   { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes sheetIn {
+      from { opacity: 0; transform: translateY(26px) scale(0.985); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes flash {
+      0%   { box-shadow: 0 0 0 rgba(255, 100, 24, 0); }
+      35%  { box-shadow: 0 0 0 3px rgba(255, 100, 24, 0.18), 0 18px 44px rgba(255, 100, 24, 0.12); }
+      100% { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18); }
+    }
   </style>
 </head>
 <body>
-  <div class="splash" id="splash"><img class="splash-img" src="loading.jpg" alt="Загрузка" /><div class="splash-content"><div class="splash-title">Святилище<br><span>ТРЕНЕРА</span></div><div class="splash-sub">всем привет сегодня трена</div><div class="loader"><i></i></div></div></div>
+  <div class="splash" id="splash">
+    <img class="splash-img" src="loading.jpg" alt="Загрузка" />
+    <div class="splash-content">
+      <div class="splash-title">Святилище<br /><span>ТРЕНЕРА</span></div>
+      <div class="splash-sub">всем привет сегодня трена</div>
+      <div class="loader"><i></i></div>
+    </div>
+  </div>
+
   <div class="app">
-    <header class="top"><div><div class="title" id="screenTitle">Трена</div><div class="meta" id="screenMeta">Загрузка данных</div></div></header>
-    <div class="tabs-shell"><nav class="tabs" id="tabsNav" data-active="0"><button class="tab active" data-tab="today">Трена</button><button class="tab" data-tab="history">История</button><button class="tab" data-tab="progress">Прогресс</button></nav></div>
+    <header class="top">
+      <div class="top-copy">
+        <div class="title" id="screenTitle">Трена</div>
+        <div class="meta" id="screenMeta">Загрузка данных</div>
+      </div>
+    </header>
+
+    <div class="tabs-shell">
+      <nav class="tabs" id="tabsNav" data-active="0">
+        <button class="tab active" data-tab="today">Трена</button>
+        <button class="tab" data-tab="history">История</button>
+        <button class="tab" data-tab="progress">Прогресс</button>
+      </nav>
+    </div>
+
     <main>
       <section class="panel active" id="todayPanel">
-        <section class="section"><div class="section-title">Добавить подход</div><div class="card"><div class="form-stack"><input id="exerciseInput" placeholder="Упражнение" list="exerciseList" autocomplete="off" /><div class="form-numbers"><input id="weightInput" placeholder="кг" inputmode="decimal" /><input id="repsInput" placeholder="Повторений" inputmode="numeric" /></div><datalist id="exerciseList"></datalist><div class="row"><button id="repeatSetBtn" disabled>Такой же</button><button id="addSetBtn" disabled>Добавить</button></div><div class="muted" id="formHint">Выбери упражнение, вес и повторы</div></div></div></section>
-        <section class="section"><div class="section-title">Текущая тренировка</div><div class="card" id="draftList"></div><button id="fallbackFinishBtn" class="fallback-finish btn-card">Завершить тренировку</button></section>
+        <section class="section">
+          <div class="section-title">Добавить подход</div>
+          <div class="card">
+            <div class="form-stack">
+              <input
+                id="exerciseInput"
+                placeholder="Упражнение"
+                list="exerciseList"
+                autocomplete="off"
+              />
+              <div class="form-numbers">
+                <input id="weightInput" placeholder="кг" inputmode="decimal" />
+                <input id="repsInput" placeholder="Повторений" inputmode="numeric" />
+              </div>
+              <datalist id="exerciseList"></datalist>
+              <div class="row">
+                <button id="repeatSetBtn" disabled>Такой же</button>
+                <button id="addSetBtn" disabled>Добавить</button>
+              </div>
+              <div class="muted" id="formHint">Выбери упражнение, вес и повторы</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-title">Текущая тренировка</div>
+          <div class="card" id="draftList"></div>
+          <button id="fallbackFinishBtn" class="fallback-finish btn-card">
+            Завершить тренировку
+          </button>
+        </section>
       </section>
-      <section class="panel" id="historyPanel"><div id="historyList"></div></section>
-      <section class="panel" id="progressPanel"><div class="card"><select id="progressSelect"></select><div id="progressResult"></div></div></section>
+
+      <section class="panel" id="historyPanel">
+        <div id="historyList"></div>
+      </section>
+
+      <section class="panel" id="progressPanel">
+        <div class="card">
+          <select id="progressSelect"></select>
+          <div id="progressResult"></div>
+        </div>
+      </section>
     </main>
   </div>
+
+  <div class="global-timer" aria-live="off">
+    <div class="timer-widget" id="timerWidget">
+      <button
+        class="timer-idle"
+        id="timerStartBtn"
+        type="button"
+        aria-label="Запустить секундомер"
+      >
+        <svg class="timer-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M8 6.5c0-.82.93-1.29 1.59-.81l8.15 5.95a1 1 0 0 1 0 1.62L9.59 19.2A1 1 0 0 1 8 18.39V6.5Z"></path>
+        </svg>
+        <span>Старт</span>
+      </button>
+
+      <div class="timer-live">
+        <span class="timer-readout" id="timerReadout">00:00.00</span>
+        <button
+          class="timer-stop"
+          id="timerStopBtn"
+          type="button"
+          aria-label="Остановить и сбросить секундомер"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <rect x="7" y="7" width="10" height="10" rx="2"></rect>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
-  <div class="modal" id="modal"><div class="sheet"><div class="handle"></div><div id="modalBody"></div></div></div>
+
+  <div class="modal" id="modal">
+    <div class="sheet">
+      <div class="handle"></div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
 
   <script>
     (() => {
       "use strict";
-      const CONFIG={storageKey:"workouts_v4",draftKey:"draft_workout_v4",localDataKey:"trainer_data_v1",splashDelay:4000,toastDelay:2200};
-      const tg=window.Telegram&&window.Telegram.WebApp?window.Telegram.WebApp:null;
-      const state={tab:"today",workouts:[],draft:createDraft(),exercises:new Set()};
-      const tabOrder=["today","history","progress"];
-      const el={
-        splash:document.getElementById("splash"),screenTitle:document.getElementById("screenTitle"),screenMeta:document.getElementById("screenMeta"),tabsNav:document.getElementById("tabsNav"),
-        tabs:[...document.querySelectorAll(".tab")],panels:{today:document.getElementById("todayPanel"),history:document.getElementById("historyPanel"),progress:document.getElementById("progressPanel")},
-        exerciseInput:document.getElementById("exerciseInput"),weightInput:document.getElementById("weightInput"),repsInput:document.getElementById("repsInput"),exerciseList:document.getElementById("exerciseList"),
-        addSetBtn:document.getElementById("addSetBtn"),repeatSetBtn:document.getElementById("repeatSetBtn"),formHint:document.getElementById("formHint"),draftList:document.getElementById("draftList"),fallbackFinishBtn:document.getElementById("fallbackFinishBtn"),
-        historyList:document.getElementById("historyList"),progressSelect:document.getElementById("progressSelect"),progressResult:document.getElementById("progressResult"),toast:document.getElementById("toast"),modal:document.getElementById("modal"),modalBody:document.getElementById("modalBody")
+
+      const CONFIG = {
+        storageKey: "workouts_v4",
+        draftKey: "draft_workout_v4",
+        localDataKey: "trainer_data_v1",
+        splashDelay: 4000,
+        toastDelay: 2200
       };
 
-      function id(){return crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(16).slice(2)}`}
-      function createDraft(){return{id:id(),status:"draft",createdAt:new Date().toISOString(),exercises:[]}}
-      function text(node,value){if(node)node.textContent=value==null?"":String(value)}
-      function make(tag,cls,content){const n=document.createElement(tag);if(cls)n.className=cls;if(content!==undefined)text(n,content);return n}
-      function sameName(a,b){return String(a||"").trim().toLowerCase()===String(b||"").trim().toLowerCase()}
-      function normalizeNumber(v){return Number(String(v).trim().replace(",","."))}
-      function parseSetInput(w,r){const weight=normalizeNumber(w);const reps=Number(String(r).trim());if(!Number.isFinite(weight)||weight<0)return null;if(!Number.isInteger(reps)||reps<=0)return null;return{weight,reps}}
-      function safeJsonParse(v,f=null){try{return v?JSON.parse(v):f}catch{return f}}
-      function safeStorageGet(k){try{return localStorage.getItem(k)}catch{return null}}
-      function safeStorageSet(k,v){try{localStorage.setItem(k,v);return true}catch{toast("Не удалось сохранить данные");return false}}
-      function getStats(w){const exercises=w.exercises.length;const sets=w.exercises.reduce((s,e)=>s+e.sets.length,0);const volume=w.exercises.reduce((s,e)=>s+e.sets.reduce((x,set)=>x+set.weight*set.reps,0),0);return{exercises,sets,volume}}
-      function isValidDraft(v){return v&&v.status==="draft"&&Array.isArray(v.exercises)}
-      function capitalize(value){return String(value||"").replace(/^./,ch=>ch.toUpperCase())}
-      function sanitizeWorkout(w){return{id:w.id||id(),status:w.status||"completed",createdAt:w.createdAt||new Date().toISOString(),finishedAt:w.finishedAt,exercises:(w.exercises||[]).filter(e=>e&&e.name&&Array.isArray(e.sets)).map(e=>({id:e.id||id(),name:String(e.name).trim(),sets:e.sets.map(s=>({id:s.id||id(),weight:Number(s.weight),reps:Number(s.reps)})).filter(s=>Number.isFinite(s.weight)&&s.weight>=0&&Number.isInteger(s.reps)&&s.reps>0)})).filter(e=>e.name&&e.sets.length)}}
-      function rebuildCatalog(){state.exercises=new Set();state.workouts.forEach(w=>w.exercises.forEach(e=>state.exercises.add(e.name)));state.draft.exercises.forEach(e=>state.exercises.add(e.name))}
-      function toast(msg){text(el.toast,msg);el.toast.style.display="block";el.toast.classList.remove("show");requestAnimationFrame(()=>el.toast.classList.add("show"));clearTimeout(toast.timer);toast.timer=setTimeout(()=>{el.toast.style.display="none";el.toast.classList.remove("show")},CONFIG.toastDelay)}
-      function haptic(type="light"){if(tg&&tg.HapticFeedback)tg.HapticFeedback.impactOccurred(type)}
-      function hideKeyboard(){if(document.activeElement&&document.activeElement.blur)document.activeElement.blur()}
-      function showPopup(message){if(tg&&tg.showPopup)return new Promise(resolve=>tg.showPopup({message,buttons:[{id:"cancel",type:"cancel",text:"Отмена"},{id:"ok",type:"default",text:"ОК"}]},resolve));return Promise.resolve(confirm(message)?"ok":"cancel")}
+      const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
-      function loadData(){
-        const snapshot=safeJsonParse(safeStorageGet(CONFIG.localDataKey),null);
-        if(snapshot&&Array.isArray(snapshot.workouts)&&snapshot.draft){state.workouts=snapshot.workouts.map(sanitizeWorkout).filter(w=>w.exercises.length);state.draft=isValidDraft(snapshot.draft)?sanitizeWorkout(snapshot.draft):createDraft();state.draft.status="draft"}
-        else{state.workouts=safeJsonParse(safeStorageGet(CONFIG.storageKey),[]).map(sanitizeWorkout).filter(w=>w.exercises.length);const d=safeJsonParse(safeStorageGet(CONFIG.draftKey),null);state.draft=isValidDraft(d)?sanitizeWorkout(d):createDraft();state.draft.status="draft"}
-        rebuildCatalog();renderAll();commit(false);setTimeout(()=>el.splash.classList.add("hide"),CONFIG.splashDelay)
+      const state = {
+        tab: "today",
+        workouts: [],
+        draft: createDraft(),
+        exercises: new Set(),
+        timer: {
+          running: false,
+          startedAt: 0,
+          raf: 0
+        }
+      };
+
+      const tabOrder = ["today", "history", "progress"];
+
+      const el = {
+        splash: document.getElementById("splash"),
+        screenTitle: document.getElementById("screenTitle"),
+        screenMeta: document.getElementById("screenMeta"),
+        tabsNav: document.getElementById("tabsNav"),
+        tabs: [...document.querySelectorAll(".tab")],
+        panels: {
+          today: document.getElementById("todayPanel"),
+          history: document.getElementById("historyPanel"),
+          progress: document.getElementById("progressPanel")
+        },
+        exerciseInput: document.getElementById("exerciseInput"),
+        weightInput: document.getElementById("weightInput"),
+        repsInput: document.getElementById("repsInput"),
+        exerciseList: document.getElementById("exerciseList"),
+        addSetBtn: document.getElementById("addSetBtn"),
+        repeatSetBtn: document.getElementById("repeatSetBtn"),
+        formHint: document.getElementById("formHint"),
+        draftList: document.getElementById("draftList"),
+        fallbackFinishBtn: document.getElementById("fallbackFinishBtn"),
+        historyList: document.getElementById("historyList"),
+        progressSelect: document.getElementById("progressSelect"),
+        progressResult: document.getElementById("progressResult"),
+        toast: document.getElementById("toast"),
+        modal: document.getElementById("modal"),
+        modalBody: document.getElementById("modalBody"),
+        timerWidget: document.getElementById("timerWidget"),
+        timerStartBtn: document.getElementById("timerStartBtn"),
+        timerStopBtn: document.getElementById("timerStopBtn"),
+        timerReadout: document.getElementById("timerReadout")
+      };
+
+      function id() {
+        return crypto.randomUUID
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
       }
-      function commit(render=true){rebuildCatalog();const snapshot={updatedAt:Date.now(),workouts:state.workouts,draft:state.draft};safeStorageSet(CONFIG.localDataKey,JSON.stringify(snapshot));safeStorageSet(CONFIG.storageKey,JSON.stringify(state.workouts));safeStorageSet(CONFIG.draftKey,JSON.stringify(state.draft));if(render)renderAll()}
-      function renderAll(){updateMeta();renderTabs();renderExerciseList();renderDraft();renderHistory();renderProgress();updateForm();updateMainActions()}
-      function updateMeta(){const s=getStats(state.draft);text(el.screenTitle,{today:"Трена",history:"История",progress:"Прогресс"}[state.tab]);if(state.tab==="today")text(el.screenMeta,`${s.exercises} упражнений · ${s.sets} подходов · ${Math.round(s.volume)} кг`);else if(state.tab==="history")text(el.screenMeta,`${state.workouts.length} тренировок сохранено`);else text(el.screenMeta,"Лучшие веса и объем")}
-      function renderTabs(){el.tabsNav.dataset.active=String(tabOrder.indexOf(state.tab));el.tabs.forEach(t=>{const active=t.dataset.tab===state.tab;t.classList.toggle("active",active);el.panels[t.dataset.tab].classList.toggle("active",active)})}
-      function renderExerciseList(){el.exerciseList.replaceChildren();[...state.exercises].sort((a,b)=>a.localeCompare(b,"ru")).forEach(name=>{const o=document.createElement("option");o.value=name;el.exerciseList.appendChild(o)})}
-      function updateMainActions(){const hasSets=getStats(state.draft).sets>0;const shouldShow=hasSets&&state.tab==="today";const mainButton=tg&&tg.MainButton?tg.MainButton:null;el.fallbackFinishBtn.style.display=shouldShow&&!mainButton?"block":"none";if(!mainButton)return;mainButton.offClick(finishWorkout);if(!shouldShow){mainButton.hide();return}mainButton.setText("Завершить тренировку");mainButton.setParams({color:"#ff6418",text_color:"#ffffff"});mainButton.onClick(finishWorkout);mainButton.show()}
-      function updateForm(){const name=el.exerciseInput.value.trim();const parsed=parseSetInput(el.weightInput.value,el.repsInput.value);const valid=Boolean(name)&&Boolean(parsed);el.addSetBtn.disabled=!valid;el.repeatSetBtn.disabled=!getLastSet(name);text(el.formHint,valid?"Готово к добавлению":"Выбери упражнение, вес и повторы")}
-      function getOrCreateDraftExercise(name){let ex=state.draft.exercises.find(e=>sameName(e.name,name));if(!ex){ex={id:id(),name,sets:[]};state.draft.exercises.push(ex)}return ex}
-      function addSet(){const name=el.exerciseInput.value.trim();const parsed=parseSetInput(el.weightInput.value,el.repsInput.value);if(!name||!parsed){toast("Проверь вес и повторы");return}getOrCreateDraftExercise(name).sets.push({id:id(),...parsed});el.weightInput.value="";el.repsInput.value="";hideKeyboard();haptic();commit();el.draftList.classList.remove("flash");requestAnimationFrame(()=>el.draftList.classList.add("flash"))}
-      function getLastSet(name){if(!name)return null;const d=state.draft.exercises.find(e=>sameName(e.name,name));if(d&&d.sets.length)return d.sets[d.sets.length-1];for(const w of [...state.workouts].sort((a,b)=>new Date(b.finishedAt)-new Date(a.finishedAt))){const e=w.exercises.find(x=>sameName(x.name,name));if(e&&e.sets.length)return e.sets[e.sets.length-1]}return null}
-      function fillLastSet(){const last=getLastSet(el.exerciseInput.value.trim());if(!last)return;el.weightInput.value=last.weight;el.repsInput.value=last.reps;updateForm()}
 
-      function renderDraft(){
+      function createDraft() {
+        return {
+          id: id(),
+          status: "draft",
+          createdAt: new Date().toISOString(),
+          exercises: []
+        };
+      }
+
+      function text(node, value) {
+        if (node) node.textContent = value == null ? "" : String(value);
+      }
+
+      function make(tag, cls, content) {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (content !== undefined) text(n, content);
+        return n;
+      }
+
+      function sameName(a, b) {
+        return String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
+      }
+
+      function normalizeNumber(v) {
+        return Number(String(v).trim().replace(",", "."));
+      }
+
+      function parseSetInput(w, r) {
+        const weight = normalizeNumber(w);
+        const reps = Number(String(r).trim());
+        if (!Number.isFinite(weight) || weight < 0) return null;
+        if (!Number.isInteger(reps) || reps <= 0) return null;
+        return { weight, reps };
+      }
+
+      function safeJsonParse(v, fallback = null) {
+        try {
+          return v ? JSON.parse(v) : fallback;
+        } catch {
+          return fallback;
+        }
+      }
+
+      function safeStorageGet(key) {
+        try {
+          return localStorage.getItem(key);
+        } catch {
+          return null;
+        }
+      }
+
+      function safeStorageSet(key, value) {
+        try {
+          localStorage.setItem(key, value);
+          return true;
+        } catch {
+          toast("Не удалось сохранить данные");
+          return false;
+        }
+      }
+
+      function getStats(workout) {
+        const exercises = workout.exercises.length;
+        const sets = workout.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
+        const volume = workout.exercises.reduce(
+          (sum, ex) => sum + ex.sets.reduce((x, set) => x + set.weight * set.reps, 0),
+          0
+        );
+        return { exercises, sets, volume };
+      }
+
+      function isValidDraft(value) {
+        return value && value.status === "draft" && Array.isArray(value.exercises);
+      }
+
+      function capitalize(value) {
+        return String(value || "").replace(/^./, (ch) => ch.toUpperCase());
+      }
+
+      function sanitizeWorkout(workout) {
+        return {
+          id: workout.id || id(),
+          status: workout.status || "completed",
+          createdAt: workout.createdAt || new Date().toISOString(),
+          finishedAt: workout.finishedAt,
+          exercises: (workout.exercises || [])
+            .filter((ex) => ex && ex.name && Array.isArray(ex.sets))
+            .map((ex) => ({
+              id: ex.id || id(),
+              name: String(ex.name).trim(),
+              sets: ex.sets
+                .map((set) => ({
+                  id: set.id || id(),
+                  weight: Number(set.weight),
+                  reps: Number(set.reps)
+                }))
+                .filter(
+                  (set) =>
+                    Number.isFinite(set.weight) &&
+                    set.weight >= 0 &&
+                    Number.isInteger(set.reps) &&
+                    set.reps > 0
+                )
+            }))
+            .filter((ex) => ex.name && ex.sets.length)
+        };
+      }
+
+      function rebuildCatalog() {
+        state.exercises = new Set();
+        state.workouts.forEach((w) => w.exercises.forEach((e) => state.exercises.add(e.name)));
+        state.draft.exercises.forEach((e) => state.exercises.add(e.name));
+      }
+
+      function toast(msg) {
+        text(el.toast, msg);
+        el.toast.style.display = "block";
+        el.toast.classList.remove("show");
+        requestAnimationFrame(() => el.toast.classList.add("show"));
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => {
+          el.toast.style.display = "none";
+          el.toast.classList.remove("show");
+        }, CONFIG.toastDelay);
+      }
+
+      function haptic(type = "light") {
+        if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred(type);
+      }
+
+      function hideKeyboard() {
+        if (document.activeElement && document.activeElement.blur) {
+          document.activeElement.blur();
+        }
+      }
+
+      function showPopup(message) {
+        if (tg && tg.showPopup) {
+          return new Promise((resolve) =>
+            tg.showPopup(
+              {
+                message,
+                buttons: [
+                  { id: "cancel", type: "cancel", text: "Отмена" },
+                  { id: "ok", type: "default", text: "ОК" }
+                ]
+              },
+              resolve
+            )
+          );
+        }
+        return Promise.resolve(confirm(message) ? "ok" : "cancel");
+      }
+
+      function loadData() {
+        const snapshot = safeJsonParse(safeStorageGet(CONFIG.localDataKey), null);
+
+        if (snapshot && Array.isArray(snapshot.workouts) && snapshot.draft) {
+          state.workouts = snapshot.workouts
+            .map(sanitizeWorkout)
+            .filter((w) => w.exercises.length);
+          state.draft = isValidDraft(snapshot.draft)
+            ? sanitizeWorkout(snapshot.draft)
+            : createDraft();
+          state.draft.status = "draft";
+        } else {
+          state.workouts = safeJsonParse(safeStorageGet(CONFIG.storageKey), [])
+            .map(sanitizeWorkout)
+            .filter((w) => w.exercises.length);
+
+          const draft = safeJsonParse(safeStorageGet(CONFIG.draftKey), null);
+          state.draft = isValidDraft(draft) ? sanitizeWorkout(draft) : createDraft();
+          state.draft.status = "draft";
+        }
+
+        rebuildCatalog();
+        renderAll();
+        commit(false);
+        setTimeout(() => el.splash.classList.add("hide"), CONFIG.splashDelay);
+      }
+
+      function commit(render = true) {
+        rebuildCatalog();
+
+        const snapshot = {
+          updatedAt: Date.now(),
+          workouts: state.workouts,
+          draft: state.draft
+        };
+
+        safeStorageSet(CONFIG.localDataKey, JSON.stringify(snapshot));
+        safeStorageSet(CONFIG.storageKey, JSON.stringify(state.workouts));
+        safeStorageSet(CONFIG.draftKey, JSON.stringify(state.draft));
+
+        if (render) renderAll();
+      }
+
+      function renderAll() {
+        updateMeta();
+        renderTabs();
+        renderExerciseList();
+        renderDraft();
+        renderHistory();
+        renderProgress();
+        updateForm();
+        updateMainActions();
+      }
+
+      function updateMeta() {
+        const stats = getStats(state.draft);
+        text(
+          el.screenTitle,
+          { today: "Трена", history: "История", progress: "Прогресс" }[state.tab]
+        );
+
+        if (state.tab === "today") {
+          text(
+            el.screenMeta,
+            `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
+          );
+        } else if (state.tab === "history") {
+          text(el.screenMeta, `${state.workouts.length} тренировок сохранено`);
+        } else {
+          text(el.screenMeta, "Лучшие веса и объем");
+        }
+      }
+
+      function renderTabs() {
+        el.tabsNav.dataset.active = String(tabOrder.indexOf(state.tab));
+        el.tabs.forEach((tab) => {
+          const active = tab.dataset.tab === state.tab;
+          tab.classList.toggle("active", active);
+          el.panels[tab.dataset.tab].classList.toggle("active", active);
+        });
+      }
+
+      function renderExerciseList() {
+        el.exerciseList.replaceChildren();
+        [...state.exercises]
+          .sort((a, b) => a.localeCompare(b, "ru"))
+          .forEach((name) => {
+            const option = document.createElement("option");
+            option.value = name;
+            el.exerciseList.appendChild(option);
+          });
+      }
+
+      function updateMainActions() {
+        const hasSets = getStats(state.draft).sets > 0;
+        const shouldShow = hasSets && state.tab === "today";
+        const mainButton = tg && tg.MainButton ? tg.MainButton : null;
+
+        el.fallbackFinishBtn.style.display = shouldShow && !mainButton ? "block" : "none";
+
+        if (!mainButton) return;
+
+        mainButton.offClick(finishWorkout);
+
+        if (!shouldShow) {
+          mainButton.hide();
+          return;
+        }
+
+        mainButton.setText("Завершить тренировку");
+        mainButton.setParams({ color: "#ff6418", text_color: "#ffffff" });
+        mainButton.onClick(finishWorkout);
+        mainButton.show();
+      }
+
+      function updateForm() {
+        const name = el.exerciseInput.value.trim();
+        const parsed = parseSetInput(el.weightInput.value, el.repsInput.value);
+        const valid = Boolean(name) && Boolean(parsed);
+
+        el.addSetBtn.disabled = !valid;
+        el.repeatSetBtn.disabled = !getLastSet(name);
+
+        text(
+          el.formHint,
+          valid ? "Готово к добавлению" : "Выбери упражнение, вес и повторы"
+        );
+      }
+
+      function getOrCreateDraftExercise(name) {
+        let ex = state.draft.exercises.find((item) => sameName(item.name, name));
+        if (!ex) {
+          ex = { id: id(), name, sets: [] };
+          state.draft.exercises.push(ex);
+        }
+        return ex;
+      }
+
+      function addSet() {
+        const name = el.exerciseInput.value.trim();
+        const parsed = parseSetInput(el.weightInput.value, el.repsInput.value);
+
+        if (!name || !parsed) {
+          toast("Проверь вес и повторы");
+          return;
+        }
+
+        getOrCreateDraftExercise(name).sets.push({ id: id(), ...parsed });
+
+        el.weightInput.value = "";
+        el.repsInput.value = "";
+        hideKeyboard();
+        haptic();
+        commit();
+
+        el.draftList.classList.remove("flash");
+        requestAnimationFrame(() => el.draftList.classList.add("flash"));
+      }
+
+      function getLastSet(name) {
+        if (!name) return null;
+
+        const draftExercise = state.draft.exercises.find((e) => sameName(e.name, name));
+        if (draftExercise && draftExercise.sets.length) {
+          return draftExercise.sets[draftExercise.sets.length - 1];
+        }
+
+        const sorted = [...state.workouts].sort(
+          (a, b) => new Date(b.finishedAt) - new Date(a.finishedAt)
+        );
+
+        for (const workout of sorted) {
+          const ex = workout.exercises.find((item) => sameName(item.name, name));
+          if (ex && ex.sets.length) return ex.sets[ex.sets.length - 1];
+        }
+
+        return null;
+      }
+
+      function fillLastSet() {
+        const last = getLastSet(el.exerciseInput.value.trim());
+        if (!last) return;
+        el.weightInput.value = last.weight;
+        el.repsInput.value = last.reps;
+        updateForm();
+      }
+
+      function renderDraft() {
         el.draftList.replaceChildren();
-        if(!state.draft.exercises.length){el.draftList.appendChild(make("div","empty","Пока нет подходов"));return}
-        state.draft.exercises.forEach(ex=>{
-          const box=make("div","exercise");
-          const volume=ex.sets.reduce((s,set)=>s+set.weight*set.reps,0);
-          const head=make("div","exercise-head");
-          head.append(make("div","exercise-name",ex.name),make("div","muted",`${ex.sets.length} подходов · ${Math.round(volume)} кг`));
+
+        if (!state.draft.exercises.length) {
+          el.draftList.appendChild(make("div", "empty", "Пока нет подходов"));
+          return;
+        }
+
+        state.draft.exercises.forEach((ex) => {
+          const box = make("div", "exercise");
+          const volume = ex.sets.reduce((sum, set) => sum + set.weight * set.reps, 0);
+
+          const head = make("div", "exercise-head");
+          head.append(
+            make("div", "exercise-name", ex.name),
+            make("div", "muted", `${ex.sets.length} подходов · ${Math.round(volume)} кг`)
+          );
           box.appendChild(head);
-          ex.sets.forEach((set,i)=>{
-            const row=make("div","set-row");
-            row.appendChild(make("div","set-value",`${i+1}. ${set.weight} кг × ${set.reps}`));
-            const edit=make("button","btn-card btn-accent icon-square","✎");
-            edit.onclick=()=>openEditSetModal(ex.id,set.id);
-            const del=make("button","btn-card btn-danger icon-square","×");
-            del.onclick=()=>animateRemove(row,()=>deleteDraftSet(ex.id,set.id));
-            row.append(edit,del);
+
+          ex.sets.forEach((set, index) => {
+            const row = make("div", "set-row");
+            row.appendChild(
+              make("div", "set-value", `${index + 1}. ${set.weight} кг × ${set.reps}`)
+            );
+
+            const edit = make("button", "btn-card btn-accent icon-square", "✎");
+            edit.onclick = () => openEditSetModal(ex.id, set.id);
+
+            const del = make("button", "btn-card btn-danger icon-square", "×");
+            del.onclick = () => animateRemove(row, () => deleteDraftSet(ex.id, set.id));
+
+            row.append(edit, del);
             box.appendChild(row);
           });
+
           el.draftList.appendChild(box);
         });
       }
-      function deleteDraftSet(exId,setId){const ex=state.draft.exercises.find(e=>e.id===exId);if(!ex)return;ex.sets=ex.sets.filter(s=>s.id!==setId);state.draft.exercises=state.draft.exercises.filter(e=>e.sets.length);haptic("medium");commit();toast("Подход удален")}
-      function openEditSetModal(exId,setId){const ex=state.draft.exercises.find(e=>e.id===exId);const set=ex&&ex.sets.find(s=>s.id===setId);if(!set)return;openSheet();el.modalBody.replaceChildren();const title=make("div","title","Редактировать подход");const form=make("div","modal-form");const name=document.createElement("input");name.value=ex.name;const nums=make("div","form-numbers");const w=document.createElement("input");w.value=set.weight;w.inputMode="decimal";const r=document.createElement("input");r.value=set.reps;r.inputMode="numeric";nums.append(w,r);const save=make("button","btn-card btn-accent","Сохранить");save.onclick=()=>{const parsed=parseSetInput(w.value,r.value);if(!name.value.trim()||!parsed){toast("Проверь упражнение, вес и повторы");return}moveOrUpdateSet(state.draft,exId,setId,name.value.trim(),parsed.weight,parsed.reps);closeModal()};const cancel=make("button","btn-card btn-muted","Отмена");cancel.onclick=closeModal;form.append(name,nums,save,cancel);el.modalBody.append(title,form)}
-      function moveOrUpdateSet(workout,exId,setId,newName,weight,reps){const old=workout.exercises.find(e=>e.id===exId);if(!old)return;const idx=old.sets.findIndex(s=>s.id===setId);if(idx<0)return;const updated={...old.sets[idx],weight,reps};old.sets.splice(idx,1);let target=workout.exercises.find(e=>sameName(e.name,newName));if(!target){target={id:id(),name:newName,sets:[]};workout.exercises.push(target)}target.sets.push(updated);workout.exercises=workout.exercises.filter(e=>e.sets.length);haptic();commit();toast("Подход обновлен")}
-      async function finishWorkout(){if(!getStats(state.draft).sets)return;const answer=await showPopup("Завершить тренировку?");if(answer!=="ok")return;state.workouts.push({...state.draft,status:"completed",finishedAt:new Date().toISOString()});state.draft=createDraft();haptic("heavy");commit();toast("Тренировка сохранена")}
 
-      function renderHistory(){
-        el.historyList.replaceChildren();
-        if(!state.workouts.length){el.historyList.appendChild(make("div","empty","Пока нет сохраненных тренировок"));return}
-        let currentMonthKey="";
-        [...state.workouts].sort((a,b)=>new Date(b.finishedAt)-new Date(a.finishedAt)).forEach(w=>{
-          const date=new Date(w.finishedAt);
-          const monthKey=`${date.getFullYear()}-${date.getMonth()}`;
-          if(monthKey!==currentMonthKey){
-            currentMonthKey=monthKey;
-            const monthTitle=date.toLocaleDateString("ru-RU",{month:"long",year:"numeric"});
-            el.historyList.appendChild(make("div","history-month-title",capitalize(monthTitle)));
-          }
-          const s=getStats(w);
-          const row=make("div","history-row");
-          row.dataset.id=w.id;
-          const open=make("button","history-item");
-          open.onclick=()=>openWorkout(w.id);
-          open.append(make("div","history-title",formatDateTitle(w.finishedAt)),make("div","muted",`${s.exercises} упражнений · ${s.sets} подходов · ${Math.round(s.volume)} кг`));
-          const csv=make("button","btn-card btn-accent icon-square","CSV");
-          csv.onclick=()=>exportWorkoutCsv(w.id);
-          const del=make("button","btn-card btn-danger icon-square","×");
-          del.onclick=()=>confirmDeleteWorkout(w.id,row);
-          row.append(open,csv,del);
-          el.historyList.appendChild(row);
-        });
+      function deleteDraftSet(exId, setId) {
+        const ex = state.draft.exercises.find((item) => item.id === exId);
+        if (!ex) return;
+
+        ex.sets = ex.sets.filter((set) => set.id !== setId);
+        state.draft.exercises = state.draft.exercises.filter((item) => item.sets.length);
+
+        haptic("medium");
+        commit();
+        toast("Подход удален");
       }
-      function renderProgress(){const selected=el.progressSelect.value;const names=[...state.exercises].sort((a,b)=>a.localeCompare(b,"ru"));el.progressSelect.replaceChildren();const empty=document.createElement("option");empty.value="";text(empty,"Выбери упражнение");el.progressSelect.appendChild(empty);names.forEach(n=>{const o=document.createElement("option");o.value=n;text(o,n);el.progressSelect.appendChild(o)});el.progressSelect.value=selected&&names.includes(selected)?selected:"";showProgress()}
-      function showProgress(){const name=el.progressSelect.value;el.progressResult.replaceChildren();if(!name){el.progressResult.appendChild(make("div","progress-empty","Выбери упражнение, чтобы увидеть график"));return}const entries=[];state.workouts.slice().sort((a,b)=>new Date(a.finishedAt)-new Date(b.finishedAt)).forEach(w=>{let best=null,volume=0;w.exercises.forEach(e=>{if(!sameName(e.name,name))return;e.sets.forEach(s=>{best=best===null?s.weight:Math.max(best,s.weight);volume=Math.max(volume,s.weight*s.reps)})});if(best!==null)entries.push({date:w.finishedAt,weight:best,volume})});if(!entries.length){el.progressResult.appendChild(make("div","progress-empty","По этому упражнению пока нет данных"));return}const maxW=Math.max(...entries.map(e=>e.weight));const maxV=Math.max(...entries.map(e=>e.volume));const grid=make("div","stats-grid");[["Макс вес",`${maxW} кг`],["Лучший объем",`${Math.round(maxV)} кг`],["Тренировок",entries.length],["Последний",`${entries.at(-1).weight} кг`]].forEach(([l,v])=>{const c=make("div","stat");c.append(make("div","stat-num",v),make("div","muted",l));grid.appendChild(c)});el.progressResult.append(grid,make("div","chart-label","График показывает лучший вес по тренировкам"))}
-      function formatDateTitle(iso){const d=new Date(iso);const now=new Date();const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());const day=new Date(d.getFullYear(),d.getMonth(),d.getDate());const diff=Math.round((today-day)/86400000);if(diff===0)return"Сегодня";if(diff===1)return"Вчера";return d.toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}
 
-      function openWorkout(workoutId){
-        const w=state.workouts.find(x=>x.id===workoutId);
-        if(!w)return;
+      function openEditSetModal(exId, setId) {
+        const ex = state.draft.exercises.find((item) => item.id === exId);
+        const set = ex && ex.sets.find((item) => item.id === setId);
+        if (!set) return;
+
         openSheet();
         el.modalBody.replaceChildren();
-        const s=getStats(w);
-        el.modalBody.append(
-          make("div","title",formatDateTitle(w.finishedAt)),
-          make("div","meta",`${s.exercises} упражнений · ${s.sets} подходов · ${Math.round(s.volume)} кг`)
+
+        const title = make("div", "title", "Редактировать подход");
+        const form = make("div", "modal-form");
+
+        const name = document.createElement("input");
+        name.value = ex.name;
+
+        const nums = make("div", "form-numbers");
+        const weight = document.createElement("input");
+        weight.value = set.weight;
+        weight.inputMode = "decimal";
+
+        const reps = document.createElement("input");
+        reps.value = set.reps;
+        reps.inputMode = "numeric";
+
+        nums.append(weight, reps);
+
+        const save = make("button", "btn-card btn-accent", "Сохранить");
+        save.onclick = () => {
+          const parsed = parseSetInput(weight.value, reps.value);
+          if (!name.value.trim() || !parsed) {
+            toast("Проверь упражнение, вес и повторы");
+            return;
+          }
+          moveOrUpdateSet(state.draft, exId, setId, name.value.trim(), parsed.weight, parsed.reps);
+          closeModal();
+        };
+
+        const cancel = make("button", "btn-card btn-muted", "Отмена");
+        cancel.onclick = closeModal;
+
+        form.append(name, nums, save, cancel);
+        el.modalBody.append(title, form);
+      }
+
+      function moveOrUpdateSet(workout, exId, setId, newName, weight, reps) {
+        const oldExercise = workout.exercises.find((ex) => ex.id === exId);
+        if (!oldExercise) return;
+
+        const index = oldExercise.sets.findIndex((set) => set.id === setId);
+        if (index < 0) return;
+
+        const updated = { ...oldExercise.sets[index], weight, reps };
+        oldExercise.sets.splice(index, 1);
+
+        let target = workout.exercises.find((ex) => sameName(ex.name, newName));
+        if (!target) {
+          target = { id: id(), name: newName, sets: [] };
+          workout.exercises.push(target);
+        }
+
+        target.sets.push(updated);
+        workout.exercises = workout.exercises.filter((ex) => ex.sets.length);
+
+        haptic();
+        commit();
+        toast("Подход обновлен");
+      }
+
+      async function finishWorkout() {
+        if (!getStats(state.draft).sets) return;
+
+        const answer = await showPopup("Завершить тренировку?");
+        if (answer !== "ok") return;
+
+        state.workouts.push({
+          ...state.draft,
+          status: "completed",
+          finishedAt: new Date().toISOString()
+        });
+
+        state.draft = createDraft();
+
+        haptic("heavy");
+        commit();
+        toast("Тренировка сохранена");
+      }
+
+      function renderHistory() {
+        el.historyList.replaceChildren();
+
+        if (!state.workouts.length) {
+          el.historyList.appendChild(make("div", "empty", "Пока нет сохраненных тренировок"));
+          return;
+        }
+
+        let currentMonthKey = "";
+
+        [...state.workouts]
+          .sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt))
+          .forEach((workout) => {
+            const date = new Date(workout.finishedAt);
+            const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+
+            if (monthKey !== currentMonthKey) {
+              currentMonthKey = monthKey;
+              const monthTitle = date.toLocaleDateString("ru-RU", {
+                month: "long",
+                year: "numeric"
+              });
+              el.historyList.appendChild(
+                make("div", "history-month-title", capitalize(monthTitle))
+              );
+            }
+
+            const stats = getStats(workout);
+            const row = make("div", "history-row");
+            row.dataset.id = workout.id;
+
+            const open = make("button", "history-item");
+            open.onclick = () => openWorkout(workout.id);
+            open.append(
+              make("div", "history-title", formatDateTitle(workout.finishedAt)),
+              make(
+                "div",
+                "muted",
+                `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
+              )
+            );
+
+            const csv = make("button", "btn-card btn-accent icon-square", "CSV");
+            csv.onclick = () => exportWorkoutCsv(workout.id);
+
+            const del = make("button", "btn-card btn-danger icon-square", "×");
+            del.onclick = () => confirmDeleteWorkout(workout.id, row);
+
+            row.append(open, csv, del);
+            el.historyList.appendChild(row);
+          });
+      }
+
+      function renderProgress() {
+        const selected = el.progressSelect.value;
+        const names = [...state.exercises].sort((a, b) => a.localeCompare(b, "ru"));
+
+        el.progressSelect.replaceChildren();
+
+        const empty = document.createElement("option");
+        empty.value = "";
+        text(empty, "Выбери упражнение");
+        el.progressSelect.appendChild(empty);
+
+        names.forEach((name) => {
+          const option = document.createElement("option");
+          option.value = name;
+          text(option, name);
+          el.progressSelect.appendChild(option);
+        });
+
+        el.progressSelect.value = selected && names.includes(selected) ? selected : "";
+        showProgress();
+      }
+
+      function showProgress() {
+        const name = el.progressSelect.value;
+        el.progressResult.replaceChildren();
+
+        if (!name) {
+          el.progressResult.appendChild(
+            make("div", "progress-empty", "Выбери упражнение, чтобы увидеть график")
+          );
+          return;
+        }
+
+        const entries = [];
+
+        state.workouts
+          .slice()
+          .sort((a, b) => new Date(a.finishedAt) - new Date(b.finishedAt))
+          .forEach((workout) => {
+            let best = null;
+            let volume = 0;
+
+            workout.exercises.forEach((ex) => {
+              if (!sameName(ex.name, name)) return;
+
+              ex.sets.forEach((set) => {
+                best = best === null ? set.weight : Math.max(best, set.weight);
+                volume = Math.max(volume, set.weight * set.reps);
+              });
+            });
+
+            if (best !== null) {
+              entries.push({
+                date: workout.finishedAt,
+                weight: best,
+                volume
+              });
+            }
+          });
+
+        if (!entries.length) {
+          el.progressResult.appendChild(
+            make("div", "progress-empty", "По этому упражнению пока нет данных")
+          );
+          return;
+        }
+
+        const maxWeight = Math.max(...entries.map((item) => item.weight));
+        const maxVolume = Math.max(...entries.map((item) => item.volume));
+        const lastEntry = entries[entries.length - 1];
+
+        const grid = make("div", "stats-grid");
+        [
+          ["Макс вес", `${maxWeight} кг`],
+          ["Лучший объем", `${Math.round(maxVolume)} кг`],
+          ["Тренировок", entries.length],
+          ["Последний", `${lastEntry.weight} кг`]
+        ].forEach(([label, value]) => {
+          const card = make("div", "stat");
+          card.append(
+            make("div", "stat-num", value),
+            make("div", "muted", label)
+          );
+          grid.appendChild(card);
+        });
+
+        el.progressResult.append(
+          grid,
+          make("div", "chart-label", "График показывает лучший вес по тренировкам")
         );
-        w.exercises.forEach(e=>{
-          const box=make("div","exercise");
-          box.appendChild(make("div","exercise-name",e.name));
-          e.sets.forEach((set,i)=>{
-            const row=make("div","modal-set-row");
+      }
+
+      function formatDateTitle(iso) {
+        const date = new Date(iso);
+        const now = new Date();
+
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const diff = Math.round((today - day) / 86400000);
+
+        if (diff === 0) return "Сегодня";
+        if (diff === 1) return "Вчера";
+
+        return date.toLocaleDateString("ru-RU", {
+          day: "numeric",
+          month: "long"
+        });
+      }
+
+      function openWorkout(workoutId) {
+        const workout = state.workouts.find((item) => item.id === workoutId);
+        if (!workout) return;
+
+        openSheet();
+        el.modalBody.replaceChildren();
+
+        const stats = getStats(workout);
+
+        el.modalBody.append(
+          make("div", "title", formatDateTitle(workout.finishedAt)),
+          make(
+            "div",
+            "meta",
+            `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
+          )
+        );
+
+        workout.exercises.forEach((ex) => {
+          const box = make("div", "exercise");
+          box.appendChild(make("div", "exercise-name", ex.name));
+
+          ex.sets.forEach((set, index) => {
+            const row = make("div", "modal-set-row");
             row.append(
-              make("div","",`${i+1}. ${set.weight} кг × ${set.reps}`),
-              make("div","muted",`${Math.round(set.weight*set.reps)} кг`)
+              make("div", "", `${index + 1}. ${set.weight} кг × ${set.reps}`),
+              make("div", "muted", `${Math.round(set.weight * set.reps)} кг`)
             );
             box.appendChild(row);
           });
+
           el.modalBody.appendChild(box);
         });
-        const actions=make("div","sheet-actions");
-        const edit=make("button","btn-card btn-accent","Редактировать");
-        edit.onclick=()=>openEditWorkout(workoutId);
+
+        const actions = make("div", "sheet-actions");
+        const edit = make("button", "btn-card btn-accent", "Редактировать");
+        edit.onclick = () => openEditWorkout(workoutId);
         actions.append(edit);
         el.modalBody.appendChild(actions);
       }
 
-      // Удаление карточки подхода: если это последний подход в упражнении — удаляем весь блок упражнения
-      function removeEditSetCard(card){
-        const group=card.closest(".edit-exercise-group");
-        if(!group){ animateRemove(card,()=>card.remove()); return; }
-        const cards=[...group.querySelectorAll(".edit-set-card")];
-        if(cards.length<=1){
-          animateRemove(group,()=>group.remove());
+      function removeEditSetCard(card) {
+        const group = card.closest(".edit-exercise-group");
+
+        if (!group) {
+          animateRemove(card, () => card.remove());
           return;
         }
-        animateRemove(card,()=>card.remove());
+
+        const cards = [...group.querySelectorAll(".edit-set-card")];
+        if (cards.length <= 1) {
+          animateRemove(group, () => group.remove());
+          return;
+        }
+
+        animateRemove(card, () => card.remove());
       }
 
-      // Helpers to create editable blocks for Edit Workout modal
-      function createEditSetCard(weightValue="", repsValue=""){
-        const card=make("div","edit-set-card");
-        const nums=make("div","form-numbers");
-        const weight=make("input","");
-        weight.value=weightValue;
-        weight.inputMode="decimal";
-        weight.dataset.kind="weight";
-        const reps=make("input","");
-        reps.value=repsValue;
-        reps.inputMode="numeric";
-        reps.dataset.kind="reps";
-        nums.append(weight,reps);
-        const del=make("button","btn-card btn-danger icon-square","×");
-        del.type="button";
-        del.onclick=()=>removeEditSetCard(card);
-        card.append(nums,del);
+      function createEditSetCard(weightValue = "", repsValue = "") {
+        const card = make("div", "edit-set-card");
+        const nums = make("div", "form-numbers");
+
+        const weight = make("input", "");
+        weight.value = weightValue;
+        weight.inputMode = "decimal";
+        weight.dataset.kind = "weight";
+
+        const reps = make("input", "");
+        reps.value = repsValue;
+        reps.inputMode = "numeric";
+        reps.dataset.kind = "reps";
+
+        nums.append(weight, reps);
+
+        const del = make("button", "btn-card btn-danger icon-square", "×");
+        del.type = "button";
+        del.onclick = () => removeEditSetCard(card);
+
+        card.append(nums, del);
         return card;
       }
 
-      function createExerciseGroup(nameValue=""){
-        const group=make("div","edit-exercise-group");
-        const exId=id();
-        group.dataset.exId=exId;
-        const name=make("input","");
-        name.value=nameValue;
-        name.dataset.exId=exId; // используется в saveWorkoutEdit
+      function createExerciseGroup(nameValue = "") {
+        const group = make("div", "edit-exercise-group");
+        const exId = id();
+        group.dataset.exId = exId;
+
+        const name = make("input", "");
+        name.value = nameValue;
+        name.dataset.exId = exId;
+
         group.appendChild(name);
-        // Первый пустой подход
-        const firstSet=createEditSetCard("","");
-        group.appendChild(firstSet);
+        group.appendChild(createEditSetCard("", ""));
         return group;
       }
 
-      function openEditWorkout(workoutId){
-        const w=state.workouts.find(x=>x.id===workoutId);
-        if(!w)return;
+      function openEditWorkout(workoutId) {
+        const workout = state.workouts.find((item) => item.id === workoutId);
+        if (!workout) return;
+
         openSheet();
         el.modalBody.replaceChildren();
 
-        // Хедер с заголовком и кнопкой "+"
-        const header=make("div","title-row");
-        const title=make("div","title","Редактировать тренировку");
-        const addBtn=make("button","btn-card btn-accent icon-square","+");
-        header.append(title,addBtn);
+        const header = make("div", "title-row");
+        const title = make("div", "title", "Редактировать тренировку");
+        const addBtn = make("button", "btn-card btn-accent icon-square", "+");
+
+        header.append(title, addBtn);
         el.modalBody.appendChild(header);
 
-        const form=make("div","modal-form");
+        const form = make("div", "modal-form");
 
-        // Существующие упражнения
-        w.exercises.forEach(ex=>{
-          const group=make("div","edit-exercise-group");
-          group.dataset.exId=ex.id;
-          const name=make("input","");
-          name.value=ex.name;
-          name.dataset.exId=ex.id;
+        workout.exercises.forEach((ex) => {
+          const group = make("div", "edit-exercise-group");
+          group.dataset.exId = ex.id;
+
+          const name = make("input", "");
+          name.value = ex.name;
+          name.dataset.exId = ex.id;
           group.appendChild(name);
 
-          ex.sets.forEach(set=>{
-            const card=make("div","edit-set-card");
-            card.dataset.setId=set.id;
-            const nums=make("div","form-numbers");
-            const weight=make("input","");
-            weight.value=set.weight;
-            weight.inputMode="decimal";
-            weight.dataset.kind="weight";
-            const reps=make("input","");
-            reps.value=set.reps;
-            reps.inputMode="numeric";
-            reps.dataset.kind="reps";
-            nums.append(weight,reps);
-            const del=make("button","btn-card btn-danger icon-square","×");
-            del.type="button";
-            del.onclick=()=>removeEditSetCard(card);
-            card.append(nums,del);
+          ex.sets.forEach((set) => {
+            const card = make("div", "edit-set-card");
+            card.dataset.setId = set.id;
+
+            const nums = make("div", "form-numbers");
+
+            const weight = make("input", "");
+            weight.value = set.weight;
+            weight.inputMode = "decimal";
+            weight.dataset.kind = "weight";
+
+            const reps = make("input", "");
+            reps.value = set.reps;
+            reps.inputMode = "numeric";
+            reps.dataset.kind = "reps";
+
+            nums.append(weight, reps);
+
+            const del = make("button", "btn-card btn-danger icon-square", "×");
+            del.type = "button";
+            del.onclick = () => removeEditSetCard(card);
+
+            card.append(nums, del);
             group.appendChild(card);
           });
+
           form.appendChild(group);
         });
 
-        // Добавить новое упражнение по "+"
-        addBtn.onclick=()=>{
-          const newGroup=createExerciseGroup("");
+        addBtn.onclick = () => {
+          const newGroup = createExerciseGroup("");
           form.appendChild(newGroup);
           haptic();
-          newGroup.scrollIntoView({behavior:"smooth",block:"nearest"});
+          newGroup.scrollIntoView({ behavior: "smooth", block: "nearest" });
         };
 
-        const actions=make("div","sheet-actions");
-        const save=make("button","btn-card btn-accent","Сохранить");
-        save.onclick=()=>saveWorkoutEdit(workoutId,form);
+        const actions = make("div", "sheet-actions");
+        const save = make("button", "btn-card btn-accent", "Сохранить");
+        save.onclick = () => saveWorkoutEdit(workoutId, form);
         actions.append(save);
 
-        el.modalBody.append(form,actions);
+        el.modalBody.append(form, actions);
       }
 
-      function saveWorkoutEdit(workoutId,form){
-        const w=state.workouts.find(x=>x.id===workoutId);
-        if(!w)return;
-        const nextExercises=[];
-        const groups=[...form.querySelectorAll(".edit-exercise-group")];
-        for(const group of groups){
-          const nameInput=group.querySelector("input[data-ex-id]");
-          const name=nameInput?nameInput.value.trim():"";
-          if(!name){
-            const hasCards=group.querySelector(".edit-set-card")!==null;
-            if(!hasCards) continue;
+      function saveWorkoutEdit(workoutId, form) {
+        const workout = state.workouts.find((item) => item.id === workoutId);
+        if (!workout) return;
+
+        const nextExercises = [];
+        const groups = [...form.querySelectorAll(".edit-exercise-group")];
+
+        for (const group of groups) {
+          const nameInput = group.querySelector("input[data-ex-id]");
+          const name = nameInput ? nameInput.value.trim() : "";
+
+          if (!name) {
+            const hasCards = group.querySelector(".edit-set-card") !== null;
+            if (!hasCards) continue;
             toast("Проверь название упражнения");
             return;
           }
-          const cards=[...group.querySelectorAll(".edit-set-card")];
-          if(!cards.length)continue;
-          const sets=[];
-          for(const card of cards){
-            const weightEl=card.querySelector('[data-kind="weight"]');
-            const repsEl=card.querySelector('[data-kind="reps"]');
-            const parsed=parseSetInput(weightEl.value,repsEl.value);
-            if(!parsed){toast("Проверь вес и повторы");return}
-            sets.push({id:card.dataset.setId||id(),weight:parsed.weight,reps:parsed.reps});
+
+          const cards = [...group.querySelectorAll(".edit-set-card")];
+          if (!cards.length) continue;
+
+          const sets = [];
+
+          for (const card of cards) {
+            const weightEl = card.querySelector('[data-kind="weight"]');
+            const repsEl = card.querySelector('[data-kind="reps"]');
+            const parsed = parseSetInput(weightEl.value, repsEl.value);
+
+            if (!parsed) {
+              toast("Проверь вес и повторы");
+              return;
+            }
+
+            sets.push({
+              id: card.dataset.setId || id(),
+              weight: parsed.weight,
+              reps: parsed.reps
+            });
           }
-          nextExercises.push({id:group.dataset.exId||id(),name,sets});
+
+          nextExercises.push({
+            id: group.dataset.exId || id(),
+            name,
+            sets
+          });
         }
-        if(!nextExercises.length){toast("Нельзя сохранить пустую тренировку");return}
-        w.exercises=nextExercises;
+
+        if (!nextExercises.length) {
+          toast("Нельзя сохранить пустую тренировку");
+          return;
+        }
+
+        workout.exercises = nextExercises;
+
         haptic();
         commit();
         closeModal();
         toast("Тренировка обновлена");
       }
 
-      function exportWorkoutCsv(workoutId){const w=state.workouts.find(x=>x.id===workoutId);if(!w)return;const csv=w.exercises.map(e=>`"${[e.name,...e.sets.map((s,i)=>`${i+1}й подход ${s.weight}кг х ${s.reps}`)].join("\n").replace(/"/g,'""')}"`).join(";");const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`workout-${new Date(w.finishedAt).toISOString().slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast("CSV-файл создан")}
-      async function confirmDeleteWorkout(workoutId,node){const answer=await showPopup("Удалить тренировку?");if(answer!=="ok")return;const row=node||el.historyList.querySelector(`[data-id="${workoutId}"]`);if(row)animateRemove(row,()=>deleteWorkout(workoutId));else deleteWorkout(workoutId)}
-      function deleteWorkout(workoutId){state.workouts=state.workouts.filter(w=>w.id!==workoutId);closeModal();haptic("medium");commit();toast("Тренировка удалена")}
-      function openSheet(){el.modal.classList.add("open");if(tg&&tg.BackButton){tg.BackButton.offClick(closeModal);tg.BackButton.onClick(closeModal);tg.BackButton.show()}}
-      function closeModal(){el.modal.classList.remove("open");hideKeyboard();if(tg&&tg.BackButton){tg.BackButton.offClick(closeModal);tg.BackButton.hide()}}
-      function animateRemove(node,done){node.style.maxHeight=node.scrollHeight+"px";node.style.overflow="hidden";requestAnimationFrame(()=>node.classList.add("remove-anim"));setTimeout(()=>done&&done(),260)}
-      function bindEvents(){el.tabs.forEach(tab=>tab.addEventListener("click",()=>{state.tab=tab.dataset.tab;haptic();renderAll()}));[el.exerciseInput,el.weightInput,el.repsInput].forEach(i=>i.addEventListener("input",updateForm));el.exerciseInput.addEventListener("change",fillLastSet);el.addSetBtn.addEventListener("click",addSet);el.repeatSetBtn.addEventListener("click",fillLastSet);el.fallbackFinishBtn.addEventListener("click",finishWorkout);el.progressSelect.addEventListener("change",showProgress);el.modal.addEventListener("click",e=>{if(e.target===el.modal)closeModal()});el.repsInput.addEventListener("keydown",e=>{if(e.key==="Enter"&&!el.addSetBtn.disabled){e.preventDefault();addSet()}})}
-      function initTelegram(){if(!tg)return;tg.ready();tg.expand();if(tg.MainButton){tg.MainButton.offClick(finishWorkout);tg.MainButton.setParams({color:"#ff6418",text_color:"#ffffff"});tg.MainButton.hide()}}
-      function init(){initTelegram();bindEvents();loadData()}
+      function exportWorkoutCsv(workoutId) {
+        const workout = state.workouts.find((item) => item.id === workoutId);
+        if (!workout) return;
+
+        const csv = workout.exercises
+          .map((ex) =>
+            `"${[ex.name, ...ex.sets.map((set, i) => `${i + 1}й подход ${set.weight}кг х ${set.reps}`)]
+              .join("\n")
+              .replace(/"/g, '""')}"`
+          )
+          .join(";");
+
+        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `workout-${new Date(workout.finishedAt).toISOString().slice(0, 10)}.csv`;
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+
+        toast("CSV-файл создан");
+      }
+
+      async function confirmDeleteWorkout(workoutId, node) {
+        const answer = await showPopup("Удалить тренировку?");
+        if (answer !== "ok") return;
+
+        const row = node || el.historyList.querySelector(`[data-id="${workoutId}"]`);
+        if (row) {
+          animateRemove(row, () => deleteWorkout(workoutId));
+        } else {
+          deleteWorkout(workoutId);
+        }
+      }
+
+      function deleteWorkout(workoutId) {
+        state.workouts = state.workouts.filter((workout) => workout.id !== workoutId);
+        closeModal();
+        haptic("medium");
+        commit();
+        toast("Тренировка удалена");
+      }
+
+      function openSheet() {
+        el.modal.classList.add("open");
+
+        if (tg && tg.BackButton) {
+          tg.BackButton.offClick(closeModal);
+          tg.BackButton.onClick(closeModal);
+          tg.BackButton.show();
+        }
+      }
+
+      function closeModal() {
+        el.modal.classList.remove("open");
+        hideKeyboard();
+
+        if (tg && tg.BackButton) {
+          tg.BackButton.offClick(closeModal);
+          tg.BackButton.hide();
+        }
+      }
+
+      function animateRemove(node, done) {
+        node.style.maxHeight = node.scrollHeight + "px";
+        node.style.overflow = "hidden";
+        requestAnimationFrame(() => node.classList.add("remove-anim"));
+        setTimeout(() => done && done(), 260);
+      }
+
+      function formatStopwatch(ms) {
+        const centiseconds = Math.floor(ms / 10) % 100;
+        const totalSeconds = Math.floor(ms / 1000);
+        const seconds = totalSeconds % 60;
+        const minutes = Math.floor(totalSeconds / 60);
+
+        return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(centiseconds).padStart(2, "0")}`;
+      }
+
+      function renderTimer(ms = 0) {
+        text(el.timerReadout, formatStopwatch(ms));
+        el.timerWidget.classList.toggle("running", state.timer.running);
+      }
+
+      function timerLoop(now) {
+        if (!state.timer.running) return;
+        renderTimer(now - state.timer.startedAt);
+        state.timer.raf = requestAnimationFrame(timerLoop);
+      }
+
+      function startTimer() {
+        if (state.timer.running) return;
+        state.timer.running = true;
+        state.timer.startedAt = performance.now();
+        renderTimer(0);
+        haptic();
+        state.timer.raf = requestAnimationFrame(timerLoop);
+      }
+
+      function stopTimer() {
+        const wasRunning = state.timer.running;
+
+        if (state.timer.raf) {
+          cancelAnimationFrame(state.timer.raf);
+        }
+
+        state.timer.running = false;
+        state.timer.startedAt = 0;
+        state.timer.raf = 0;
+        renderTimer(0);
+
+        if (wasRunning) haptic("medium");
+      }
+
+      function bindEvents() {
+        el.tabs.forEach((tab) =>
+          tab.addEventListener("click", () => {
+            state.tab = tab.dataset.tab;
+            haptic();
+            renderAll();
+          })
+        );
+
+        [el.exerciseInput, el.weightInput, el.repsInput].forEach((input) =>
+          input.addEventListener("input", updateForm)
+        );
+
+        el.exerciseInput.addEventListener("change", fillLastSet);
+        el.addSetBtn.addEventListener("click", addSet);
+        el.repeatSetBtn.addEventListener("click", fillLastSet);
+        el.fallbackFinishBtn.addEventListener("click", finishWorkout);
+        el.progressSelect.addEventListener("change", showProgress);
+
+        el.modal.addEventListener("click", (e) => {
+          if (e.target === el.modal) closeModal();
+        });
+
+        el.repsInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !el.addSetBtn.disabled) {
+            e.preventDefault();
+            addSet();
+          }
+        });
+
+        el.timerStartBtn.addEventListener("click", startTimer);
+        el.timerStopBtn.addEventListener("click", stopTimer);
+      }
+
+      function initTelegram() {
+        if (!tg) return;
+        tg.ready();
+        tg.expand();
+
+        if (tg.MainButton) {
+          tg.MainButton.offClick(finishWorkout);
+          tg.MainButton.setParams({ color: "#ff6418", text_color: "#ffffff" });
+          tg.MainButton.hide();
+        }
+      }
+
+      function init() {
+        initTelegram();
+        bindEvents();
+        renderTimer(0);
+        loadData();
+      }
+
       init();
     })();
   </script>
