@@ -9,7 +9,7 @@
     *{box-sizing:border-box;margin:0;padding:0}
     :root{--bg:#070707;--surface:rgba(255,255,255,.055);--field:#171717;--line:rgba(255,255,255,.09);--text:#fff;--muted:rgba(255,255,255,.58);--accent:#ff6418;--accent-soft:rgba(255,100,24,.10);--accent-line:rgba(255,100,24,.24);--danger-soft:rgba(255,70,70,.12);--danger-line:rgba(255,90,90,.28);--danger-text:#ff8a8a;--radius:18px;--safe-top:env(safe-area-inset-top);--safe-bottom:env(safe-area-inset-bottom)}
     html,body{min-height:100%}
-    body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui,sans-serif;background:radial-gradient(circle at 80% 0%,rgba(255,100,24,.18),transparent 36%),linear-gradient(180deg,#12100f 0%,var(--bg) 46%);color:var(--text);padding:max(14px,var(--safe-top)) 14px calc(28px + var(--safe-bottom));font-size:15px}
+    body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui,sans-serif;background:radial-gradient(circle at 80% 0%,rgba(255,100,24,.18),transparent 36%),linear-gradient(180deg,#12100f 0%,var(--bg) 46%);color:var(--text);padding:max(14px,var(--safe-top)) 14px calc(104px + var(--safe-bottom));font-size:15px}
     button,input,select{font:inherit;color:inherit}
     button{min-height:46px;border:0;border-radius:999px;background:var(--accent);color:#fff;font-weight:750;cursor:pointer;-webkit-tap-highlight-color:transparent}
     button:disabled{opacity:.42;cursor:default}
@@ -40,15 +40,15 @@
     .form-stack,.modal-form{display:grid;gap:9px}.form-numbers{display:grid;grid-template-columns:1fr 1fr;gap:9px}.row{display:flex;gap:8px}.row>*{flex:1}#formHint{text-align:center}
     .btn-card{min-height:54px;padding:0 14px;border-radius:var(--radius);border:1px solid var(--line);box-shadow:none;font-weight:750}.btn-muted{background:rgba(255,255,255,.06)}.btn-accent{color:var(--accent);background:var(--accent-soft);border-color:var(--accent-line)}.btn-danger{color:var(--danger-text);background:var(--danger-soft);border-color:var(--danger-line)}
     .icon-square{width:54px;min-width:54px;padding:0;font-size:18px}#repeatSetBtn,#addSetBtn{min-height:54px;border-radius:var(--radius);box-shadow:none}#repeatSetBtn{background:rgba(255,255,255,.06);border:1px solid var(--line)}#addSetBtn{color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-line)}
-    .fallback-finish{display:none;width:100%;margin-top:10px}
+    .fallback-finish{display:none;position:fixed;left:50%;bottom:calc(14px + var(--safe-bottom));z-index:25;width:calc(100% - 28px);max-width:560px;min-height:56px;margin:0;transform:translateX(-50%);background:#ff6418;color:#fff;border:1px solid rgba(255,100,24,.55);box-shadow:0 16px 36px rgba(255,100,24,.28),0 10px 30px rgba(0,0,0,.36)}
     .exercise{padding:16px 0;border-bottom:1px solid var(--line);animation:itemIn .18s ease both}.exercise:last-child{border-bottom:0}.exercise-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:16px}.exercise-name{font-size:16px;font-weight:800;overflow-wrap:anywhere}
     .set-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;min-height:46px;animation:itemIn .18s ease both}.set-value{display:flex;align-items:center;width:100%;min-height:54px;padding:14px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line);font-weight:700}#draftList .set-row{grid-template-columns:1fr 54px 54px;align-items:stretch;min-height:54px;margin-bottom:9px}
     .history-group{margin-bottom:18px}.history-month-title{margin:18px 2px 10px;font-size:15px;font-weight:850;color:rgba(255,255,255,.78)}.history-row{display:grid;grid-template-columns:1fr 54px 54px;gap:8px;align-items:stretch;margin-bottom:9px}.history-item{width:100%;min-height:54px;text-align:left;display:block;background:var(--surface);padding:14px;border-radius:var(--radius);border:1px solid var(--line);box-shadow:none}.history-title{font-weight:820;font-size:17px;margin-bottom:4px}
     .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:13px}.stat-num{font-size:23px;font-weight:850;color:var(--accent);overflow-wrap:anywhere}.progress-chart{width:100%;height:190px;margin-top:14px;border-radius:var(--radius);background:rgba(255,255,255,.04);border:1px solid var(--line);overflow:hidden}.progress-chart svg{display:block;width:100%;height:100%}.chart-label{margin-top:8px;text-align:center;color:var(--muted);font-size:13px}
-    .toast{position:fixed;left:50%;bottom:calc(18px + var(--safe-bottom));transform:translateX(-50%);max-width:calc(100vw - 28px);padding:11px 15px;border-radius:999px;background:rgba(20,20,20,.92);border:1px solid var(--line);z-index:40;display:none}
+    .toast{position:fixed;left:50%;bottom:calc(86px + var(--safe-bottom));transform:translateX(-50%);max-width:calc(100vw - 28px);padding:11px 15px;border-radius:999px;background:rgba(20,20,20,.92);border:1px solid var(--line);z-index:40;display:none}
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.64);display:none;align-items:flex-end;z-index:30;backdrop-filter:blur(8px)}.modal.open{display:flex;animation:fadeIn .16s ease both}.sheet{width:100%;max-width:560px;max-height:88vh;margin:0 auto;overflow:auto;background:#0b0b0b;border:1px solid var(--line);border-radius:24px 24px 0 0;padding:18px 14px calc(28px + var(--safe-bottom));animation:sheetIn .22s ease both}.handle{width:42px;height:4px;border-radius:4px;background:rgba(255,255,255,.22);margin:0 auto 16px}
     .sheet-actions{position:sticky;bottom:-14px;padding-top:12px;margin-top:12px;background:linear-gradient(180deg,transparent,rgba(11,11,11,.95) 44%,#0b0b0b 90%)}.sheet-actions .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.modal-set-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;min-height:40px;padding:8px 0}.edit-exercise-group{margin-top:14px}.edit-group-title{font-size:15px;font-weight:850;color:rgba(255,255,255,.86);margin:0 2px 8px;overflow-wrap:anywhere}.edit-set-card{padding:10px;margin-bottom:8px;border-radius:14px;background:rgba(255,255,255,.045);box-shadow:none}.edit-set-head{display:grid;grid-template-columns:1fr 54px;gap:8px;margin-bottom:8px}.remove-anim{transition:opacity .18s ease,transform .18s ease;opacity:0;transform:translateY(-6px) scale(.98)}
-    button,.history-item,.set-value,input,select{transition:transform .14s ease,background-color .16s ease,border-color .16s ease,box-shadow .16s ease,opacity .16s ease}button:active,.history-item:active{transform:scale(.975)}.toast.show{animation:toastIn .18s ease both}
+    button,.history-item,.set-value,input,select{transition:transform .14s ease,background-color .16s ease,border-color .16s ease,box-shadow .16s ease,opacity .16s ease}button:active,.history-item:active{transform:scale(.975)}.fallback-finish:active{transform:translateX(-50%) scale(.975)}.toast.show{animation:toastIn .18s ease both}
     @keyframes load{0%{transform:translateX(-120%)}100%{transform:translateX(260%)}}@keyframes softIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes panelIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}@keyframes itemIn{from{opacity:0;transform:translateY(6px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes toastIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes sheetIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
   </style>
 </head>
@@ -60,7 +60,7 @@
     <main>
       <section class="panel active" id="todayPanel">
         <section class="section"><div class="section-title">Добавить подход</div><div class="card"><div class="form-stack"><input id="exerciseInput" placeholder="Упражнение" list="exerciseList" autocomplete="off" /><div class="form-numbers"><input id="weightInput" placeholder="кг" inputmode="decimal" /><input id="repsInput" placeholder="Повторений" inputmode="numeric" /></div><datalist id="exerciseList"></datalist><div class="row"><button id="repeatSetBtn" disabled>Такой же</button><button id="addSetBtn" disabled>Добавить</button></div><div class="muted" id="formHint">Выбери упражнение, вес и повторы</div></div></div></section>
-        <section class="section"><div class="section-title">Текущая тренировка</div><div class="card" id="draftList"></div><button id="fallbackFinishBtn" class="fallback-finish btn-card btn-accent">Завершить тренировку</button></section>
+        <section class="section"><div class="section-title">Текущая тренировка</div><div class="card" id="draftList"></div><button id="fallbackFinishBtn" class="fallback-finish">Завершить тренировку</button></section>
       </section>
       <section class="panel" id="historyPanel"><div id="historyList"></div></section>
       <section class="panel" id="progressPanel"><div class="card"><select id="progressSelect"></select><div id="progressResult"></div></div></section>
@@ -127,14 +127,8 @@
       function updateMainActions(){
         const hasSets=getStats(state.draft).sets>0;
         const shouldShow=hasSets && state.tab==="today";
-        const mainButton=tg&&tg.MainButton?tg.MainButton:null;
-        el.fallbackFinishBtn.style.display=shouldShow&&!mainButton?"block":"none";
-        if(!mainButton)return;
-        mainButton.offClick(finishWorkout);
-        if(!shouldShow){mainButton.hide();return}
-        mainButton.setText("Завершить тренировку");
-        mainButton.onClick(finishWorkout);
-        mainButton.show();
+        el.fallbackFinishBtn.style.display=shouldShow ? "block" : "none";
+        if(tg&&tg.MainButton)tg.MainButton.hide();
       }
 
       function updateForm(){const name=el.exerciseInput.value.trim(); const parsed=parseSetInput(el.weightInput.value,el.repsInput.value); const valid=Boolean(name)&&Boolean(parsed); el.addSetBtn.disabled=!valid; el.repeatSetBtn.disabled=!getLastSet(name); text(el.formHint,valid?"Готово к добавлению":"Выбери упражнение, вес и повторы")}
@@ -175,7 +169,7 @@
       function closeModal(){el.modal.classList.remove("open"); hideKeyboard(); if(tg&&tg.BackButton){tg.BackButton.offClick(closeModal);tg.BackButton.hide()}}
       function animateRemove(node,done){node.style.opacity="1";node.style.transform="translateY(0) scale(1)";requestAnimationFrame(()=>node.classList.add("remove-anim"));setTimeout(()=>done&&done(),200)}
       function bindEvents(){el.tabs.forEach(tab=>tab.addEventListener("click",()=>{state.tab=tab.dataset.tab;haptic();renderAll()})); [el.exerciseInput,el.weightInput,el.repsInput].forEach(i=>i.addEventListener("input",updateForm)); el.exerciseInput.addEventListener("change",fillLastSet); el.addSetBtn.addEventListener("click",addSet); el.repeatSetBtn.addEventListener("click",fillLastSet); el.fallbackFinishBtn.addEventListener("click",finishWorkout); el.progressSelect.addEventListener("change",showProgress); el.modal.addEventListener("click",e=>{if(e.target===el.modal)closeModal()}); el.repsInput.addEventListener("keydown",e=>{if(e.key==="Enter"&&!el.addSetBtn.disabled){e.preventDefault();addSet()}})}
-      function initTelegram(){if(!tg)return; tg.ready(); tg.expand(); if(tg.MainButton){tg.MainButton.offClick(finishWorkout); tg.MainButton.hide()}}
+      function initTelegram(){if(!tg)return; tg.ready(); tg.expand(); if(tg.MainButton)tg.MainButton.hide()}
       function init(){initTelegram(); bindEvents(); loadData()}
       init();
     })();
