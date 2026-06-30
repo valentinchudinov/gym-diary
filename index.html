@@ -120,7 +120,7 @@
       align-items: flex-start;
       gap: 12px;
       margin-bottom: 16px;
-      padding-right: 148px;
+      padding-right: clamp(138px, 35vw, 176px);
       animation: softIn 0.24s ease both;
     }
 
@@ -151,6 +151,10 @@
       margin-top: 6px;
       color: var(--muted);
       font-size: 13px;
+      min-height: 18px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .muted {
@@ -597,7 +601,6 @@
       font-size: 13px;
     }
 
-    /* PROGRESS */
     .progress-controls {
       display: grid;
       gap: 10px;
@@ -640,7 +643,7 @@
       overflow: hidden;
       border-radius: 28px;
       padding: 18px 16px 16px;
-      min-height: 470px;
+      min-height: 438px;
       background:
         radial-gradient(circle at 95% 100%, rgba(255, 84, 0, 0.26), transparent 30%),
         radial-gradient(circle at 30% -10%, rgba(255, 84, 0, 0.08), transparent 40%),
@@ -722,6 +725,9 @@
       color: rgba(255, 255, 255, 0.62);
       font-size: 13px;
       line-height: 1.35;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .progress-hint {
@@ -737,8 +743,8 @@
       position: relative;
       z-index: 1;
       margin-top: 12px;
-      margin-bottom: 8px;
-      padding-bottom: 22px;
+      margin-bottom: 0;
+      padding-bottom: 0;
       overflow: hidden;
       touch-action: manipulation;
       user-select: none;
@@ -750,6 +756,19 @@
       height: auto;
       display: block;
       overflow: hidden;
+    }
+
+    .progress-range {
+      position: relative;
+      z-index: 1;
+      margin-top: 6px;
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.3;
+      color: rgba(255, 255, 255, 0.46);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .progress-mini-stats {
@@ -956,8 +975,8 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 8px 11px;
-      border-radius: 15px;
+      padding: 10px 14px;
+      border-radius: 17px;
       border: 1px solid rgba(255, 255, 255, 0.09);
       background: rgba(10, 10, 10, 0.34);
       box-shadow:
@@ -984,14 +1003,14 @@
     .timer-live {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       white-space: nowrap;
     }
 
     .timer-idle {
       color: rgba(255, 255, 255, 0.76);
-      font-size: 14px;
-      font-weight: 760;
+      font-size: 15px;
+      font-weight: 780;
       letter-spacing: 0.01em;
     }
 
@@ -1000,26 +1019,26 @@
     }
 
     .timer-icon {
-      width: 13px;
-      height: 13px;
+      width: 14px;
+      height: 14px;
       display: block;
       flex: none;
       color: var(--accent);
     }
 
     .timer-readout {
-      font-size: 17px;
+      font-size: 20px;
       line-height: 1;
       font-weight: 820;
-      letter-spacing: 0.045em;
+      letter-spacing: 0.05em;
       font-variant-numeric: tabular-nums;
       font-feature-settings: "tnum" 1;
       text-shadow: 0 1px 10px rgba(0, 0, 0, 0.22);
     }
 
     .timer-mark {
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -1029,8 +1048,8 @@
     }
 
     .timer-mark svg {
-      width: 8px;
-      height: 8px;
+      width: 9px;
+      height: 9px;
       display: block;
     }
 
@@ -1304,7 +1323,8 @@
         timer: {
           running: false,
           startedAt: 0,
-          raf: 0
+          raf: 0,
+          lastPaintAt: 0
         }
       };
 
@@ -1617,12 +1637,7 @@
         } else if (state.tab === "history") {
           text(el.screenMeta, `${state.workouts.length} тренировок сохранено`);
         } else {
-          const metricMeta = {
-            weight: "Лучший вес по тренировкам",
-            volume: "Объем упражнения по тренировкам",
-            reps: "Повторы упражнения по тренировкам"
-          };
-          text(el.screenMeta, metricMeta[state.progressMetric]);
+          text(el.screenMeta, "Следи за прогрессом по упражнениям");
         }
       }
 
@@ -1846,7 +1861,7 @@
             return;
           }
 
-          moveOrUpdateSet(state.draft, exId, setId, name.value.trim(), parsed.weight, parsed.reps);
+          moveOrUpdateSet(state.draft, ex.id, set.id, name.value.trim(), parsed.weight, parsed.reps);
           closeModal();
         };
 
@@ -2067,11 +2082,11 @@
 
       function buildProgressSvg(entries, metric, selectedIndex) {
         const width = 360;
-        const height = 308;
+        const height = 260;
         const left = 16;
         const right = 12;
         const top = 24;
-        const bottom = 88;
+        const bottom = 34;
         const baseY = height - bottom;
         const chartHeight = baseY - top;
 
@@ -2131,34 +2146,6 @@
             />
           `;
         }).join("");
-
-        const labelStep = points.length > 8 ? 2 : 1;
-
-        const labels = points
-          .map((point, index) => {
-            const showLabel =
-              index === 0 ||
-              index === points.length - 1 ||
-              index === safeSelectedIndex ||
-              index % labelStep === 0;
-
-            if (!showLabel) return "";
-
-            const bottomLabelY = height - 14;
-
-            return `
-              <text
-                x="${point.x.toFixed(2)}"
-                y="${bottomLabelY}"
-                transform="rotate(-90 ${point.x.toFixed(2)} ${bottomLabelY})"
-                text-anchor="end"
-                font-size="11"
-                font-weight="${index === safeSelectedIndex ? "800" : "600"}"
-                fill="${index === safeSelectedIndex ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.46)"}"
-              >${escapeSvgText(point.label)}</text>
-            `;
-          })
-          .join("");
 
         const pointsMarkup = points
           .map((point, index) => {
@@ -2282,7 +2269,6 @@
             >${selectedLabel}</text>
 
             ${pointsMarkup}
-            ${labels}
           </svg>
         `;
       }
@@ -2361,26 +2347,14 @@
         const firstEntry = allEntries[0];
         const delta = lastEntry[metric] - firstEntry[metric];
 
-        const titleMap = {
-          weight: "Прогресс веса",
-          volume: "Объём упражнения",
-          reps: "Прогресс повторов"
-        };
-
-        const subtitleMap = {
-          weight: `Лучший вес в подходе · ${name}`,
-          volume: `Суммарный объём за тренировку · ${name}`,
-          reps: `Сумма повторений за тренировку · ${name}`
-        };
-
-        const rangeLabel =
+        const intervalText =
           visibleEntries.length === 1
-            ? "1 тренировка"
-            : `${visibleEntries.length} последних тренировок`;
+            ? `Дата: ${formatProgressAxisLabel(visibleEntries[0].date)}`
+            : `Интервал: ${formatProgressAxisLabel(visibleEntries[0].date)} — ${formatProgressAxisLabel(visibleEntries[visibleEntries.length - 1].date)}`;
 
         const hero = make("div", "progress-hero");
         hero.append(
-          make("div", "progress-kicker", titleMap[metric]),
+          make("div", "progress-kicker", "Прогресс упражнения"),
           make("div", "progress-big", formatMetricValue(selectedEntry[metric], metric))
         );
 
@@ -2391,7 +2365,7 @@
         hero.appendChild(focus);
 
         hero.append(
-          make("div", "progress-sub", `${subtitleMap[metric]} · ${rangeLabel}`)
+          make("div", "progress-sub", `Динамика по выбранному упражнению · ${name}`)
         );
 
         if (visibleEntries.length > 1) {
@@ -2414,6 +2388,7 @@
         });
 
         hero.appendChild(chart);
+        hero.appendChild(make("div", "progress-range", intervalText));
 
         const miniStats = make("div", "progress-mini-stats");
 
@@ -2757,18 +2732,27 @@
       }
 
       function renderTimer(ms = 0) {
-        text(el.timerReadout, formatStopwatch(ms));
+        const value = formatStopwatch(ms);
+
+        if (el.timerReadout.textContent !== value) {
+          text(el.timerReadout, value);
+        }
+
         el.timerToggleBtn.classList.toggle("running", state.timer.running);
         el.timerToggleBtn.setAttribute(
           "aria-label",
           state.timer.running ? "Остановить и сбросить секундомер" : "Запустить секундомер"
         );
-        scheduleTimerViewportSync();
       }
 
       function timerLoop(now) {
         if (!state.timer.running) return;
-        renderTimer(now - state.timer.startedAt);
+
+        if (!state.timer.lastPaintAt || now - state.timer.lastPaintAt >= 50) {
+          state.timer.lastPaintAt = now;
+          renderTimer(now - state.timer.startedAt);
+        }
+
         state.timer.raf = requestAnimationFrame(timerLoop);
       }
 
@@ -2777,6 +2761,7 @@
 
         state.timer.running = true;
         state.timer.startedAt = performance.now();
+        state.timer.lastPaintAt = 0;
         renderTimer(0);
         haptic();
         state.timer.raf = requestAnimationFrame(timerLoop);
@@ -2792,6 +2777,7 @@
         state.timer.running = false;
         state.timer.startedAt = 0;
         state.timer.raf = 0;
+        state.timer.lastPaintAt = 0;
         renderTimer(0);
 
         if (wasRunning) haptic("medium");
