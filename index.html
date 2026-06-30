@@ -121,7 +121,7 @@
       gap: 12px;
       margin-bottom: 16px;
       padding-right: clamp(138px, 35vw, 176px);
-      animation: softIn 0.24s ease both;
+      animation: softIn 0.18s ease both;
     }
 
     .top-copy {
@@ -164,7 +164,7 @@
 
     .section {
       margin-bottom: 16px;
-      animation: softIn 0.24s ease both;
+      animation: softIn 0.18s ease both;
     }
 
     .section-title {
@@ -179,8 +179,8 @@
       border: 1px solid var(--line);
       padding: 13px;
       margin-bottom: 10px;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
-      animation: softIn 0.24s ease both;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.14);
+      animation: softIn 0.18s ease both;
     }
 
     .empty,
@@ -196,7 +196,7 @@
 
     .panel.active {
       display: block;
-      animation: panelSlide 0.22s cubic-bezier(.2, .8, .2, 1) both;
+      animation: panelSlide 0.18s cubic-bezier(.2, .8, .2, 1) both;
     }
 
     .splash {
@@ -290,9 +290,9 @@
         rgba(255, 255, 255, 0.075);
       border: 1px solid rgba(255, 255, 255, 0.13);
       box-shadow:
-        0 18px 40px rgba(0, 0, 0, 0.24),
+        0 14px 28px rgba(0, 0, 0, 0.18),
         inset 0 1px 0 rgba(255, 255, 255, 0.08);
-      animation: softIn 0.24s ease both;
+      animation: softIn 0.18s ease both;
     }
 
     .tabs {
@@ -312,10 +312,10 @@
       width: calc((100% - 16px) / 3);
       border-radius: 18px;
       background: rgba(255, 100, 24, 0.14);
-      border: 1px solid rgba(255, 100, 24, 0.32);
-      box-shadow: 0 10px 22px rgba(255, 100, 24, 0.12);
+      border: 1px solid rgba(255, 100, 24, 0.28);
+      box-shadow: 0 8px 16px rgba(255, 100, 24, 0.08);
       transform: translateX(calc(var(--tab-index) * (100% + 8px)));
-      transition: transform 0.28s cubic-bezier(.2, .9, .2, 1);
+      transition: transform 0.22s cubic-bezier(.2, .9, .2, 1);
       box-sizing: border-box;
     }
 
@@ -341,7 +341,7 @@
       color: rgba(255, 255, 255, 0.72);
       box-shadow: none;
       font-size: 14px;
-      transition: color 0.2s ease, transform 0.16s ease;
+      transition: color 0.18s ease, transform 0.14s ease;
     }
 
     .tab.active {
@@ -488,7 +488,7 @@
     .exercise {
       padding: 16px 0;
       border-bottom: 1px solid var(--line);
-      animation: itemIn 0.2s cubic-bezier(.2, .8, .2, 1) both;
+      animation: itemIn 0.16s cubic-bezier(.2, .8, .2, 1) both;
     }
 
     .exercise:last-child {
@@ -514,7 +514,7 @@
       gap: 8px;
       align-items: center;
       min-height: 46px;
-      animation: itemIn 0.2s cubic-bezier(.2, .8, .2, 1) both;
+      animation: itemIn 0.16s cubic-bezier(.2, .8, .2, 1) both;
       overflow: hidden;
     }
 
@@ -542,7 +542,7 @@
       font-size: 15px;
       font-weight: 850;
       color: rgba(255, 255, 255, 0.78);
-      animation: itemIn 0.2s cubic-bezier(.2, .8, .2, 1) both;
+      animation: itemIn 0.16s cubic-bezier(.2, .8, .2, 1) both;
     }
 
     .history-row {
@@ -552,7 +552,7 @@
       align-items: stretch;
       margin-bottom: 9px;
       overflow: hidden;
-      animation: itemIn 0.2s cubic-bezier(.2, .8, .2, 1) both;
+      animation: itemIn 0.16s cubic-bezier(.2, .8, .2, 1) both;
     }
 
     .history-item {
@@ -571,34 +571,6 @@
       font-weight: 820;
       font-size: 17px;
       margin-bottom: 4px;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 9px;
-      margin-top: 10px;
-    }
-
-    .stat {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 13px;
-    }
-
-    .stat-num {
-      font-size: 23px;
-      font-weight: 850;
-      color: var(--accent);
-      overflow-wrap: anywhere;
-    }
-
-    .chart-label {
-      margin-top: 8px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
     }
 
     .progress-controls {
@@ -645,23 +617,13 @@
       padding: 18px 16px 16px;
       min-height: 438px;
       background:
-        radial-gradient(circle at 95% 100%, rgba(255, 84, 0, 0.26), transparent 30%),
-        radial-gradient(circle at 30% -10%, rgba(255, 84, 0, 0.08), transparent 40%),
+        radial-gradient(circle at 95% 100%, rgba(255, 84, 0, 0.18), transparent 30%),
+        radial-gradient(circle at 30% -10%, rgba(255, 84, 0, 0.06), transparent 40%),
         linear-gradient(180deg, rgba(22, 22, 22, 0.96), rgba(10, 10, 10, 0.98));
       border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow:
-        0 24px 60px rgba(0, 0, 0, 0.28),
-        inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    }
-
-    .progress-hero::after {
-      content: "";
-      position: absolute;
-      inset: auto -10% -20% 30%;
-      height: 180px;
-      background: radial-gradient(circle, rgba(255, 96, 0, 0.22), transparent 65%);
-      pointer-events: none;
-      filter: blur(18px);
+        0 18px 40px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
     }
 
     .progress-kicker {
@@ -696,10 +658,8 @@
       margin-top: 12px;
       padding: 8px 12px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .progress-focus-dot {
@@ -707,7 +667,6 @@
       height: 8px;
       border-radius: 50%;
       background: var(--accent);
-      box-shadow: 0 0 14px rgba(255, 100, 24, 0.75);
       flex: none;
     }
 
@@ -784,9 +743,8 @@
       min-width: 0;
       padding: 10px 10px 11px;
       border-radius: 16px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(8px);
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.07);
     }
 
     .progress-mini-value {
@@ -808,7 +766,7 @@
       padding: 24px 16px;
       border: 1px solid rgba(255, 255, 255, 0.08);
       background:
-        radial-gradient(circle at 90% 100%, rgba(255, 84, 0, 0.16), transparent 28%),
+        radial-gradient(circle at 90% 100%, rgba(255, 84, 0, 0.12), transparent 28%),
         linear-gradient(180deg, rgba(22, 22, 22, 0.96), rgba(10, 10, 10, 0.98));
       text-align: center;
     }
@@ -840,12 +798,11 @@
       display: none;
       align-items: flex-end;
       z-index: 80;
-      backdrop-filter: blur(8px);
     }
 
     .modal.open {
       display: flex;
-      animation: fadeIn 0.16s ease both;
+      animation: fadeIn 0.14s ease both;
     }
 
     .sheet {
@@ -858,7 +815,7 @@
       border: 1px solid var(--line);
       border-radius: 24px 24px 0 0;
       padding: 18px 14px calc(28px + var(--safe-bottom));
-      animation: sheetIn 0.24s cubic-bezier(.2, .9, .2, 1) both;
+      animation: sheetIn 0.2s cubic-bezier(.2, .9, .2, 1) both;
     }
 
     .handle {
@@ -938,15 +895,15 @@
       padding-top: 0 !important;
       padding-bottom: 0 !important;
       transition:
-        opacity 0.22s ease,
-        transform 0.22s ease,
-        max-height 0.24s ease,
-        margin 0.24s ease,
-        padding 0.24s ease;
+        opacity 0.18s ease,
+        transform 0.18s ease,
+        max-height 0.2s ease,
+        margin 0.2s ease,
+        padding 0.2s ease;
     }
 
     .flash {
-      animation: flash 0.42s ease both;
+      animation: flash 0.32s ease both;
     }
 
     .global-timer-layer {
@@ -978,12 +935,10 @@
       padding: 10px 14px;
       border-radius: 17px;
       border: 1px solid rgba(255, 255, 255, 0.09);
-      background: rgba(10, 10, 10, 0.34);
+      background: rgba(10, 10, 10, 0.28);
       box-shadow:
-        0 12px 28px rgba(0, 0, 0, 0.18),
+        0 10px 20px rgba(0, 0, 0, 0.14),
         inset 0 1px 0 rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(14px) saturate(120%);
-      -webkit-backdrop-filter: blur(14px) saturate(120%);
       color: rgba(255, 255, 255, 0.92);
       pointer-events: auto;
       touch-action: manipulation;
@@ -1033,7 +988,6 @@
       letter-spacing: 0.05em;
       font-variant-numeric: tabular-nums;
       font-feature-settings: "tnum" 1;
-      text-shadow: 0 1px 10px rgba(0, 0, 0, 0.22);
     }
 
     .timer-mark {
@@ -1055,7 +1009,7 @@
 
     .timer-widget.running {
       border-color: rgba(255, 100, 24, 0.18);
-      background: rgba(12, 12, 12, 0.42);
+      background: rgba(12, 12, 12, 0.36);
     }
 
     .timer-widget.running .timer-idle {
@@ -1072,7 +1026,29 @@
     }
 
     .toast.show {
-      animation: toastIn 0.18s ease both;
+      animation: toastIn 0.16s ease both;
+    }
+
+    .lite .card,
+    .lite .progress-mini-stat,
+    .lite .timer-widget,
+    .lite .tabs-shell {
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .lite .progress-hero::after {
+      display: none;
+    }
+
+    .lite .splash-img {
+      filter: none;
+    }
+
+    .lite * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.12s !important;
+      scroll-behavior: auto !important;
     }
 
     @keyframes load {
@@ -1083,7 +1059,7 @@
     @keyframes softIn {
       from {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(6px);
       }
       to {
         opacity: 1;
@@ -1094,7 +1070,7 @@
     @keyframes panelSlide {
       from {
         opacity: 0;
-        transform: translateX(14px);
+        transform: translateX(10px);
       }
       to {
         opacity: 1;
@@ -1105,7 +1081,7 @@
     @keyframes itemIn {
       from {
         opacity: 0;
-        transform: translateY(8px) scale(0.985);
+        transform: translateY(6px) scale(0.99);
       }
       to {
         opacity: 1;
@@ -1132,7 +1108,7 @@
     @keyframes sheetIn {
       from {
         opacity: 0;
-        transform: translateY(26px) scale(0.985);
+        transform: translateY(20px) scale(0.99);
       }
       to {
         opacity: 1;
@@ -1146,11 +1122,11 @@
       }
       35% {
         box-shadow:
-          0 0 0 3px rgba(255, 100, 24, 0.18),
-          0 18px 44px rgba(255, 100, 24, 0.12);
+          0 0 0 2px rgba(255, 100, 24, 0.14),
+          0 12px 20px rgba(255, 100, 24, 0.08);
       }
       100% {
-        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.14);
       }
     }
   </style>
@@ -1305,10 +1281,20 @@
         draftKey: "draft_workout_v4",
         localDataKey: "trainer_data_v1",
         splashDelay: 4000,
-        toastDelay: 2200
+        toastDelay: 2200,
+        persistDelay: 250
       };
 
       const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+      const lowPerfMode =
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+        (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+        (navigator.deviceMemory && navigator.deviceMemory <= 4);
+
+      if (lowPerfMode) {
+        document.documentElement.classList.add("lite");
+      }
 
       const state = {
         tab: "today",
@@ -1366,6 +1352,7 @@
 
       let timerViewportRaf = 0;
       let timerResizeObserver = null;
+      let persistTimer = 0;
 
       function id() {
         return crypto.randomUUID
@@ -1560,6 +1547,31 @@
         return Promise.resolve(confirm(message) ? "ok" : "cancel");
       }
 
+      function persistNow() {
+        const snapshot = {
+          updatedAt: Date.now(),
+          workouts: state.workouts,
+          draft: state.draft
+        };
+
+        safeStorageSet(CONFIG.localDataKey, JSON.stringify(snapshot));
+        safeStorageSet(CONFIG.storageKey, JSON.stringify(state.workouts));
+        safeStorageSet(CONFIG.draftKey, JSON.stringify(state.draft));
+      }
+
+      function schedulePersist(immediate = false) {
+        clearTimeout(persistTimer);
+
+        if (immediate) {
+          persistNow();
+          return;
+        }
+
+        persistTimer = setTimeout(() => {
+          persistNow();
+        }, CONFIG.persistDelay);
+      }
+
       function loadData() {
         const snapshot = safeJsonParse(safeStorageGet(CONFIG.localDataKey), null);
 
@@ -1585,36 +1597,72 @@
 
         rebuildCatalog();
         renderAll();
-        commit(false);
+        schedulePersist(true);
         setTimeout(() => el.splash.classList.add("hide"), CONFIG.splashDelay);
       }
 
-      function commit(render = true) {
-        rebuildCatalog();
+      function renderShell() {
+        updateMeta();
+        renderTabs();
+        updateMainActions();
+      }
 
-        const snapshot = {
-          updatedAt: Date.now(),
-          workouts: state.workouts,
-          draft: state.draft
-        };
+      function renderTodayOnly() {
+        updateMeta();
+        renderExerciseList();
+        renderDraft();
+        updateForm();
+        updateMainActions();
+      }
 
-        safeStorageSet(CONFIG.localDataKey, JSON.stringify(snapshot));
-        safeStorageSet(CONFIG.storageKey, JSON.stringify(state.workouts));
-        safeStorageSet(CONFIG.draftKey, JSON.stringify(state.draft));
+      function renderHistoryOnly() {
+        updateMeta();
+        renderHistory();
+        updateMainActions();
+      }
 
-        if (render) renderAll();
+      function renderProgressOnly() {
+        updateMeta();
+        renderProgress();
+        updateMainActions();
+      }
+
+      function renderCurrentPanel() {
+        if (state.tab === "today") {
+          renderExerciseList();
+          renderDraft();
+          updateForm();
+          return;
+        }
+
+        if (state.tab === "history") {
+          renderHistory();
+          return;
+        }
+
+        renderProgress();
       }
 
       function renderAll() {
-        updateMeta();
-        renderTabs();
-        renderExerciseList();
-        renderDraft();
-        renderHistory();
-        renderProgress();
-        updateForm();
-        updateMainActions();
+        renderShell();
+        renderCurrentPanel();
         scheduleTimerViewportSync();
+      }
+
+      function commit({
+        render = true,
+        persist = true,
+        immediate = false
+      } = {}) {
+        rebuildCatalog();
+
+        if (render) {
+          renderAll();
+        }
+
+        if (persist) {
+          schedulePersist(immediate);
+        }
       }
 
       function updateMeta() {
@@ -1737,7 +1785,10 @@
         el.repsInput.value = "";
         hideKeyboard();
         haptic();
-        commit();
+
+        rebuildCatalog();
+        schedulePersist();
+        renderTodayOnly();
 
         el.draftList.classList.remove("flash");
         requestAnimationFrame(() => el.draftList.classList.add("flash"));
@@ -1822,7 +1873,9 @@
         state.draft.exercises = state.draft.exercises.filter((item) => item.sets.length);
 
         haptic("medium");
-        commit();
+        rebuildCatalog();
+        schedulePersist();
+        renderTodayOnly();
         toast("Подход удален");
       }
 
@@ -1893,7 +1946,9 @@
         workout.exercises = workout.exercises.filter((ex) => ex.sets.length);
 
         haptic();
-        commit();
+        rebuildCatalog();
+        schedulePersist();
+        renderTodayOnly();
         toast("Подход обновлен");
       }
 
@@ -1912,7 +1967,7 @@
         state.draft = createDraft();
 
         haptic("heavy");
-        commit();
+        commit({ render: true, persist: true, immediate: true });
         toast("Тренировка сохранена");
       }
 
@@ -2165,19 +2220,19 @@
                   <circle
                     cx="${point.x.toFixed(2)}"
                     cy="${point.y.toFixed(2)}"
-                    r="12"
+                    r="10"
                     fill="#ff6418"
-                    fill-opacity="0.16"
+                    fill-opacity="0.12"
                   ></circle>
                 ` : ""}
 
                 <circle
                   cx="${point.x.toFixed(2)}"
                   cy="${point.y.toFixed(2)}"
-                  r="${isSelected ? "5.6" : "3.2"}"
+                  r="${isSelected ? "5.2" : "3"}"
                   fill="${isSelected ? "#ffffff" : "rgba(255,130,80,0.92)"}"
                   stroke="${isSelected ? "#ff6418" : "none"}"
-                  stroke-width="${isSelected ? "3" : "0"}"
+                  stroke-width="${isSelected ? "2.6" : "0"}"
                   data-point-index="${index}"
                   style="pointer-events:all;cursor:pointer"
                 ></circle>
@@ -2204,8 +2259,8 @@
           <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <defs>
               <linearGradient id="progressAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#ff6418" stop-opacity="0.42"></stop>
-                <stop offset="72%" stop-color="#ff6418" stop-opacity="0.10"></stop>
+                <stop offset="0%" stop-color="#ff6418" stop-opacity="0.28"></stop>
+                <stop offset="72%" stop-color="#ff6418" stop-opacity="0.08"></stop>
                 <stop offset="100%" stop-color="#ff6418" stop-opacity="0"></stop>
               </linearGradient>
 
@@ -2213,14 +2268,6 @@
                 <stop offset="0%" stop-color="#ff8a40"></stop>
                 <stop offset="100%" stop-color="#ff5a00"></stop>
               </linearGradient>
-
-              <filter id="progressGlow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="5" result="blur"></feGaussianBlur>
-                <feMerge>
-                  <feMergeNode in="blur"></feMergeNode>
-                  <feMergeNode in="SourceGraphic"></feMergeNode>
-                </feMerge>
-              </filter>
             </defs>
 
             <rect
@@ -2241,8 +2288,8 @@
               x2="${selected.x.toFixed(2)}"
               y2="${baseY}"
               stroke="#ff6418"
-              stroke-opacity="0.34"
-              stroke-width="2.2"
+              stroke-opacity="0.28"
+              stroke-width="2"
             />
 
             ${areaPath ? `<path d="${areaPath}" fill="url(#progressAreaGradient)"></path>` : ""}
@@ -2251,10 +2298,9 @@
                 d="${smoothPath}"
                 fill="none"
                 stroke="url(#progressLineGradient)"
-                stroke-width="4.2"
+                stroke-width="3.8"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                filter="url(#progressGlow)"
               ></path>
             ` : ""}
             ${singlePointLine}
@@ -2328,7 +2374,7 @@
         const savedDate =
           state.progressSelection.exercise === name ? state.progressSelection.date : "";
 
-        let selectedEntry =
+        const selectedEntry =
           visibleEntries.find((entry) => entry.date === savedDate) ||
           visibleEntries[visibleEntries.length - 1];
 
@@ -2569,7 +2615,7 @@
           const newGroup = createExerciseGroup("");
           form.appendChild(newGroup);
           haptic();
-          newGroup.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          newGroup.scrollIntoView({ behavior: lowPerfMode ? "auto" : "smooth", block: "nearest" });
         };
 
         const actions = make("div", "sheet-actions");
@@ -2636,7 +2682,7 @@
         workout.exercises = nextExercises;
 
         haptic();
-        commit();
+        commit({ render: true, persist: true, immediate: true });
         closeModal();
         toast("Тренировка обновлена");
       }
@@ -2686,7 +2732,7 @@
         state.workouts = state.workouts.filter((workout) => workout.id !== workoutId);
         closeModal();
         haptic("medium");
-        commit();
+        commit({ render: true, persist: true, immediate: true });
         toast("Тренировка удалена");
       }
 
@@ -2719,7 +2765,7 @@
         setTimeout(() => {
           if (done) done();
           scheduleTimerViewportSync();
-        }, 260);
+        }, 220);
       }
 
       function formatStopwatch(ms) {
@@ -2818,6 +2864,7 @@
       function bindEvents() {
         el.tabs.forEach((tab) => {
           tab.addEventListener("click", () => {
+            if (state.tab === tab.dataset.tab) return;
             state.tab = tab.dataset.tab;
             haptic();
             renderAll();
@@ -2842,9 +2889,9 @@
 
         el.progressMetricBtns.forEach((btn) => {
           btn.addEventListener("click", () => {
+            if (state.progressMetric === btn.dataset.metric) return;
             state.progressMetric = btn.dataset.metric;
             renderProgressMetricButtons();
-            updateMeta();
             showProgress();
             haptic();
           });
@@ -2879,6 +2926,23 @@
           timerResizeObserver.observe(document.body);
           timerResizeObserver.observe(document.documentElement);
         }
+
+        window.addEventListener("pagehide", () => {
+          clearTimeout(persistTimer);
+          persistNow();
+        });
+
+        window.addEventListener("beforeunload", () => {
+          clearTimeout(persistTimer);
+          persistNow();
+        });
+
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "hidden") {
+            clearTimeout(persistTimer);
+            persistNow();
+          }
+        });
       }
 
       function initTelegram() {
