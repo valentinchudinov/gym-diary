@@ -486,6 +486,13 @@
       border: 1px solid var(--line);
       box-shadow: none;
       font-weight: 750;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
+      line-height: 1;
     }
 
     .btn-muted {
@@ -505,10 +512,12 @@
     }
 
     .icon-square {
-      width: 54px;
-      min-width: 54px;
+      width: 58px;
+      min-width: 58px;
+      min-height: 58px;
       padding: 0;
       font-size: 18px;
+      flex-shrink: 0;
     }
 
     #repeatSetBtn,
@@ -584,7 +593,7 @@
     }
 
     #draftList .set-row {
-      grid-template-columns: 1fr 54px 54px;
+      grid-template-columns: 1fr 58px 58px;
       align-items: stretch;
       min-height: 54px;
       margin-bottom: 9px;
@@ -656,12 +665,12 @@
 
     .history-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 50px 50px;
+      grid-template-columns: minmax(0, 1fr) 62px 62px;
       gap: 8px;
       align-items: stretch;
       min-height: 92px;
       margin-bottom: 8px;
-      overflow: hidden;
+      overflow: visible;
       animation: itemIn 0.16s cubic-bezier(.2, .8, .2, 1) both;
       background: transparent !important;
     }
@@ -683,6 +692,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      overflow: hidden;
     }
 
     .history-title {
@@ -997,7 +1007,7 @@
 
     .edit-set-card {
       display: grid;
-      grid-template-columns: 1fr 54px;
+      grid-template-columns: 1fr 58px;
       gap: 8px;
       align-items: stretch;
       padding: 10px;
@@ -1428,7 +1438,9 @@
         historyRowHeight: 100,
         historyMonthHeight: 52,
         historyOverscanPx: 900,
-        historyPoolExtra: 12
+        historyPoolExtra: 12,
+        cloudPollInterval: 12000,
+        cloudResumeDebounce: 1200
       };
 
       const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -1469,7 +1481,12 @@
           loading: false,
           saving: false,
           lastLoadedAt: 0,
-          lastSavedAt: 0
+          lastSavedAt: 0,
+          polling: false,
+          syncInFlight: false,
+          lastSeenUpdatedAt: 0,
+          lastAppliedUpdatedAt: 0,
+          lastPullAt: 0
         },
         cache: {
           statsByWorkoutId: new Map(),
@@ -1543,6 +1560,8 @@
       let timerResizeObserver = null;
       let persistTimer = 0;
       let cloudSaveTimer = 0;
+      let cloudPollTimer = 0;
+      let cloudResumeTimer = 0;
       let historyViewportResizeObserver = null;
 
       function id() {
@@ -1778,11 +1797,20 @@
         };
       }
 
+      function getLocalSnapshotForCompare() {
+        const localSnapshot = safeJsonParse(safeStorageGet(CONFIG.localDataKey), null);
+        if (localSnapshot && Array.isArray(localSnapshot.workouts) && localSnapshot.draft) {
+          return localSnapshot;
+        }
+        return buildSnapshot();
+      }
+
       function persistNowLocal() {
         const snapshot = buildSnapshot();
         safeStorageSet(CONFIG.localDataKey, JSON.stringify(snapshot));
         safeStorageSet(CONFIG.storageKey, JSON.stringify(state.workouts));
         safeStorageSet(CONFIG.draftKey, JSON.stringify(state.draft));
+        state.cloud.lastSeenUpdatedAt = Math.max(state.cloud.lastSeenUpdatedAt, Number(snapshot.updatedAt) || 0);
       }
 
       function cloudGetItem(key) {
@@ -1833,6 +1861,7 @@
 
         if (ok) {
           state.cloud.lastSavedAt = Date.now();
+          state.cloud.lastSeenUpdatedAt = Math.max(state.cloud.lastSeenUpdatedAt, Number(snapshot.updatedAt) || 0);
         }
 
         return ok;
@@ -2237,6 +2266,91 @@
         applyHistoryFilter();
       }
 
+      async function pullCloudSnapshot() {
+        if (!state.cloud.enabled) return null;
+        const cloudRaw = await cloudGetItem(CONFIG.cloudDataKey);
+        const cloudSnapshot = safeJsonParse(cloudRaw, null);
+        if (cloudSnapshot && Array.isArray(cloudSnapshot.workouts) && cloudSnapshot.draft) {
+          state.cloud.lastLoadedAt = Date.now();
+          state.cloud.lastPullAt = Date.now();
+          state.cloud.lastSeenUpdatedAt = Math.max(
+            state.cloud.lastSeenUpdatedAt,
+            Number(cloudSnapshot.updatedAt) || 0
+          );
+          return cloudSnapshot;
+        }
+        return null;
+      }
+
+      async function syncFromCloud(options = {}) {
+        const {
+          force = false,
+          silent = true
+        } = options;
+
+        if (!state.cloud.enabled) return false;
+        if (state.cloud.syncInFlight) return false;
+
+        state.cloud.syncInFlight = true;
+        state.cloud.loading = true;
+
+        try {
+          const cloudSnapshot = await pullCloudSnapshot();
+          if (!cloudSnapshot) return false;
+
+          const cloudUpdatedAt = Number(cloudSnapshot.updatedAt) || 0;
+          const localSnapshot = getLocalSnapshotForCompare();
+          const localUpdatedAt = Number(localSnapshot.updatedAt) || 0;
+
+          if (!force && cloudUpdatedAt <= localUpdatedAt) {
+            return false;
+          }
+
+          applySnapshot(cloudSnapshot);
+          persistNowLocal();
+          state.cloud.lastAppliedUpdatedAt = cloudUpdatedAt;
+
+          if (!silent) {
+            toast("Данные обновлены из облака");
+          }
+
+          renderAll();
+          return true;
+        } finally {
+          state.cloud.loading = false;
+          state.cloud.syncInFlight = false;
+        }
+      }
+
+      function startCloudPolling() {
+        stopCloudPolling();
+
+        if (!state.cloud.enabled) return;
+
+        state.cloud.polling = true;
+
+        cloudPollTimer = setInterval(() => {
+          if (document.visibilityState !== "visible") return;
+          syncFromCloud({ force: false, silent: true });
+        }, CONFIG.cloudPollInterval);
+      }
+
+      function stopCloudPolling() {
+        state.cloud.polling = false;
+        clearInterval(cloudPollTimer);
+        cloudPollTimer = 0;
+      }
+
+      function scheduleCloudResumeSync() {
+        clearTimeout(cloudResumeTimer);
+
+        if (!state.cloud.enabled) return;
+
+        cloudResumeTimer = setTimeout(() => {
+          syncFromCloud({ force: false, silent: true });
+        }, CONFIG.cloudResumeDebounce);
+      }
+
       async function loadData() {
         migrateLegacyDataIfNeeded();
 
@@ -2268,8 +2382,10 @@
           const cloudUpdatedAt = Number(cloudSnapshot && cloudSnapshot.updatedAt) || 0;
 
           if (cloudSnapshot && Array.isArray(cloudSnapshot.workouts) && cloudSnapshot.draft) {
+            state.cloud.lastSeenUpdatedAt = cloudUpdatedAt;
             if (cloudUpdatedAt >= localUpdatedAt) {
               finalSnapshot = cloudSnapshot;
+              state.cloud.lastAppliedUpdatedAt = cloudUpdatedAt;
             } else {
               finalSnapshot = fallbackSnapshot;
               scheduleCloudPersist(true);
@@ -2283,6 +2399,7 @@
         applySnapshot(finalSnapshot);
         renderAll();
         persistNowLocal();
+        startCloudPolling();
 
         setTimeout(() => {
           el.splash.classList.add("hide");
@@ -2879,6 +2996,8 @@
 
         const del = make("button", "btn-card btn-danger icon-square", "×");
         del.type = "button";
+        del.setAttribute("aria-label", "Удалить тренировку");
+        del.title = "Удалить тренировку";
 
         row.append(open, csv, del);
         host.append(month, row);
@@ -3991,6 +4110,10 @@
           }
         });
 
+        window.addEventListener("focus", () => {
+          scheduleCloudResumeSync();
+        });
+
         if (window.visualViewport) {
           window.visualViewport.addEventListener("scroll", scheduleTimerViewportSync, { passive: true });
           window.visualViewport.addEventListener("resize", scheduleTimerViewportSync, { passive: true });
@@ -4024,6 +4147,8 @@
             clearTimeout(cloudSaveTimer);
             persistNowLocal();
             persistNowCloud();
+          } else if (document.visibilityState === "visible") {
+            scheduleCloudResumeSync();
           }
         });
       }
