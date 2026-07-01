@@ -426,6 +426,58 @@
       transform: translateY(-50%) scale(0.9);
     }
 
+    .search-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      z-index: 30;
+      display: none;
+      max-height: min(280px, 46vh);
+      overflow: auto;
+      border-radius: 16px;
+      background: #121212;
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.32);
+      overscroll-behavior: contain;
+    }
+
+    .search-dropdown.open {
+      display: block;
+      animation: softIn 0.12s ease both;
+    }
+
+    .search-option {
+      width: 100%;
+      min-height: 48px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #fff;
+      text-align: left;
+      padding: 12px 14px;
+      box-shadow: none;
+      font-weight: 650;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .search-option:last-child {
+      border-bottom: 0;
+    }
+
+    .search-option mark {
+      background: rgba(255, 100, 24, 0.2);
+      color: #fff;
+      padding: 0 2px;
+      border-radius: 4px;
+    }
+
+    .search-empty {
+      padding: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
     .btn-card {
       min-height: 54px;
       padding: 0 14px;
@@ -535,6 +587,43 @@
       align-items: stretch;
       min-height: 54px;
       margin-bottom: 9px;
+    }
+
+    .history-controls {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .history-summary {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 0 2px;
+    }
+
+    .history-search-wrap {
+      position: relative;
+    }
+
+    .history-viewport {
+      position: relative;
+      min-height: 320px;
+    }
+
+    .history-spacer {
+      height: 0;
+      pointer-events: none;
+    }
+
+    .history-inner {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      will-change: transform;
     }
 
     .history-month-title {
@@ -1167,8 +1256,8 @@
                 <input
                   id="exerciseInput"
                   placeholder="Упражнение"
-                  list="exerciseList"
                   autocomplete="off"
+                  spellcheck="false"
                 />
                 <button
                   id="exerciseClearBtn"
@@ -1180,14 +1269,13 @@
                     <path d="M7.76 7.76a1 1 0 0 1 1.41 0L12 10.59l2.83-2.83a1 1 0 1 1 1.41 1.41L13.41 12l2.83 2.83a1 1 0 1 1-1.41 1.41L12 13.41l-2.83 2.83a1 1 0 1 1-1.41-1.41L10.59 12 7.76 9.17a1 1 0 0 1 0-1.41Z"></path>
                   </svg>
                 </button>
+                <div class="search-dropdown" id="exerciseDropdown"></div>
               </div>
 
               <div class="form-numbers">
                 <input id="weightInput" placeholder="кг" inputmode="decimal" />
                 <input id="repsInput" placeholder="Повторений" inputmode="numeric" />
               </div>
-
-              <datalist id="exerciseList"></datalist>
 
               <div class="row">
                 <button id="repeatSetBtn" type="button" disabled>Такой же</button>
@@ -1209,6 +1297,17 @@
       </section>
 
       <section class="panel" id="historyPanel">
+        <div class="card">
+          <div class="history-controls">
+            <div class="history-search-wrap">
+              <input id="historySearchInput" placeholder="Поиск по дате, упражнению, объёму..." autocomplete="off" />
+            </div>
+            <div class="history-summary">
+              <span id="historySummaryLeft">0 тренировок</span>
+              <span id="historySummaryRight">0 показано</span>
+            </div>
+          </div>
+        </div>
         <div id="historyList"></div>
       </section>
 
@@ -1277,12 +1376,17 @@
       "use strict";
 
       const CONFIG = {
-        storageKey: "workouts_v4",
-        draftKey: "draft_workout_v4",
-        localDataKey: "trainer_data_v1",
-        splashDelay: 4000,
+        storageKey: "workouts_v5",
+        draftKey: "draft_workout_v5",
+        localDataKey: "trainer_data_v2",
+        splashDelay: 1800,
         toastDelay: 2200,
-        persistDelay: 250
+        persistDelay: 250,
+        searchDebounce: 80,
+        searchMaxResults: 12,
+        historyRowHeight: 72,
+        historyMonthHeight: 38,
+        historyOverscan: 10
       };
 
       const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -1299,8 +1403,13 @@
       const state = {
         tab: "today",
         workouts: [],
+        workoutsById: new Map(),
         draft: createDraft(),
-        exercises: new Set(),
+        exerciseCatalog: {
+          byKey: new Map(),
+          sorted: [],
+          version: 0
+        },
         progressMetric: "weight",
         progressSelection: {
           exercise: "",
@@ -1311,6 +1420,27 @@
           startedAt: 0,
           raf: 0,
           lastPaintAt: 0
+        },
+        cache: {
+          statsByWorkoutId: new Map(),
+          historyMetaByWorkoutId: new Map(),
+          historyOrderedIds: [],
+          progressByExercise: new Map(),
+          lastCompletedSetByExercise: new Map()
+        },
+        search: {
+          exerciseQuery: "",
+          results: [],
+          open: false,
+          debounceTimer: 0
+        },
+        historyUi: {
+          query: "",
+          filteredIds: [],
+          virtualItems: [],
+          viewportHeight: 0,
+          scrollTop: 0,
+          lastRenderedKey: ""
         }
       };
 
@@ -1330,15 +1460,18 @@
         exerciseInputWrap: document.getElementById("exerciseInputWrap"),
         exerciseInput: document.getElementById("exerciseInput"),
         exerciseClearBtn: document.getElementById("exerciseClearBtn"),
+        exerciseDropdown: document.getElementById("exerciseDropdown"),
         weightInput: document.getElementById("weightInput"),
         repsInput: document.getElementById("repsInput"),
-        exerciseList: document.getElementById("exerciseList"),
         addSetBtn: document.getElementById("addSetBtn"),
         repeatSetBtn: document.getElementById("repeatSetBtn"),
         formHint: document.getElementById("formHint"),
         draftList: document.getElementById("draftList"),
         fallbackFinishBtn: document.getElementById("fallbackFinishBtn"),
         historyList: document.getElementById("historyList"),
+        historySearchInput: document.getElementById("historySearchInput"),
+        historySummaryLeft: document.getElementById("historySummaryLeft"),
+        historySummaryRight: document.getElementById("historySummaryRight"),
         progressSelect: document.getElementById("progressSelect"),
         progressResult: document.getElementById("progressResult"),
         progressMetricBtns: [...document.querySelectorAll(".progress-mode-btn")],
@@ -1353,6 +1486,7 @@
       let timerViewportRaf = 0;
       let timerResizeObserver = null;
       let persistTimer = 0;
+      let historyViewportResizeObserver = null;
 
       function id() {
         return crypto.randomUUID
@@ -1381,7 +1515,38 @@
       }
 
       function sameName(a, b) {
-        return String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
+        return normalizeName(a) === normalizeName(b);
+      }
+
+      function normalizeName(value) {
+        return String(value || "")
+          .trim()
+          .toLowerCase()
+          .replace(/ё/g, "е");
+      }
+
+      function exerciseKey(value) {
+        return normalizeName(value);
+      }
+
+      function normalizeSearchText(value) {
+        return String(value || "")
+          .toLowerCase()
+          .replace(/ё/g, "е")
+          .replace(/[^\p{L}\p{N}\s]+/gu, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+      }
+
+      function tokenize(value) {
+        const normalized = normalizeSearchText(value);
+        return normalized ? normalized.split(" ") : [];
+      }
+
+      function getWorkoutTimestamp(workout) {
+        const raw = workout.finishedAt || workout.createdAt || 0;
+        const ts = new Date(raw).getTime();
+        return Number.isFinite(ts) ? ts : 0;
       }
 
       function normalizeNumber(value) {
@@ -1407,6 +1572,15 @@
       }
 
       function escapeSvgText(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function escapeHtml(value) {
         return String(value)
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
@@ -1498,12 +1672,260 @@
         };
       }
 
-      function rebuildCatalog() {
-        state.exercises = new Set();
+      function createExerciseAggregate(name) {
+        return {
+          key: exerciseKey(name),
+          displayName: name,
+          count: 0
+        };
+      }
+
+      function registerExerciseName(name) {
+        const clean = String(name || "").trim();
+        if (!clean) return;
+        const key = exerciseKey(clean);
+        let entry = state.exerciseCatalog.byKey.get(key);
+        if (!entry) {
+          entry = createExerciseAggregate(clean);
+          state.exerciseCatalog.byKey.set(key, entry);
+        }
+        entry.count += 1;
+        if (!entry.displayName) entry.displayName = clean;
+      }
+
+      function unregisterExerciseName(name) {
+        const clean = String(name || "").trim();
+        if (!clean) return;
+        const key = exerciseKey(clean);
+        const entry = state.exerciseCatalog.byKey.get(key);
+        if (!entry) return;
+        entry.count -= 1;
+        if (entry.count <= 0) {
+          state.exerciseCatalog.byKey.delete(key);
+        }
+      }
+
+      function rebuildExerciseCatalogSorted() {
+        state.exerciseCatalog.sorted = [...state.exerciseCatalog.byKey.values()]
+          .map((entry) => entry.displayName)
+          .sort((a, b) => a.localeCompare(b, "ru"));
+        state.exerciseCatalog.version += 1;
+      }
+
+      function fullRebuildExerciseCatalog() {
+        state.exerciseCatalog.byKey = new Map();
+
         state.workouts.forEach((workout) => {
-          workout.exercises.forEach((ex) => state.exercises.add(ex.name));
+          workout.exercises.forEach((ex) => registerExerciseName(ex.name));
         });
-        state.draft.exercises.forEach((ex) => state.exercises.add(ex.name));
+
+        state.draft.exercises.forEach((ex) => registerExerciseName(ex.name));
+
+        rebuildExerciseCatalogSorted();
+      }
+
+      function buildWorkoutHistoryMeta(workout, stats) {
+        const ts = getWorkoutTimestamp(workout);
+        const date = new Date(ts || Date.now());
+        const title = formatDateTitle(workout.finishedAt || workout.createdAt);
+        const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+        const monthTitle = capitalize(
+          date.toLocaleDateString("ru-RU", {
+            month: "long",
+            year: "numeric"
+          })
+        );
+        const exerciseNames = workout.exercises.map((ex) => ex.name);
+        const searchText = normalizeSearchText(
+          [
+            title,
+            monthTitle,
+            workout.finishedAt || workout.createdAt,
+            `${stats.exercises} упражнений`,
+            `${stats.sets} подходов`,
+            `${Math.round(stats.volume)} кг`,
+            ...exerciseNames
+          ].join(" ")
+        );
+
+        return {
+          id: workout.id,
+          workoutId: workout.id,
+          ts,
+          title,
+          monthKey,
+          monthTitle,
+          searchText,
+          exerciseNames
+        };
+      }
+
+      function buildWorkoutProgressDelta(workout) {
+        const perWorkout = new Map();
+
+        workout.exercises.forEach((ex) => {
+          const key = exerciseKey(ex.name);
+          let bucket = perWorkout.get(key);
+
+          if (!bucket) {
+            bucket = {
+              key,
+              name: ex.name,
+              sets: []
+            };
+            perWorkout.set(key, bucket);
+          }
+
+          ex.sets.forEach((set) => bucket.sets.push(set));
+        });
+
+        const entries = [];
+        perWorkout.forEach((bucket) => {
+          if (!bucket.sets.length) return;
+
+          let bestWeight = 0;
+          let volume = 0;
+          let reps = 0;
+
+          bucket.sets.forEach((set) => {
+            if (set.weight > bestWeight) bestWeight = set.weight;
+            volume += set.weight * set.reps;
+            reps += set.reps;
+          });
+
+          entries.push({
+            key: bucket.key,
+            name: bucket.name,
+            date: workout.finishedAt || workout.createdAt,
+            weight: bestWeight,
+            volume,
+            reps,
+            sets: bucket.sets.length,
+            lastSet: bucket.sets[bucket.sets.length - 1],
+            workoutId: workout.id
+          });
+        });
+
+        return entries;
+      }
+
+      function insertSortedHistoryWorkoutId(workoutId) {
+        const meta = state.cache.historyMetaByWorkoutId.get(workoutId);
+        if (!meta) return;
+
+        const ids = state.cache.historyOrderedIds;
+        let left = 0;
+        let right = ids.length;
+
+        while (left < right) {
+          const mid = (left + right) >> 1;
+          const midMeta = state.cache.historyMetaByWorkoutId.get(ids[mid]);
+          const midTs = midMeta ? midMeta.ts : 0;
+          if (meta.ts > midTs) {
+            right = mid;
+          } else {
+            left = mid + 1;
+          }
+        }
+
+        ids.splice(left, 0, workoutId);
+      }
+
+      function removeHistoryWorkoutId(workoutId) {
+        const index = state.cache.historyOrderedIds.indexOf(workoutId);
+        if (index >= 0) state.cache.historyOrderedIds.splice(index, 1);
+      }
+
+      function compareProgressEntries(a, b) {
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      }
+
+      function insertProgressEntry(entry) {
+        let arr = state.cache.progressByExercise.get(entry.key);
+        if (!arr) {
+          arr = [];
+          state.cache.progressByExercise.set(entry.key, arr);
+        }
+
+        let left = 0;
+        let right = arr.length;
+        const ts = new Date(entry.date).getTime();
+
+        while (left < right) {
+          const mid = (left + right) >> 1;
+          const midTs = new Date(arr[mid].date).getTime();
+          if (ts < midTs) {
+            right = mid;
+          } else {
+            left = mid + 1;
+          }
+        }
+
+        arr.splice(left, 0, entry);
+      }
+
+      function removeProgressEntriesByWorkoutId(workoutId) {
+        for (const [key, arr] of state.cache.progressByExercise.entries()) {
+          const next = arr.filter((item) => item.workoutId !== workoutId);
+          if (next.length) {
+            state.cache.progressByExercise.set(key, next);
+          } else {
+            state.cache.progressByExercise.delete(key);
+          }
+        }
+      }
+
+      function rebuildLastCompletedSetByExercise() {
+        const next = new Map();
+
+        for (const [key, arr] of state.cache.progressByExercise.entries()) {
+          if (arr.length) {
+            next.set(key, arr[arr.length - 1].lastSet);
+          }
+        }
+
+        state.cache.lastCompletedSetByExercise = next;
+      }
+
+      function addWorkoutToCaches(workout) {
+        state.workoutsById.set(workout.id, workout);
+
+        const stats = getStats(workout);
+        state.cache.statsByWorkoutId.set(workout.id, stats);
+
+        const historyMeta = buildWorkoutHistoryMeta(workout, stats);
+        state.cache.historyMetaByWorkoutId.set(workout.id, historyMeta);
+        insertSortedHistoryWorkoutId(workout.id);
+
+        const progressEntries = buildWorkoutProgressDelta(workout);
+        progressEntries.forEach(insertProgressEntry);
+
+        rebuildLastCompletedSetByExercise();
+      }
+
+      function removeWorkoutFromCaches(workout) {
+        state.workoutsById.delete(workout.id);
+        state.cache.statsByWorkoutId.delete(workout.id);
+        state.cache.historyMetaByWorkoutId.delete(workout.id);
+        removeHistoryWorkoutId(workout.id);
+        removeProgressEntriesByWorkoutId(workout.id);
+        rebuildLastCompletedSetByExercise();
+      }
+
+      function replaceWorkoutInCaches(oldWorkout, newWorkout) {
+        removeWorkoutFromCaches(oldWorkout);
+        addWorkoutToCaches(newWorkout);
+      }
+
+      function fullRebuildWorkoutCaches() {
+        state.workoutsById = new Map();
+        state.cache.statsByWorkoutId = new Map();
+        state.cache.historyMetaByWorkoutId = new Map();
+        state.cache.historyOrderedIds = [];
+        state.cache.progressByExercise = new Map();
+        state.cache.lastCompletedSetByExercise = new Map();
+
+        state.workouts.forEach((workout) => addWorkoutToCaches(workout));
       }
 
       function toast(message) {
@@ -1595,10 +2017,15 @@
           state.draft.status = "draft";
         }
 
-        rebuildCatalog();
+        fullRebuildWorkoutCaches();
+        fullRebuildExerciseCatalog();
+        applyHistoryFilter();
         renderAll();
         schedulePersist(true);
-        setTimeout(() => el.splash.classList.add("hide"), CONFIG.splashDelay);
+
+        setTimeout(() => {
+          el.splash.classList.add("hide");
+        }, CONFIG.splashDelay);
       }
 
       function renderShell() {
@@ -1609,29 +2036,17 @@
 
       function renderTodayOnly() {
         updateMeta();
-        renderExerciseList();
         renderDraft();
         updateForm();
-        updateMainActions();
-      }
-
-      function renderHistoryOnly() {
-        updateMeta();
-        renderHistory();
-        updateMainActions();
-      }
-
-      function renderProgressOnly() {
-        updateMeta();
-        renderProgress();
+        renderExerciseSearchResults(true);
         updateMainActions();
       }
 
       function renderCurrentPanel() {
         if (state.tab === "today") {
-          renderExerciseList();
           renderDraft();
           updateForm();
+          renderExerciseSearchResults(true);
           return;
         }
 
@@ -1647,22 +2062,6 @@
         renderShell();
         renderCurrentPanel();
         scheduleTimerViewportSync();
-      }
-
-      function commit({
-        render = true,
-        persist = true,
-        immediate = false
-      } = {}) {
-        rebuildCatalog();
-
-        if (render) {
-          renderAll();
-        }
-
-        if (persist) {
-          schedulePersist(immediate);
-        }
       }
 
       function updateMeta() {
@@ -1697,18 +2096,6 @@
           tab.classList.toggle("active", active);
           el.panels[tab.dataset.tab].classList.toggle("active", active);
         });
-      }
-
-      function renderExerciseList() {
-        el.exerciseList.replaceChildren();
-
-        [...state.exercises]
-          .sort((a, b) => a.localeCompare(b, "ru"))
-          .forEach((name) => {
-            const option = document.createElement("option");
-            option.value = name;
-            el.exerciseList.appendChild(option);
-          });
       }
 
       function updateExerciseClear() {
@@ -1755,8 +2142,141 @@
 
       function clearExerciseInput() {
         el.exerciseInput.value = "";
+        state.search.exerciseQuery = "";
+        closeExerciseDropdown();
         updateForm();
         el.exerciseInput.focus();
+      }
+
+      function closeExerciseDropdown() {
+        state.search.open = false;
+        el.exerciseDropdown.classList.remove("open");
+      }
+
+      function highlightMatch(label, query) {
+        const safe = escapeHtml(label);
+        const q = String(query || "").trim();
+        if (!q) return safe;
+
+        const lowerLabel = label.toLowerCase();
+        const lowerQ = q.toLowerCase();
+        const index = lowerLabel.indexOf(lowerQ);
+        if (index < 0) return safe;
+
+        const start = escapeHtml(label.slice(0, index));
+        const mid = escapeHtml(label.slice(index, index + q.length));
+        const end = escapeHtml(label.slice(index + q.length));
+        return `${start}<mark>${mid}</mark>${end}`;
+      }
+
+      function scoreExerciseName(name, query) {
+        const normalizedName = normalizeSearchText(name);
+        const normalizedQuery = normalizeSearchText(query);
+        if (!normalizedQuery) return 0;
+
+        if (normalizedName === normalizedQuery) return 1000;
+        if (normalizedName.startsWith(normalizedQuery)) return 800;
+        if (normalizedName.includes(` ${normalizedQuery}`)) return 700;
+        if (normalizedName.includes(normalizedQuery)) return 600;
+
+        const qTokens = tokenize(normalizedQuery);
+        if (!qTokens.length) return 0;
+
+        let score = 0;
+        for (const token of qTokens) {
+          if (normalizedName.startsWith(token)) score += 120;
+          else if (normalizedName.includes(` ${token}`)) score += 90;
+          else if (normalizedName.includes(token)) score += 50;
+          else return 0;
+        }
+
+        return score;
+      }
+
+      function computeExerciseSearchResults(query) {
+        const names = state.exerciseCatalog.sorted;
+        if (!query.trim()) {
+          return names.slice(0, CONFIG.searchMaxResults);
+        }
+
+        const scored = [];
+        for (const name of names) {
+          const score = scoreExerciseName(name, query);
+          if (score > 0) scored.push({ name, score });
+        }
+
+        scored.sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score;
+          return a.name.localeCompare(b.name, "ru");
+        });
+
+        return scored.slice(0, CONFIG.searchMaxResults).map((item) => item.name);
+      }
+
+      function renderExerciseSearchResults(force = false) {
+        const query = el.exerciseInput.value.trim();
+        const nextResults = computeExerciseSearchResults(query);
+
+        if (
+          !force &&
+          state.search.exerciseQuery === query &&
+          state.search.results.length === nextResults.length &&
+          state.search.results.every((value, index) => value === nextResults[index])
+        ) {
+          return;
+        }
+
+        state.search.exerciseQuery = query;
+        state.search.results = nextResults;
+        el.exerciseDropdown.replaceChildren();
+
+        if (!document.activeElement || document.activeElement !== el.exerciseInput) {
+          closeExerciseDropdown();
+          return;
+        }
+
+        if (!nextResults.length && query) {
+          const empty = make("div", "search-empty", "Ничего не найдено");
+          el.exerciseDropdown.appendChild(empty);
+          state.search.open = true;
+          el.exerciseDropdown.classList.add("open");
+          return;
+        }
+
+        if (!nextResults.length) {
+          closeExerciseDropdown();
+          return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        nextResults.forEach((name) => {
+          const btn = make("button", "search-option");
+          btn.type = "button";
+          btn.innerHTML = highlightMatch(name, query);
+          btn.addEventListener("click", () => {
+            selectExerciseSuggestion(name);
+          });
+          fragment.appendChild(btn);
+        });
+
+        el.exerciseDropdown.appendChild(fragment);
+        state.search.open = true;
+        el.exerciseDropdown.classList.add("open");
+      }
+
+      function scheduleExerciseSearchRender() {
+        clearTimeout(state.search.debounceTimer);
+        state.search.debounceTimer = setTimeout(() => {
+          renderExerciseSearchResults();
+        }, CONFIG.searchDebounce);
+      }
+
+      function selectExerciseSuggestion(name) {
+        el.exerciseInput.value = name;
+        closeExerciseDropdown();
+        fillLastSet();
+        updateForm();
+        haptic();
       }
 
       function getOrCreateDraftExercise(name) {
@@ -1765,6 +2285,8 @@
         if (!ex) {
           ex = { id: id(), name, sets: [] };
           state.draft.exercises.push(ex);
+          registerExerciseName(name);
+          rebuildExerciseCatalogSorted();
         }
 
         return ex;
@@ -1779,14 +2301,18 @@
           return;
         }
 
+        const existedBefore = state.draft.exercises.some((item) => sameName(item.name, name));
         getOrCreateDraftExercise(name).sets.push({ id: id(), ...parsed });
+
+        if (!existedBefore) {
+          rebuildExerciseCatalogSorted();
+        }
 
         el.weightInput.value = "";
         el.repsInput.value = "";
         hideKeyboard();
         haptic();
 
-        rebuildCatalog();
         schedulePersist();
         renderTodayOnly();
 
@@ -1802,16 +2328,7 @@
           return draftExercise.sets[draftExercise.sets.length - 1];
         }
 
-        const sorted = [...state.workouts].sort(
-          (a, b) => new Date(b.finishedAt) - new Date(a.finishedAt)
-        );
-
-        for (const workout of sorted) {
-          const ex = workout.exercises.find((item) => sameName(item.name, name));
-          if (ex && ex.sets.length) return ex.sets[ex.sets.length - 1];
-        }
-
-        return null;
+        return state.cache.lastCompletedSetByExercise.get(exerciseKey(name)) || null;
       }
 
       function fillLastSet() {
@@ -1830,6 +2347,8 @@
           el.draftList.appendChild(make("div", "empty", "Пока нет подходов"));
           return;
         }
+
+        const fragment = document.createDocumentFragment();
 
         state.draft.exercises.forEach((ex) => {
           const box = make("div", "exercise");
@@ -1861,8 +2380,10 @@
             box.appendChild(row);
           });
 
-          el.draftList.appendChild(box);
+          fragment.appendChild(box);
         });
+
+        el.draftList.appendChild(fragment);
       }
 
       function deleteDraftSet(exId, setId) {
@@ -1870,10 +2391,15 @@
         if (!ex) return;
 
         ex.sets = ex.sets.filter((set) => set.id !== setId);
+
+        if (!ex.sets.length) {
+          unregisterExerciseName(ex.name);
+        }
+
         state.draft.exercises = state.draft.exercises.filter((item) => item.sets.length);
+        rebuildExerciseCatalogSorted();
 
         haptic("medium");
-        rebuildCatalog();
         schedulePersist();
         renderTodayOnly();
         toast("Подход удален");
@@ -1930,6 +2456,7 @@
         const oldExercise = workout.exercises.find((ex) => ex.id === exId);
         if (!oldExercise) return;
 
+        const oldName = oldExercise.name;
         const index = oldExercise.sets.findIndex((set) => set.id === setId);
         if (index < 0) return;
 
@@ -1937,16 +2464,25 @@
         oldExercise.sets.splice(index, 1);
 
         let target = workout.exercises.find((ex) => sameName(ex.name, newName));
+        const hadTarget = Boolean(target);
+
         if (!target) {
           target = { id: id(), name: newName, sets: [] };
           workout.exercises.push(target);
         }
 
         target.sets.push(updated);
+
+        const oldExerciseBecameEmpty = !oldExercise.sets.length;
         workout.exercises = workout.exercises.filter((ex) => ex.sets.length);
 
+        if (!sameName(oldName, newName)) {
+          if (oldExerciseBecameEmpty) unregisterExerciseName(oldName);
+          if (!hadTarget) registerExerciseName(newName);
+          rebuildExerciseCatalogSorted();
+        }
+
         haptic();
-        rebuildCatalog();
         schedulePersist();
         renderTodayOnly();
         toast("Подход обновлен");
@@ -1958,94 +2494,230 @@
         const answer = await showPopup("Завершить тренировку?");
         if (answer !== "ok") return;
 
-        state.workouts.push({
+        const completedWorkout = {
           ...state.draft,
           status: "completed",
           finishedAt: new Date().toISOString()
-        });
+        };
 
+        state.workouts.push(completedWorkout);
         state.draft = createDraft();
 
+        addWorkoutToCaches(completedWorkout);
+        applyHistoryFilter();
+
         haptic("heavy");
-        commit({ render: true, persist: true, immediate: true });
+        renderAll();
+        schedulePersist(true);
         toast("Тренировка сохранена");
       }
 
-      function renderHistory() {
-        el.historyList.replaceChildren();
+      function buildHistoryRow(workoutId) {
+        const workout = state.workoutsById.get(workoutId);
+        const stats = state.cache.statsByWorkoutId.get(workoutId);
+        const meta = state.cache.historyMetaByWorkoutId.get(workoutId);
+        if (!workout || !stats || !meta) return make("div", "");
 
-        if (!state.workouts.length) {
-          el.historyList.appendChild(make("div", "empty", "Пока нет сохраненных тренировок"));
+        const row = make("div", "history-row");
+        row.dataset.id = workout.id;
+
+        const open = make("button", "history-item");
+        open.type = "button";
+        open.onclick = () => openWorkout(workout.id);
+        open.append(
+          make("div", "history-title", meta.title),
+          make(
+            "div",
+            "muted",
+            `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
+          )
+        );
+
+        const csv = make("button", "btn-card btn-accent icon-square", "CSV");
+        csv.type = "button";
+        csv.onclick = () => exportWorkoutCsv(workout.id);
+
+        const del = make("button", "btn-card btn-danger icon-square", "×");
+        del.type = "button";
+        del.onclick = () => confirmDeleteWorkout(workout.id, row);
+
+        row.append(open, csv, del);
+        return row;
+      }
+
+      function applyHistoryFilter() {
+        const query = state.historyUi.query.trim();
+        const ids = state.cache.historyOrderedIds;
+
+        if (!query) {
+          state.historyUi.filteredIds = ids.slice();
+        } else {
+          const tokens = tokenize(query);
+          state.historyUi.filteredIds = ids.filter((workoutId) => {
+            const meta = state.cache.historyMetaByWorkoutId.get(workoutId);
+            if (!meta) return false;
+            return tokens.every((token) => meta.searchText.includes(token));
+          });
+        }
+
+        rebuildVirtualHistoryItems();
+      }
+
+      function rebuildVirtualHistoryItems() {
+        const items = [];
+        const filteredIds = state.historyUi.filteredIds;
+        let prevMonthKey = "";
+        let offsetTop = 0;
+
+        filteredIds.forEach((workoutId) => {
+          const meta = state.cache.historyMetaByWorkoutId.get(workoutId);
+          if (!meta) return;
+
+          if (meta.monthKey !== prevMonthKey) {
+            items.push({
+              type: "month",
+              key: `m:${meta.monthKey}:${workoutId}`,
+              monthTitle: meta.monthTitle,
+              top: offsetTop,
+              height: CONFIG.historyMonthHeight
+            });
+            offsetTop += CONFIG.historyMonthHeight;
+            prevMonthKey = meta.monthKey;
+          }
+
+          items.push({
+            type: "row",
+            key: `w:${workoutId}`,
+            workoutId,
+            top: offsetTop,
+            height: CONFIG.historyRowHeight
+          });
+          offsetTop += CONFIG.historyRowHeight;
+        });
+
+        state.historyUi.virtualItems = items;
+      }
+
+      function ensureHistoryViewport() {
+        let viewport = el.historyList.querySelector(".history-viewport");
+        if (viewport) return viewport;
+
+        viewport = make("div", "history-viewport");
+        const spacer = make("div", "history-spacer");
+        const inner = make("div", "history-inner");
+
+        viewport.append(spacer, inner);
+        el.historyList.replaceChildren(viewport);
+
+        viewport.addEventListener("scroll", onHistoryScroll, { passive: true });
+
+        if ("ResizeObserver" in window) {
+          historyViewportResizeObserver && historyViewportResizeObserver.disconnect();
+          historyViewportResizeObserver = new ResizeObserver(() => {
+            state.historyUi.viewportHeight = viewport.clientHeight;
+            renderHistoryVirtualWindow();
+          });
+          historyViewportResizeObserver.observe(viewport);
+        }
+
+        return viewport;
+      }
+
+      function onHistoryScroll(event) {
+        state.historyUi.scrollTop = event.currentTarget.scrollTop;
+        renderHistoryVirtualWindow();
+      }
+
+      function renderHistorySummary() {
+        text(el.historySummaryLeft, `${state.workouts.length} тренировок`);
+        text(el.historySummaryRight, `${state.historyUi.filteredIds.length} показано`);
+      }
+
+      function renderHistory() {
+        renderHistorySummary();
+
+        if (!state.cache.historyOrderedIds.length) {
+          el.historyList.replaceChildren(make("div", "empty", "Пока нет сохраненных тренировок"));
           return;
         }
 
-        let currentMonthKey = "";
+        if (!state.historyUi.filteredIds.length) {
+          el.historyList.replaceChildren(make("div", "empty", "Ничего не найдено"));
+          return;
+        }
 
-        [...state.workouts]
-          .sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt))
-          .forEach((workout) => {
-            const date = new Date(workout.finishedAt);
-            const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+        const viewport = ensureHistoryViewport();
+        viewport.style.height = `min(${Math.max(320, Math.round(window.innerHeight * 0.68))}px, 68vh)`;
 
-            if (monthKey !== currentMonthKey) {
-              currentMonthKey = monthKey;
-              const monthTitle = date.toLocaleDateString("ru-RU", {
-                month: "long",
-                year: "numeric"
-              });
-              el.historyList.appendChild(
-                make("div", "history-month-title", capitalize(monthTitle))
-              );
-            }
+        const spacer = viewport.querySelector(".history-spacer");
+        spacer.style.height = `${state.historyUi.virtualItems.length ? state.historyUi.virtualItems[state.historyUi.virtualItems.length - 1].top + state.historyUi.virtualItems[state.historyUi.virtualItems.length - 1].height : 0}px`;
 
-            const stats = getStats(workout);
-            const row = make("div", "history-row");
-            row.dataset.id = workout.id;
+        state.historyUi.viewportHeight = viewport.clientHeight;
+        renderHistoryVirtualWindow();
+      }
 
-            const open = make("button", "history-item");
-            open.type = "button";
-            open.onclick = () => openWorkout(workout.id);
-            open.append(
-              make("div", "history-title", formatDateTitle(workout.finishedAt)),
-              make(
-                "div",
-                "muted",
-                `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
-              )
-            );
+      function renderHistoryVirtualWindow() {
+        const viewport = el.historyList.querySelector(".history-viewport");
+        if (!viewport) return;
 
-            const csv = make("button", "btn-card btn-accent icon-square", "CSV");
-            csv.type = "button";
-            csv.onclick = () => exportWorkoutCsv(workout.id);
+        const inner = viewport.querySelector(".history-inner");
+        const items = state.historyUi.virtualItems;
+        const viewportHeight = state.historyUi.viewportHeight || viewport.clientHeight || 0;
+        const scrollTop = state.historyUi.scrollTop || viewport.scrollTop || 0;
 
-            const del = make("button", "btn-card btn-danger icon-square", "×");
-            del.type = "button";
-            del.onclick = () => confirmDeleteWorkout(workout.id, row);
+        const startY = Math.max(0, scrollTop - CONFIG.historyOverscan * CONFIG.historyRowHeight);
+        const endY = scrollTop + viewportHeight + CONFIG.historyOverscan * CONFIG.historyRowHeight;
 
-            row.append(open, csv, del);
-            el.historyList.appendChild(row);
-          });
+        let startIndex = 0;
+        while (startIndex < items.length && items[startIndex].top + items[startIndex].height < startY) {
+          startIndex += 1;
+        }
+
+        let endIndex = startIndex;
+        while (endIndex < items.length && items[endIndex].top <= endY) {
+          endIndex += 1;
+        }
+
+        const renderKey = `${startIndex}:${endIndex}:${items.length}`;
+        if (state.historyUi.lastRenderedKey === renderKey) return;
+        state.historyUi.lastRenderedKey = renderKey;
+
+        const fragment = document.createDocumentFragment();
+        const visible = items.slice(startIndex, endIndex);
+        const firstTop = visible.length ? visible[0].top : 0;
+
+        visible.forEach((item) => {
+          if (item.type === "month") {
+            fragment.appendChild(make("div", "history-month-title", item.monthTitle));
+          } else {
+            fragment.appendChild(buildHistoryRow(item.workoutId));
+          }
+        });
+
+        inner.style.transform = `translateY(${firstTop}px)`;
+        inner.replaceChildren(fragment);
       }
 
       function renderProgress() {
         const selected = el.progressSelect.value;
-        const names = [...state.exercises].sort((a, b) => a.localeCompare(b, "ru"));
-
-        el.progressSelect.replaceChildren();
+        const fragment = document.createDocumentFragment();
 
         const empty = document.createElement("option");
         empty.value = "";
         text(empty, "Выбери упражнение");
-        el.progressSelect.appendChild(empty);
+        fragment.appendChild(empty);
 
-        names.forEach((name) => {
+        state.exerciseCatalog.sorted.forEach((name) => {
           const option = document.createElement("option");
           option.value = name;
           text(option, name);
-          el.progressSelect.appendChild(option);
+          fragment.appendChild(option);
         });
 
-        el.progressSelect.value = selected && names.includes(selected) ? selected : "";
+        el.progressSelect.replaceChildren(fragment);
+        el.progressSelect.value =
+          selected && state.exerciseCatalog.sorted.includes(selected) ? selected : "";
+
         renderProgressMetricButtons();
         showProgress();
       }
@@ -2057,35 +2729,7 @@
       }
 
       function getExerciseProgressEntries(name) {
-        const entries = [];
-
-        state.workouts
-          .slice()
-          .sort((a, b) => new Date(a.finishedAt) - new Date(b.finishedAt))
-          .forEach((workout) => {
-            const matchedSets = [];
-
-            workout.exercises.forEach((ex) => {
-              if (!sameName(ex.name, name)) return;
-              ex.sets.forEach((set) => matchedSets.push(set));
-            });
-
-            if (!matchedSets.length) return;
-
-            const bestWeight = Math.max(...matchedSets.map((set) => set.weight));
-            const volume = matchedSets.reduce((sum, set) => sum + set.weight * set.reps, 0);
-            const reps = matchedSets.reduce((sum, set) => sum + set.reps, 0);
-
-            entries.push({
-              date: workout.finishedAt,
-              weight: bestWeight,
-              volume,
-              reps,
-              sets: matchedSets.length
-            });
-          });
-
-        return entries;
+        return state.cache.progressByExercise.get(exerciseKey(name)) || [];
       }
 
       function formatProgressAxisLabel(iso) {
@@ -2480,16 +3124,16 @@
       }
 
       function openWorkout(workoutId) {
-        const workout = state.workouts.find((item) => item.id === workoutId);
+        const workout = state.workoutsById.get(workoutId);
         if (!workout) return;
 
         openSheet();
         el.modalBody.replaceChildren();
 
-        const stats = getStats(workout);
+        const stats = state.cache.statsByWorkoutId.get(workout.id) || getStats(workout);
 
         el.modalBody.append(
-          make("div", "title", formatDateTitle(workout.finishedAt)),
+          make("div", "title", formatDateTitle(workout.finishedAt || workout.createdAt)),
           make(
             "div",
             "meta",
@@ -2577,7 +3221,7 @@
       }
 
       function openEditWorkout(workoutId) {
-        const workout = state.workouts.find((item) => item.id === workoutId);
+        const workout = state.workoutsById.get(workoutId);
         if (!workout) return;
 
         openSheet();
@@ -2628,8 +3272,8 @@
       }
 
       function saveWorkoutEdit(workoutId, form) {
-        const workout = state.workouts.find((item) => item.id === workoutId);
-        if (!workout) return;
+        const oldWorkout = state.workoutsById.get(workoutId);
+        if (!oldWorkout) return;
 
         const nextExercises = [];
         const groups = [...form.querySelectorAll(".edit-exercise-group")];
@@ -2679,16 +3323,32 @@
           return;
         }
 
-        workout.exercises = nextExercises;
+        const newWorkout = sanitizeWorkout({
+          ...oldWorkout,
+          exercises: nextExercises
+        });
+
+        const workoutIndex = state.workouts.findIndex((item) => item.id === workoutId);
+        if (workoutIndex < 0) return;
+
+        state.workouts[workoutIndex] = newWorkout;
+        replaceWorkoutInCaches(oldWorkout, newWorkout);
+
+        oldWorkout.exercises.forEach((ex) => unregisterExerciseName(ex.name));
+        newWorkout.exercises.forEach((ex) => registerExerciseName(ex.name));
+        rebuildExerciseCatalogSorted();
+
+        applyHistoryFilter();
 
         haptic();
-        commit({ render: true, persist: true, immediate: true });
+        renderAll();
+        schedulePersist(true);
         closeModal();
         toast("Тренировка обновлена");
       }
 
       function exportWorkoutCsv(workoutId) {
-        const workout = state.workouts.find((item) => item.id === workoutId);
+        const workout = state.workoutsById.get(workoutId);
         if (!workout) return;
 
         const csv = workout.exercises
@@ -2706,7 +3366,7 @@
 
         const a = document.createElement("a");
         a.href = url;
-        a.download = `workout-${new Date(workout.finishedAt).toISOString().slice(0, 10)}.csv`;
+        a.download = `workout-${new Date(workout.finishedAt || workout.createdAt).toISOString().slice(0, 10)}.csv`;
 
         document.body.appendChild(a);
         a.click();
@@ -2729,10 +3389,21 @@
       }
 
       function deleteWorkout(workoutId) {
-        state.workouts = state.workouts.filter((workout) => workout.id !== workoutId);
+        const workout = state.workoutsById.get(workoutId);
+        if (!workout) return;
+
+        state.workouts = state.workouts.filter((item) => item.id !== workoutId);
+        removeWorkoutFromCaches(workout);
+
+        workout.exercises.forEach((ex) => unregisterExerciseName(ex.name));
+        rebuildExerciseCatalogSorted();
+
+        applyHistoryFilter();
+
         closeModal();
         haptic("medium");
-        commit({ render: true, persist: true, immediate: true });
+        renderAll();
+        schedulePersist(true);
         toast("Тренировка удалена");
       }
 
@@ -2871,15 +3542,53 @@
           });
         });
 
-        [el.exerciseInput, el.weightInput, el.repsInput].forEach((input) => {
-          input.addEventListener("input", updateForm);
+        el.exerciseInput.addEventListener("input", () => {
+          updateForm();
+          scheduleExerciseSearchRender();
         });
+
+        el.exerciseInput.addEventListener("focus", () => {
+          renderExerciseSearchResults(true);
+        });
+
+        el.exerciseInput.addEventListener("blur", () => {
+          setTimeout(() => {
+            if (document.activeElement && el.exerciseDropdown.contains(document.activeElement)) return;
+            closeExerciseDropdown();
+          }, 120);
+        });
+
+        el.weightInput.addEventListener("input", updateForm);
+        el.repsInput.addEventListener("input", updateForm);
 
         el.exerciseInput.addEventListener("change", fillLastSet);
         el.exerciseClearBtn.addEventListener("click", clearExerciseInput);
         el.addSetBtn.addEventListener("click", addSet);
         el.repeatSetBtn.addEventListener("click", fillLastSet);
         el.fallbackFinishBtn.addEventListener("click", finishWorkout);
+
+        el.exerciseInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            if (state.search.results.length) {
+              e.preventDefault();
+              selectExerciseSuggestion(state.search.results[0]);
+              return;
+            }
+
+            if (!el.addSetBtn.disabled) {
+              e.preventDefault();
+              addSet();
+            }
+          }
+        });
+
+        el.historySearchInput.addEventListener("input", () => {
+          state.historyUi.query = el.historySearchInput.value;
+          applyHistoryFilter();
+          state.historyUi.scrollTop = 0;
+          state.historyUi.lastRenderedKey = "";
+          renderHistory();
+        });
 
         el.progressSelect.addEventListener("change", () => {
           state.progressSelection.exercise = el.progressSelect.value;
@@ -2908,11 +3617,29 @@
           }
         });
 
+        document.addEventListener("click", (event) => {
+          if (!el.exerciseInputWrap.contains(event.target)) {
+            closeExerciseDropdown();
+          }
+        });
+
         el.timerToggleBtn.addEventListener("click", toggleTimer);
 
         window.addEventListener("scroll", scheduleTimerViewportSync, { passive: true });
-        window.addEventListener("resize", scheduleTimerViewportSync, { passive: true });
-        window.addEventListener("orientationchange", scheduleTimerViewportSync);
+        window.addEventListener("resize", () => {
+          scheduleTimerViewportSync();
+          if (state.tab === "history") {
+            state.historyUi.lastRenderedKey = "";
+            renderHistory();
+          }
+        }, { passive: true });
+        window.addEventListener("orientationchange", () => {
+          scheduleTimerViewportSync();
+          if (state.tab === "history") {
+            state.historyUi.lastRenderedKey = "";
+            renderHistory();
+          }
+        });
 
         if (window.visualViewport) {
           window.visualViewport.addEventListener("scroll", scheduleTimerViewportSync, { passive: true });
