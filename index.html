@@ -647,7 +647,7 @@
     }
 
     .history-month-title {
-      margin: 18px 2px 10px;
+      margin: 22px 2px 16px;
       font-size: 15px;
       font-weight: 850;
       color: rgba(255, 255, 255, 0.78);
@@ -656,11 +656,11 @@
 
     .history-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 54px 54px;
+      grid-template-columns: minmax(0, 1fr) 50px 50px;
       gap: 8px;
       align-items: stretch;
-      min-height: 132px;
-      margin-bottom: 10px;
+      min-height: 92px;
+      margin-bottom: 8px;
       overflow: hidden;
       animation: itemIn 0.16s cubic-bezier(.2, .8, .2, 1) both;
       background: transparent !important;
@@ -668,13 +668,13 @@
 
     .history-item {
       width: 100%;
-      min-height: 132px;
+      min-height: 92px;
       text-align: left;
       display: block;
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
         rgba(255, 255, 255, 0.025);
-      padding: 14px;
+      padding: 10px 12px;
       border-radius: var(--radius);
       border: 1px solid var(--line);
       box-shadow: none;
@@ -687,15 +687,16 @@
 
     .history-title {
       font-weight: 820;
-      font-size: 17px;
-      margin-bottom: 6px;
-      line-height: 1.15;
+      font-size: 16px;
+      margin-bottom: 4px;
+      line-height: 1.1;
     }
 
     .history-item .muted {
       white-space: normal;
-      line-height: 1.35;
+      line-height: 1.25;
       overflow-wrap: anywhere;
+      font-size: 12px;
     }
 
     .progress-controls {
@@ -1412,19 +1413,20 @@
       "use strict";
 
       const CONFIG = {
-        storageKey: "workouts_v5",
-        draftKey: "draft_workout_v5",
-        localDataKey: "trainer_data_v2",
-        legacyStorageKey: "workouts_v4",
-        legacyDraftKey: "draft_workout_v4",
-        legacyLocalDataKey: "trainer_data_v1",
+        storageKey: "workouts_v6",
+        draftKey: "draft_workout_v6",
+        localDataKey: "trainer_data_v3",
+        cloudDataKey: "trainer_cloud_data_v3",
+        legacyStorageKey: "workouts_v5",
+        legacyDraftKey: "draft_workout_v5",
+        legacyLocalDataKey: "trainer_data_v2",
         splashDelay: 1400,
         toastDelay: 2200,
         persistDelay: 250,
         searchDebounce: 70,
         searchMaxResults: 12,
-        historyRowHeight: 142,
-        historyMonthHeight: 38,
+        historyRowHeight: 100,
+        historyMonthHeight: 52,
         historyOverscanPx: 900,
         historyPoolExtra: 12
       };
@@ -1461,6 +1463,13 @@
           startedAt: 0,
           raf: 0,
           lastPaintAt: 0
+        },
+        cloud: {
+          enabled: Boolean(tg && tg.CloudStorage),
+          loading: false,
+          saving: false,
+          lastLoadedAt: 0,
+          lastSavedAt: 0
         },
         cache: {
           statsByWorkoutId: new Map(),
@@ -1533,6 +1542,7 @@
       let timerViewportRaf = 0;
       let timerResizeObserver = null;
       let persistTimer = 0;
+      let cloudSaveTimer = 0;
       let historyViewportResizeObserver = null;
 
       function id() {
@@ -1760,29 +1770,103 @@
         return Promise.resolve(confirm(message) ? "ok" : "cancel");
       }
 
-      function persistNow() {
-        const snapshot = {
+      function buildSnapshot() {
+        return {
           updatedAt: Date.now(),
           workouts: state.workouts,
           draft: state.draft
         };
+      }
 
+      function persistNowLocal() {
+        const snapshot = buildSnapshot();
         safeStorageSet(CONFIG.localDataKey, JSON.stringify(snapshot));
         safeStorageSet(CONFIG.storageKey, JSON.stringify(state.workouts));
         safeStorageSet(CONFIG.draftKey, JSON.stringify(state.draft));
+      }
+
+      function cloudGetItem(key) {
+        return new Promise((resolve) => {
+          if (!state.cloud.enabled || !tg || !tg.CloudStorage) {
+            resolve(null);
+            return;
+          }
+
+          try {
+            tg.CloudStorage.getItem(key, (error, value) => {
+              if (error) {
+                resolve(null);
+                return;
+              }
+              resolve(value || null);
+            });
+          } catch {
+            resolve(null);
+          }
+        });
+      }
+
+      function cloudSetItem(key, value) {
+        return new Promise((resolve) => {
+          if (!state.cloud.enabled || !tg || !tg.CloudStorage) {
+            resolve(false);
+            return;
+          }
+
+          try {
+            tg.CloudStorage.setItem(key, value, (error) => {
+              resolve(!error);
+            });
+          } catch {
+            resolve(false);
+          }
+        });
+      }
+
+      async function persistNowCloud() {
+        if (!state.cloud.enabled) return false;
+
+        const snapshot = buildSnapshot();
+        state.cloud.saving = true;
+        const ok = await cloudSetItem(CONFIG.cloudDataKey, JSON.stringify(snapshot));
+        state.cloud.saving = false;
+
+        if (ok) {
+          state.cloud.lastSavedAt = Date.now();
+        }
+
+        return ok;
+      }
+
+      function scheduleCloudPersist(immediate = false) {
+        clearTimeout(cloudSaveTimer);
+
+        if (!state.cloud.enabled) return;
+
+        if (immediate) {
+          persistNowCloud();
+          return;
+        }
+
+        cloudSaveTimer = setTimeout(() => {
+          persistNowCloud();
+        }, 500);
       }
 
       function schedulePersist(immediate = false) {
         clearTimeout(persistTimer);
 
         if (immediate) {
-          persistNow();
+          persistNowLocal();
+          scheduleCloudPersist(true);
           return;
         }
 
         persistTimer = setTimeout(() => {
-          persistNow();
+          persistNowLocal();
         }, CONFIG.persistDelay);
+
+        scheduleCloudPersist(false);
       }
 
       function migrateLegacyDataIfNeeded() {
@@ -1827,7 +1911,7 @@
 
         const nextSnapshot = {
           updatedAt: Date.now(),
-          migratedFrom: "v4",
+          migratedFrom: "v5",
           workouts,
           draft
         };
@@ -2137,36 +2221,68 @@
         rebuildExerciseSearchIndex();
       }
 
-      function loadData() {
-        migrateLegacyDataIfNeeded();
+      function applySnapshot(snapshot) {
+        state.workouts = (snapshot.workouts || [])
+          .map(sanitizeWorkout)
+          .filter((workout) => workout.exercises.length);
 
-        const snapshot = safeJsonParse(safeStorageGet(CONFIG.localDataKey), null);
+        state.draft = isValidDraft(snapshot.draft)
+          ? sanitizeWorkout(snapshot.draft)
+          : createDraft();
 
-        if (snapshot && Array.isArray(snapshot.workouts) && snapshot.draft) {
-          state.workouts = snapshot.workouts
-            .map(sanitizeWorkout)
-            .filter((workout) => workout.exercises.length);
-
-          state.draft = isValidDraft(snapshot.draft)
-            ? sanitizeWorkout(snapshot.draft)
-            : createDraft();
-
-          state.draft.status = "draft";
-        } else {
-          state.workouts = safeJsonParse(safeStorageGet(CONFIG.storageKey), [])
-            .map(sanitizeWorkout)
-            .filter((workout) => workout.exercises.length);
-
-          const draft = safeJsonParse(safeStorageGet(CONFIG.draftKey), null);
-          state.draft = isValidDraft(draft) ? sanitizeWorkout(draft) : createDraft();
-          state.draft.status = "draft";
-        }
+        state.draft.status = "draft";
 
         fullRebuildWorkoutCaches();
         fullRebuildIndexes();
         applyHistoryFilter();
+      }
+
+      async function loadData() {
+        migrateLegacyDataIfNeeded();
+
+        const localSnapshot = safeJsonParse(safeStorageGet(CONFIG.localDataKey), null);
+        const localWorkouts = safeJsonParse(safeStorageGet(CONFIG.storageKey), []);
+        const localDraft = safeJsonParse(safeStorageGet(CONFIG.draftKey), null);
+
+        let fallbackSnapshot = null;
+
+        if (localSnapshot && Array.isArray(localSnapshot.workouts) && localSnapshot.draft) {
+          fallbackSnapshot = localSnapshot;
+        } else {
+          fallbackSnapshot = {
+            updatedAt: Date.now(),
+            workouts: Array.isArray(localWorkouts) ? localWorkouts : [],
+            draft: isValidDraft(localDraft) ? localDraft : createDraft()
+          };
+        }
+
+        let finalSnapshot = fallbackSnapshot;
+
+        if (state.cloud.enabled) {
+          state.cloud.loading = true;
+          const cloudRaw = await cloudGetItem(CONFIG.cloudDataKey);
+          const cloudSnapshot = safeJsonParse(cloudRaw, null);
+          state.cloud.loading = false;
+
+          const localUpdatedAt = Number(fallbackSnapshot && fallbackSnapshot.updatedAt) || 0;
+          const cloudUpdatedAt = Number(cloudSnapshot && cloudSnapshot.updatedAt) || 0;
+
+          if (cloudSnapshot && Array.isArray(cloudSnapshot.workouts) && cloudSnapshot.draft) {
+            if (cloudUpdatedAt >= localUpdatedAt) {
+              finalSnapshot = cloudSnapshot;
+            } else {
+              finalSnapshot = fallbackSnapshot;
+              scheduleCloudPersist(true);
+            }
+            state.cloud.lastLoadedAt = Date.now();
+          } else if (fallbackSnapshot) {
+            scheduleCloudPersist(true);
+          }
+        }
+
+        applySnapshot(finalSnapshot);
         renderAll();
-        schedulePersist(true);
+        persistNowLocal();
 
         setTimeout(() => {
           el.splash.classList.add("hide");
@@ -2316,21 +2432,16 @@
       }
 
       function highlightTextByTokens(textValue, queryTokens) {
-        const text = String(textValue || "");
-        if (!queryTokens || !queryTokens.length) return escapeHtml(text);
+        const textValueSafe = String(textValue || "");
+        if (!queryTokens || !queryTokens.length) return escapeHtml(textValueSafe);
 
-        const normalizedChars = [];
-        for (const ch of text) {
-          normalizedChars.push(ch.toLowerCase() === "ё" ? "е" : ch.toLowerCase());
-        }
-        const normalized = normalizedChars.join("");
-
+        const normalized = textValueSafe.toLowerCase().replace(/ё/g, "е");
         const ranges = [];
+
         queryTokens
           .slice()
           .sort((a, b) => b.length - a.length)
           .forEach((token) => {
-            if (!token) return;
             let from = 0;
             while (from < normalized.length) {
               const index = normalized.indexOf(token, from);
@@ -2340,7 +2451,7 @@
             }
           });
 
-        if (!ranges.length) return escapeHtml(text);
+        if (!ranges.length) return escapeHtml(textValueSafe);
 
         ranges.sort((a, b) => a[0] - b[0]);
         const merged = [];
@@ -2356,11 +2467,11 @@
         let result = "";
         let cursor = 0;
         for (const [start, end] of merged) {
-          result += escapeHtml(text.slice(cursor, start));
-          result += `<span class="history-highlight">${escapeHtml(text.slice(start, end))}</span>`;
+          result += escapeHtml(textValueSafe.slice(cursor, start));
+          result += `<span class="history-highlight">${escapeHtml(textValueSafe.slice(start, end))}</span>`;
           cursor = end;
         }
-        result += escapeHtml(text.slice(cursor));
+        result += escapeHtml(textValueSafe.slice(cursor));
         return result;
       }
 
@@ -3895,18 +4006,24 @@
 
         window.addEventListener("pagehide", () => {
           clearTimeout(persistTimer);
-          persistNow();
+          clearTimeout(cloudSaveTimer);
+          persistNowLocal();
+          persistNowCloud();
         });
 
         window.addEventListener("beforeunload", () => {
           clearTimeout(persistTimer);
-          persistNow();
+          clearTimeout(cloudSaveTimer);
+          persistNowLocal();
+          persistNowCloud();
         });
 
         document.addEventListener("visibilitychange", () => {
           if (document.visibilityState === "hidden") {
             clearTimeout(persistTimer);
-            persistNow();
+            clearTimeout(cloudSaveTimer);
+            persistNowLocal();
+            persistNowCloud();
           }
         });
       }
@@ -3924,13 +4041,13 @@
         }
       }
 
-      function init() {
+      async function init() {
         initTelegram();
         bindEvents();
         renderTimer(0);
         updateExerciseClear();
         scheduleTimerViewportSync();
-        loadData();
+        await loadData();
       }
 
       init();
