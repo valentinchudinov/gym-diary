@@ -479,12 +479,6 @@
       border-radius: 4px;
     }
 
-    .search-empty {
-      padding: 14px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
     .btn-card {
       min-height: 54px;
       padding: 0 14px;
@@ -662,10 +656,11 @@
 
     .history-row {
       display: grid;
-      grid-template-columns: 1fr 54px 54px;
+      grid-template-columns: minmax(0, 1fr) 54px 54px;
       gap: 8px;
       align-items: stretch;
-      margin-bottom: 9px;
+      min-height: 132px;
+      margin-bottom: 10px;
       overflow: hidden;
       animation: itemIn 0.16s cubic-bezier(.2, .8, .2, 1) both;
       background: transparent !important;
@@ -673,7 +668,7 @@
 
     .history-item {
       width: 100%;
-      min-height: 54px;
+      min-height: 132px;
       text-align: left;
       display: block;
       background:
@@ -685,12 +680,22 @@
       box-shadow: none;
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .history-title {
       font-weight: 820;
       font-size: 17px;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
+      line-height: 1.15;
+    }
+
+    .history-item .muted {
+      white-space: normal;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
     }
 
     .progress-controls {
@@ -1418,10 +1423,10 @@
         persistDelay: 250,
         searchDebounce: 70,
         searchMaxResults: 12,
-        historyRowHeight: 72,
+        historyRowHeight: 142,
         historyMonthHeight: 38,
-        historyOverscanPx: 700,
-        historyPoolExtra: 10
+        historyOverscanPx: 900,
+        historyPoolExtra: 12
       };
 
       const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -1667,12 +1672,6 @@
         }
       }
 
-      function safeStorageRemove(key) {
-        try {
-          localStorage.removeItem(key);
-        } catch {}
-      }
-
       function getStats(workout) {
         const exercises = workout.exercises.length;
         const sets = workout.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
@@ -1799,11 +1798,7 @@
         const legacyWorkouts = safeJsonParse(safeStorageGet(CONFIG.legacyStorageKey), null);
         const legacyDraft = safeJsonParse(safeStorageGet(CONFIG.legacyDraftKey), null);
 
-        if (
-          !legacySnapshot &&
-          !Array.isArray(legacyWorkouts) &&
-          !legacyDraft
-        ) {
+        if (!legacySnapshot && !Array.isArray(legacyWorkouts) && !legacyDraft) {
           return;
         }
 
@@ -1840,42 +1835,6 @@
         safeStorageSet(CONFIG.localDataKey, JSON.stringify(nextSnapshot));
         safeStorageSet(CONFIG.storageKey, JSON.stringify(workouts));
         safeStorageSet(CONFIG.draftKey, JSON.stringify(draft));
-      }
-
-      function loadData() {
-        migrateLegacyDataIfNeeded();
-
-        const snapshot = safeJsonParse(safeStorageGet(CONFIG.localDataKey), null);
-
-        if (snapshot && Array.isArray(snapshot.workouts) && snapshot.draft) {
-          state.workouts = snapshot.workouts
-            .map(sanitizeWorkout)
-            .filter((workout) => workout.exercises.length);
-
-          state.draft = isValidDraft(snapshot.draft)
-            ? sanitizeWorkout(snapshot.draft)
-            : createDraft();
-
-          state.draft.status = "draft";
-        } else {
-          state.workouts = safeJsonParse(safeStorageGet(CONFIG.storageKey), [])
-            .map(sanitizeWorkout)
-            .filter((workout) => workout.exercises.length);
-
-          const draft = safeJsonParse(safeStorageGet(CONFIG.draftKey), null);
-          state.draft = isValidDraft(draft) ? sanitizeWorkout(draft) : createDraft();
-          state.draft.status = "draft";
-        }
-
-        fullRebuildWorkoutCaches();
-        fullRebuildIndexes();
-        applyHistoryFilter();
-        renderAll();
-        schedulePersist(true);
-
-        setTimeout(() => {
-          el.splash.classList.add("hide");
-        }, CONFIG.splashDelay);
       }
 
       function buildWorkoutHistoryMeta(workout, stats) {
@@ -2045,98 +2004,6 @@
         state.cache.lastCompletedSetByExercise = next;
       }
 
-      function addWorkoutToCaches(workout) {
-        state.workoutsById.set(workout.id, workout);
-
-        const stats = getStats(workout);
-        state.cache.statsByWorkoutId.set(workout.id, stats);
-
-        const historyMeta = buildWorkoutHistoryMeta(workout, stats);
-        state.cache.historyMetaByWorkoutId.set(workout.id, historyMeta);
-        insertSortedHistoryWorkoutId(workout.id);
-
-        const progressEntries = buildWorkoutProgressEntries(workout);
-        progressEntries.forEach(insertProgressEntry);
-
-        rebuildLastCompletedSetByExercise();
-
-        upsertIndexesForWorkout(workout, historyMeta, stats);
-      }
-
-      function removeWorkoutFromCaches(workout) {
-        state.workoutsById.delete(workout.id);
-        state.cache.statsByWorkoutId.delete(workout.id);
-        state.cache.historyMetaByWorkoutId.delete(workout.id);
-        removeHistoryWorkoutId(workout.id);
-        removeProgressEntriesByWorkoutId(workout.id);
-        rebuildLastCompletedSetByExercise();
-
-        removeIndexesForWorkout(workout);
-      }
-
-      function replaceWorkoutInCaches(oldWorkout, newWorkout) {
-        removeWorkoutFromCaches(oldWorkout);
-        addWorkoutToCaches(newWorkout);
-      }
-
-      function fullRebuildWorkoutCaches() {
-        state.workoutsById = new Map();
-        state.cache.statsByWorkoutId = new Map();
-        state.cache.historyMetaByWorkoutId = new Map();
-        state.cache.historyOrderedIds = [];
-        state.cache.progressByExercise = new Map();
-        state.cache.lastCompletedSetByExercise = new Map();
-
-        state.workouts.forEach((workout) => {
-          state.workoutsById.set(workout.id, workout);
-          const stats = getStats(workout);
-          state.cache.statsByWorkoutId.set(workout.id, stats);
-          const meta = buildWorkoutHistoryMeta(workout, stats);
-          state.cache.historyMetaByWorkoutId.set(workout.id, meta);
-          insertSortedHistoryWorkoutId(workout.id);
-          buildWorkoutProgressEntries(workout).forEach(insertProgressEntry);
-        });
-
-        rebuildLastCompletedSetByExercise();
-      }
-
-      function fullRebuildIndexes() {
-        state.exerciseCatalog.sorted = [];
-        state.exerciseCatalog.namesByKey = new Map();
-        state.exerciseCatalog.searchIndex = [];
-        state.historyIndex = new Map();
-
-        const usageCounts = new Map();
-
-        const addExerciseUsage = (name) => {
-          const clean = String(name || "").trim();
-          if (!clean) return;
-          const key = exerciseKey(clean);
-          usageCounts.set(key, (usageCounts.get(key) || 0) + 1);
-          if (!state.exerciseCatalog.namesByKey.has(key)) {
-            state.exerciseCatalog.namesByKey.set(key, clean);
-          }
-        };
-
-        state.workouts.forEach((workout) => {
-          workout.exercises.forEach((ex) => addExerciseUsage(ex.name));
-          const stats = state.cache.statsByWorkoutId.get(workout.id) || getStats(workout);
-          const meta = state.cache.historyMetaByWorkoutId.get(workout.id) || buildWorkoutHistoryMeta(workout, stats);
-          upsertIndexesForWorkout(workout, meta, stats);
-        });
-
-        state.draft.exercises.forEach((ex) => addExerciseUsage(ex.name));
-
-        state.exerciseCatalog.sorted = [...state.exerciseCatalog.namesByKey.values()]
-          .sort((a, b) => a.localeCompare(b, "ru"));
-
-        state.exerciseCatalog.searchIndex = state.exerciseCatalog.sorted.map((name) => ({
-          name,
-          normalized: normalizeSearchText(name),
-          tokens: tokenize(name)
-        }));
-      }
-
       function rebuildExerciseSearchIndex() {
         state.exerciseCatalog.sorted = [...state.exerciseCatalog.namesByKey.values()]
           .sort((a, b) => a.localeCompare(b, "ru"));
@@ -2189,6 +2056,121 @@
       function removeIndexesForWorkout(workout) {
         state.historyIndex.delete(workout.id);
         workout.exercises.forEach((ex) => removeExerciseNameFromIndexIfUnused(ex.name));
+      }
+
+      function addWorkoutToCaches(workout) {
+        state.workoutsById.set(workout.id, workout);
+
+        const stats = getStats(workout);
+        state.cache.statsByWorkoutId.set(workout.id, stats);
+
+        const historyMeta = buildWorkoutHistoryMeta(workout, stats);
+        state.cache.historyMetaByWorkoutId.set(workout.id, historyMeta);
+        insertSortedHistoryWorkoutId(workout.id);
+
+        const progressEntries = buildWorkoutProgressEntries(workout);
+        progressEntries.forEach(insertProgressEntry);
+
+        rebuildLastCompletedSetByExercise();
+        upsertIndexesForWorkout(workout, historyMeta, stats);
+      }
+
+      function removeWorkoutFromCaches(workout) {
+        state.workoutsById.delete(workout.id);
+        state.cache.statsByWorkoutId.delete(workout.id);
+        state.cache.historyMetaByWorkoutId.delete(workout.id);
+        removeHistoryWorkoutId(workout.id);
+        removeProgressEntriesByWorkoutId(workout.id);
+        rebuildLastCompletedSetByExercise();
+        removeIndexesForWorkout(workout);
+      }
+
+      function replaceWorkoutInCaches(oldWorkout, newWorkout) {
+        removeWorkoutFromCaches(oldWorkout);
+        addWorkoutToCaches(newWorkout);
+      }
+
+      function fullRebuildWorkoutCaches() {
+        state.workoutsById = new Map();
+        state.cache.statsByWorkoutId = new Map();
+        state.cache.historyMetaByWorkoutId = new Map();
+        state.cache.historyOrderedIds = [];
+        state.cache.progressByExercise = new Map();
+        state.cache.lastCompletedSetByExercise = new Map();
+        state.historyIndex = new Map();
+
+        state.workouts.forEach((workout) => {
+          state.workoutsById.set(workout.id, workout);
+          const stats = getStats(workout);
+          state.cache.statsByWorkoutId.set(workout.id, stats);
+          const meta = buildWorkoutHistoryMeta(workout, stats);
+          state.cache.historyMetaByWorkoutId.set(workout.id, meta);
+          insertSortedHistoryWorkoutId(workout.id);
+          buildWorkoutProgressEntries(workout).forEach(insertProgressEntry);
+          state.historyIndex.set(workout.id, buildWorkoutSearchRecord(workout, meta, stats));
+        });
+
+        rebuildLastCompletedSetByExercise();
+      }
+
+      function fullRebuildIndexes() {
+        state.exerciseCatalog.sorted = [];
+        state.exerciseCatalog.namesByKey = new Map();
+        state.exerciseCatalog.searchIndex = [];
+
+        state.workouts.forEach((workout) => {
+          workout.exercises.forEach((ex) => {
+            const key = exerciseKey(ex.name);
+            if (!state.exerciseCatalog.namesByKey.has(key)) {
+              state.exerciseCatalog.namesByKey.set(key, ex.name);
+            }
+          });
+        });
+
+        state.draft.exercises.forEach((ex) => {
+          const key = exerciseKey(ex.name);
+          if (!state.exerciseCatalog.namesByKey.has(key)) {
+            state.exerciseCatalog.namesByKey.set(key, ex.name);
+          }
+        });
+
+        rebuildExerciseSearchIndex();
+      }
+
+      function loadData() {
+        migrateLegacyDataIfNeeded();
+
+        const snapshot = safeJsonParse(safeStorageGet(CONFIG.localDataKey), null);
+
+        if (snapshot && Array.isArray(snapshot.workouts) && snapshot.draft) {
+          state.workouts = snapshot.workouts
+            .map(sanitizeWorkout)
+            .filter((workout) => workout.exercises.length);
+
+          state.draft = isValidDraft(snapshot.draft)
+            ? sanitizeWorkout(snapshot.draft)
+            : createDraft();
+
+          state.draft.status = "draft";
+        } else {
+          state.workouts = safeJsonParse(safeStorageGet(CONFIG.storageKey), [])
+            .map(sanitizeWorkout)
+            .filter((workout) => workout.exercises.length);
+
+          const draft = safeJsonParse(safeStorageGet(CONFIG.draftKey), null);
+          state.draft = isValidDraft(draft) ? sanitizeWorkout(draft) : createDraft();
+          state.draft.status = "draft";
+        }
+
+        fullRebuildWorkoutCaches();
+        fullRebuildIndexes();
+        applyHistoryFilter();
+        renderAll();
+        schedulePersist(true);
+
+        setTimeout(() => {
+          el.splash.classList.add("hide");
+        }, CONFIG.splashDelay);
       }
 
       function renderShell() {
@@ -2422,14 +2404,6 @@
 
         if (!document.activeElement || document.activeElement !== el.exerciseInput) {
           closeExerciseDropdown();
-          return;
-        }
-
-        if (!nextResults.length && query) {
-          const empty = make("div", "search-empty", "Ничего не найдено");
-          el.exerciseDropdown.appendChild(empty);
-          state.search.open = true;
-          el.exerciseDropdown.classList.add("open");
           return;
         }
 
@@ -2708,7 +2682,7 @@
         });
       }
 
-      function highlightHistorySummary(meta, stats, tokens) {
+      function highlightHistorySummary(stats, tokens) {
         const plain = `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`;
         return highlightTextByTokens(plain, tokens);
       }
@@ -2943,10 +2917,10 @@
 
         poolNode.open.onclick = () => openWorkout(workoutId);
         poolNode.csv.onclick = () => exportWorkoutCsv(workoutId);
-        poolNode.del.onclick = () => confirmDeleteWorkout(workoutId, poolNode.row);
+        poolNode.del.onclick = () => confirmDeleteWorkout(workoutId);
 
         poolNode.title.innerHTML = highlightTextByTokens(meta.title, queryTokens);
-        poolNode.meta.innerHTML = highlightHistorySummary(meta, stats, queryTokens);
+        poolNode.meta.innerHTML = highlightHistorySummary(stats, queryTokens);
       }
 
       function renderHistoryVirtualWindow(force = false) {
