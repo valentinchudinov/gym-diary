@@ -17,6 +17,7 @@
 
     :root {
       --bg: #070707;
+      --bg-solid: #090909;
       --surface: rgba(255, 255, 255, 0.055);
       --field: #171717;
       --line: rgba(255, 255, 255, 0.09);
@@ -38,14 +39,13 @@
     html,
     body {
       min-height: 100%;
+      background: var(--bg-solid);
     }
 
     body {
       position: relative;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
-      background:
-        radial-gradient(circle at 80% 0%, rgba(255, 100, 24, 0.18), transparent 36%),
-        linear-gradient(180deg, #12100f 0%, var(--bg) 46%);
+      background: var(--bg-solid);
       color: var(--text);
       padding: max(14px, var(--safe-top)) 14px calc(28px + var(--safe-bottom));
       font-size: 15px;
@@ -112,6 +112,7 @@
     .app {
       max-width: 560px;
       margin: 0 auto;
+      background: transparent;
     }
 
     .top {
@@ -181,6 +182,8 @@
       margin-bottom: 10px;
       box-shadow: 0 14px 28px rgba(0, 0, 0, 0.14);
       animation: softIn 0.18s ease both;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
 
     .empty,
@@ -192,6 +195,7 @@
 
     .panel {
       display: none;
+      background: transparent;
     }
 
     .panel.active {
@@ -293,6 +297,8 @@
         0 14px 28px rgba(0, 0, 0, 0.18),
         inset 0 1px 0 rgba(255, 255, 255, 0.08);
       animation: softIn 0.18s ease both;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
 
     .tabs {
@@ -465,8 +471,9 @@
       border-bottom: 0;
     }
 
-    .search-option mark {
-      background: rgba(255, 100, 24, 0.2);
+    .search-option mark,
+    .history-highlight {
+      background: rgba(255, 100, 24, 0.22);
       color: #fff;
       padding: 0 2px;
       border-radius: 4px;
@@ -611,6 +618,17 @@
     .history-viewport {
       position: relative;
       min-height: 320px;
+      height: min(68vh, 780px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      background: transparent;
+    }
+
+    .history-viewport::-webkit-scrollbar {
+      display: none;
     }
 
     .history-spacer {
@@ -618,11 +636,19 @@
       pointer-events: none;
     }
 
-    .history-inner {
+    .history-recycle-layer {
       position: absolute;
       left: 0;
       top: 0;
       width: 100%;
+      pointer-events: none;
+    }
+
+    .history-recycle-item {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      pointer-events: auto;
       will-change: transform;
     }
 
@@ -642,6 +668,7 @@
       margin-bottom: 9px;
       overflow: hidden;
       animation: itemIn 0.16s cubic-bezier(.2, .8, .2, 1) both;
+      background: transparent !important;
     }
 
     .history-item {
@@ -649,11 +676,15 @@
       min-height: 54px;
       text-align: left;
       display: block;
-      background: var(--surface);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
+        rgba(255, 255, 255, 0.025);
       padding: 14px;
       border-radius: var(--radius);
       border: 1px solid var(--line);
       box-shadow: none;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
 
     .history-title {
@@ -1300,7 +1331,7 @@
         <div class="card">
           <div class="history-controls">
             <div class="history-search-wrap">
-              <input id="historySearchInput" placeholder="Поиск по дате, упражнению, объёму..." autocomplete="off" />
+              <input id="historySearchInput" placeholder="Поиск по дате, упражнению, объёму..." autocomplete="off" spellcheck="false" />
             </div>
             <div class="history-summary">
               <span id="historySummaryLeft">0 тренировок</span>
@@ -1379,14 +1410,18 @@
         storageKey: "workouts_v5",
         draftKey: "draft_workout_v5",
         localDataKey: "trainer_data_v2",
-        splashDelay: 1800,
+        legacyStorageKey: "workouts_v4",
+        legacyDraftKey: "draft_workout_v4",
+        legacyLocalDataKey: "trainer_data_v1",
+        splashDelay: 1400,
         toastDelay: 2200,
         persistDelay: 250,
-        searchDebounce: 80,
+        searchDebounce: 70,
         searchMaxResults: 12,
         historyRowHeight: 72,
         historyMonthHeight: 38,
-        historyOverscan: 10
+        historyOverscanPx: 700,
+        historyPoolExtra: 10
       };
 
       const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -1406,10 +1441,11 @@
         workoutsById: new Map(),
         draft: createDraft(),
         exerciseCatalog: {
-          byKey: new Map(),
           sorted: [],
-          version: 0
+          namesByKey: new Map(),
+          searchIndex: []
         },
+        historyIndex: new Map(),
         progressMetric: "weight",
         progressSelection: {
           exercise: "",
@@ -1436,11 +1472,17 @@
         },
         historyUi: {
           query: "",
+          queryTokens: [],
           filteredIds: [],
           virtualItems: [],
           viewportHeight: 0,
           scrollTop: 0,
-          lastRenderedKey: ""
+          lastRangeKey: "",
+          viewportEl: null,
+          spacerEl: null,
+          layerEl: null,
+          pool: [],
+          poolSize: 0
         }
       };
 
@@ -1625,6 +1667,12 @@
         }
       }
 
+      function safeStorageRemove(key) {
+        try {
+          localStorage.removeItem(key);
+        } catch {}
+      }
+
       function getStats(workout) {
         const exercises = workout.exercises.length;
         const sets = workout.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
@@ -1672,56 +1720,162 @@
         };
       }
 
-      function createExerciseAggregate(name) {
-        return {
-          key: exerciseKey(name),
-          displayName: name,
-          count: 0
+      function toast(message) {
+        text(el.toast, message);
+        el.toast.style.display = "block";
+        el.toast.classList.remove("show");
+        requestAnimationFrame(() => el.toast.classList.add("show"));
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => {
+          el.toast.style.display = "none";
+          el.toast.classList.remove("show");
+        }, CONFIG.toastDelay);
+      }
+
+      function haptic(type = "light") {
+        if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred(type);
+      }
+
+      function hideKeyboard() {
+        if (document.activeElement && document.activeElement.blur) {
+          document.activeElement.blur();
+        }
+      }
+
+      function showPopup(message) {
+        if (tg && tg.showPopup) {
+          return new Promise((resolve) =>
+            tg.showPopup(
+              {
+                message,
+                buttons: [
+                  { id: "cancel", type: "cancel", text: "Отмена" },
+                  { id: "ok", type: "default", text: "ОК" }
+                ]
+              },
+              resolve
+            )
+          );
+        }
+
+        return Promise.resolve(confirm(message) ? "ok" : "cancel");
+      }
+
+      function persistNow() {
+        const snapshot = {
+          updatedAt: Date.now(),
+          workouts: state.workouts,
+          draft: state.draft
         };
+
+        safeStorageSet(CONFIG.localDataKey, JSON.stringify(snapshot));
+        safeStorageSet(CONFIG.storageKey, JSON.stringify(state.workouts));
+        safeStorageSet(CONFIG.draftKey, JSON.stringify(state.draft));
       }
 
-      function registerExerciseName(name) {
-        const clean = String(name || "").trim();
-        if (!clean) return;
-        const key = exerciseKey(clean);
-        let entry = state.exerciseCatalog.byKey.get(key);
-        if (!entry) {
-          entry = createExerciseAggregate(clean);
-          state.exerciseCatalog.byKey.set(key, entry);
+      function schedulePersist(immediate = false) {
+        clearTimeout(persistTimer);
+
+        if (immediate) {
+          persistNow();
+          return;
         }
-        entry.count += 1;
-        if (!entry.displayName) entry.displayName = clean;
+
+        persistTimer = setTimeout(() => {
+          persistNow();
+        }, CONFIG.persistDelay);
       }
 
-      function unregisterExerciseName(name) {
-        const clean = String(name || "").trim();
-        if (!clean) return;
-        const key = exerciseKey(clean);
-        const entry = state.exerciseCatalog.byKey.get(key);
-        if (!entry) return;
-        entry.count -= 1;
-        if (entry.count <= 0) {
-          state.exerciseCatalog.byKey.delete(key);
+      function migrateLegacyDataIfNeeded() {
+        const hasNewSnapshot = safeStorageGet(CONFIG.localDataKey);
+        const hasNewWorkouts = safeStorageGet(CONFIG.storageKey);
+        const hasNewDraft = safeStorageGet(CONFIG.draftKey);
+
+        if (hasNewSnapshot || hasNewWorkouts || hasNewDraft) {
+          return;
         }
+
+        const legacySnapshot = safeJsonParse(safeStorageGet(CONFIG.legacyLocalDataKey), null);
+        const legacyWorkouts = safeJsonParse(safeStorageGet(CONFIG.legacyStorageKey), null);
+        const legacyDraft = safeJsonParse(safeStorageGet(CONFIG.legacyDraftKey), null);
+
+        if (
+          !legacySnapshot &&
+          !Array.isArray(legacyWorkouts) &&
+          !legacyDraft
+        ) {
+          return;
+        }
+
+        let workouts = [];
+        let draft = createDraft();
+
+        if (legacySnapshot && Array.isArray(legacySnapshot.workouts)) {
+          workouts = legacySnapshot.workouts
+            .map(sanitizeWorkout)
+            .filter((workout) => workout.exercises.length);
+
+          draft = isValidDraft(legacySnapshot.draft)
+            ? sanitizeWorkout(legacySnapshot.draft)
+            : createDraft();
+          draft.status = "draft";
+        } else {
+          workouts = (Array.isArray(legacyWorkouts) ? legacyWorkouts : [])
+            .map(sanitizeWorkout)
+            .filter((workout) => workout.exercises.length);
+
+          draft = isValidDraft(legacyDraft)
+            ? sanitizeWorkout(legacyDraft)
+            : createDraft();
+          draft.status = "draft";
+        }
+
+        const nextSnapshot = {
+          updatedAt: Date.now(),
+          migratedFrom: "v4",
+          workouts,
+          draft
+        };
+
+        safeStorageSet(CONFIG.localDataKey, JSON.stringify(nextSnapshot));
+        safeStorageSet(CONFIG.storageKey, JSON.stringify(workouts));
+        safeStorageSet(CONFIG.draftKey, JSON.stringify(draft));
       }
 
-      function rebuildExerciseCatalogSorted() {
-        state.exerciseCatalog.sorted = [...state.exerciseCatalog.byKey.values()]
-          .map((entry) => entry.displayName)
-          .sort((a, b) => a.localeCompare(b, "ru"));
-        state.exerciseCatalog.version += 1;
-      }
+      function loadData() {
+        migrateLegacyDataIfNeeded();
 
-      function fullRebuildExerciseCatalog() {
-        state.exerciseCatalog.byKey = new Map();
+        const snapshot = safeJsonParse(safeStorageGet(CONFIG.localDataKey), null);
 
-        state.workouts.forEach((workout) => {
-          workout.exercises.forEach((ex) => registerExerciseName(ex.name));
-        });
+        if (snapshot && Array.isArray(snapshot.workouts) && snapshot.draft) {
+          state.workouts = snapshot.workouts
+            .map(sanitizeWorkout)
+            .filter((workout) => workout.exercises.length);
 
-        state.draft.exercises.forEach((ex) => registerExerciseName(ex.name));
+          state.draft = isValidDraft(snapshot.draft)
+            ? sanitizeWorkout(snapshot.draft)
+            : createDraft();
 
-        rebuildExerciseCatalogSorted();
+          state.draft.status = "draft";
+        } else {
+          state.workouts = safeJsonParse(safeStorageGet(CONFIG.storageKey), [])
+            .map(sanitizeWorkout)
+            .filter((workout) => workout.exercises.length);
+
+          const draft = safeJsonParse(safeStorageGet(CONFIG.draftKey), null);
+          state.draft = isValidDraft(draft) ? sanitizeWorkout(draft) : createDraft();
+          state.draft.status = "draft";
+        }
+
+        fullRebuildWorkoutCaches();
+        fullRebuildIndexes();
+        applyHistoryFilter();
+        renderAll();
+        schedulePersist(true);
+
+        setTimeout(() => {
+          el.splash.classList.add("hide");
+        }, CONFIG.splashDelay);
       }
 
       function buildWorkoutHistoryMeta(workout, stats) {
@@ -1736,17 +1890,6 @@
           })
         );
         const exerciseNames = workout.exercises.map((ex) => ex.name);
-        const searchText = normalizeSearchText(
-          [
-            title,
-            monthTitle,
-            workout.finishedAt || workout.createdAt,
-            `${stats.exercises} упражнений`,
-            `${stats.sets} подходов`,
-            `${Math.round(stats.volume)} кг`,
-            ...exerciseNames
-          ].join(" ")
-        );
 
         return {
           id: workout.id,
@@ -1755,12 +1898,33 @@
           title,
           monthKey,
           monthTitle,
-          searchText,
           exerciseNames
         };
       }
 
-      function buildWorkoutProgressDelta(workout) {
+      function buildWorkoutSearchRecord(workout, meta, stats) {
+        const rawParts = [
+          meta.title,
+          meta.monthTitle,
+          workout.finishedAt || workout.createdAt,
+          `${stats.exercises} упражнений`,
+          `${stats.sets} подходов`,
+          `${Math.round(stats.volume)} кг`,
+          ...meta.exerciseNames
+        ];
+        const rawText = rawParts.join(" · ");
+        const searchText = normalizeSearchText(rawText);
+        const tokens = tokenize(rawText);
+
+        return {
+          workoutId: workout.id,
+          rawText,
+          searchText,
+          tokens
+        };
+      }
+
+      function buildWorkoutProgressEntries(workout) {
         const perWorkout = new Map();
 
         workout.exercises.forEach((ex) => {
@@ -1836,10 +2000,6 @@
         if (index >= 0) state.cache.historyOrderedIds.splice(index, 1);
       }
 
-      function compareProgressEntries(a, b) {
-        return new Date(a.date).getTime() - new Date(b.date).getTime();
-      }
-
       function insertProgressEntry(entry) {
         let arr = state.cache.progressByExercise.get(entry.key);
         if (!arr) {
@@ -1879,9 +2039,7 @@
         const next = new Map();
 
         for (const [key, arr] of state.cache.progressByExercise.entries()) {
-          if (arr.length) {
-            next.set(key, arr[arr.length - 1].lastSet);
-          }
+          if (arr.length) next.set(key, arr[arr.length - 1].lastSet);
         }
 
         state.cache.lastCompletedSetByExercise = next;
@@ -1897,10 +2055,12 @@
         state.cache.historyMetaByWorkoutId.set(workout.id, historyMeta);
         insertSortedHistoryWorkoutId(workout.id);
 
-        const progressEntries = buildWorkoutProgressDelta(workout);
+        const progressEntries = buildWorkoutProgressEntries(workout);
         progressEntries.forEach(insertProgressEntry);
 
         rebuildLastCompletedSetByExercise();
+
+        upsertIndexesForWorkout(workout, historyMeta, stats);
       }
 
       function removeWorkoutFromCaches(workout) {
@@ -1910,6 +2070,8 @@
         removeHistoryWorkoutId(workout.id);
         removeProgressEntriesByWorkoutId(workout.id);
         rebuildLastCompletedSetByExercise();
+
+        removeIndexesForWorkout(workout);
       }
 
       function replaceWorkoutInCaches(oldWorkout, newWorkout) {
@@ -1925,107 +2087,108 @@
         state.cache.progressByExercise = new Map();
         state.cache.lastCompletedSetByExercise = new Map();
 
-        state.workouts.forEach((workout) => addWorkoutToCaches(workout));
+        state.workouts.forEach((workout) => {
+          state.workoutsById.set(workout.id, workout);
+          const stats = getStats(workout);
+          state.cache.statsByWorkoutId.set(workout.id, stats);
+          const meta = buildWorkoutHistoryMeta(workout, stats);
+          state.cache.historyMetaByWorkoutId.set(workout.id, meta);
+          insertSortedHistoryWorkoutId(workout.id);
+          buildWorkoutProgressEntries(workout).forEach(insertProgressEntry);
+        });
+
+        rebuildLastCompletedSetByExercise();
       }
 
-      function toast(message) {
-        text(el.toast, message);
-        el.toast.style.display = "block";
-        el.toast.classList.remove("show");
-        requestAnimationFrame(() => el.toast.classList.add("show"));
-        clearTimeout(toast.timer);
-        toast.timer = setTimeout(() => {
-          el.toast.style.display = "none";
-          el.toast.classList.remove("show");
-        }, CONFIG.toastDelay);
-      }
+      function fullRebuildIndexes() {
+        state.exerciseCatalog.sorted = [];
+        state.exerciseCatalog.namesByKey = new Map();
+        state.exerciseCatalog.searchIndex = [];
+        state.historyIndex = new Map();
 
-      function haptic(type = "light") {
-        if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred(type);
-      }
+        const usageCounts = new Map();
 
-      function hideKeyboard() {
-        if (document.activeElement && document.activeElement.blur) {
-          document.activeElement.blur();
-        }
-      }
-
-      function showPopup(message) {
-        if (tg && tg.showPopup) {
-          return new Promise((resolve) =>
-            tg.showPopup(
-              {
-                message,
-                buttons: [
-                  { id: "cancel", type: "cancel", text: "Отмена" },
-                  { id: "ok", type: "default", text: "ОК" }
-                ]
-              },
-              resolve
-            )
-          );
-        }
-
-        return Promise.resolve(confirm(message) ? "ok" : "cancel");
-      }
-
-      function persistNow() {
-        const snapshot = {
-          updatedAt: Date.now(),
-          workouts: state.workouts,
-          draft: state.draft
+        const addExerciseUsage = (name) => {
+          const clean = String(name || "").trim();
+          if (!clean) return;
+          const key = exerciseKey(clean);
+          usageCounts.set(key, (usageCounts.get(key) || 0) + 1);
+          if (!state.exerciseCatalog.namesByKey.has(key)) {
+            state.exerciseCatalog.namesByKey.set(key, clean);
+          }
         };
 
-        safeStorageSet(CONFIG.localDataKey, JSON.stringify(snapshot));
-        safeStorageSet(CONFIG.storageKey, JSON.stringify(state.workouts));
-        safeStorageSet(CONFIG.draftKey, JSON.stringify(state.draft));
+        state.workouts.forEach((workout) => {
+          workout.exercises.forEach((ex) => addExerciseUsage(ex.name));
+          const stats = state.cache.statsByWorkoutId.get(workout.id) || getStats(workout);
+          const meta = state.cache.historyMetaByWorkoutId.get(workout.id) || buildWorkoutHistoryMeta(workout, stats);
+          upsertIndexesForWorkout(workout, meta, stats);
+        });
+
+        state.draft.exercises.forEach((ex) => addExerciseUsage(ex.name));
+
+        state.exerciseCatalog.sorted = [...state.exerciseCatalog.namesByKey.values()]
+          .sort((a, b) => a.localeCompare(b, "ru"));
+
+        state.exerciseCatalog.searchIndex = state.exerciseCatalog.sorted.map((name) => ({
+          name,
+          normalized: normalizeSearchText(name),
+          tokens: tokenize(name)
+        }));
       }
 
-      function schedulePersist(immediate = false) {
-        clearTimeout(persistTimer);
+      function rebuildExerciseSearchIndex() {
+        state.exerciseCatalog.sorted = [...state.exerciseCatalog.namesByKey.values()]
+          .sort((a, b) => a.localeCompare(b, "ru"));
 
-        if (immediate) {
-          persistNow();
-          return;
-        }
-
-        persistTimer = setTimeout(() => {
-          persistNow();
-        }, CONFIG.persistDelay);
+        state.exerciseCatalog.searchIndex = state.exerciseCatalog.sorted.map((name) => ({
+          name,
+          normalized: normalizeSearchText(name),
+          tokens: tokenize(name)
+        }));
       }
 
-      function loadData() {
-        const snapshot = safeJsonParse(safeStorageGet(CONFIG.localDataKey), null);
+      function addExerciseNameToIndex(name) {
+        const clean = String(name || "").trim();
+        if (!clean) return;
+        const key = exerciseKey(clean);
+        if (!state.exerciseCatalog.namesByKey.has(key)) {
+          state.exerciseCatalog.namesByKey.set(key, clean);
+          rebuildExerciseSearchIndex();
+        }
+      }
 
-        if (snapshot && Array.isArray(snapshot.workouts) && snapshot.draft) {
-          state.workouts = snapshot.workouts
-            .map(sanitizeWorkout)
-            .filter((workout) => workout.exercises.length);
+      function removeExerciseNameFromIndexIfUnused(name) {
+        const key = exerciseKey(name);
+        let stillUsed = false;
 
-          state.draft = isValidDraft(snapshot.draft)
-            ? sanitizeWorkout(snapshot.draft)
-            : createDraft();
-
-          state.draft.status = "draft";
-        } else {
-          state.workouts = safeJsonParse(safeStorageGet(CONFIG.storageKey), [])
-            .map(sanitizeWorkout)
-            .filter((workout) => workout.exercises.length);
-
-          const draft = safeJsonParse(safeStorageGet(CONFIG.draftKey), null);
-          state.draft = isValidDraft(draft) ? sanitizeWorkout(draft) : createDraft();
-          state.draft.status = "draft";
+        for (const workout of state.workouts) {
+          if (workout.exercises.some((ex) => exerciseKey(ex.name) === key)) {
+            stillUsed = true;
+            break;
+          }
         }
 
-        fullRebuildWorkoutCaches();
-        fullRebuildExerciseCatalog();
-        applyHistoryFilter();
-        renderAll();
-        schedulePersist(true);
+        if (!stillUsed) {
+          if (state.draft.exercises.some((ex) => exerciseKey(ex.name) === key)) {
+            stillUsed = true;
+          }
+        }
 
-        setTimeout(() => {
-          el.splash.classList.add("hide");
-        }, CONFIG.splashDelay);
+        if (!stillUsed && state.exerciseCatalog.namesByKey.has(key)) {
+          state.exerciseCatalog.namesByKey.delete(key);
+          rebuildExerciseSearchIndex();
+        }
+      }
+
+      function upsertIndexesForWorkout(workout, meta, stats) {
+        state.historyIndex.set(workout.id, buildWorkoutSearchRecord(workout, meta, stats));
+        workout.exercises.forEach((ex) => addExerciseNameToIndex(ex.name));
+      }
+
+      function removeIndexesForWorkout(workout) {
+        state.historyIndex.delete(workout.id);
+        workout.exercises.forEach((ex) => removeExerciseNameFromIndexIfUnused(ex.name));
       }
 
       function renderShell() {
@@ -2153,69 +2316,96 @@
         el.exerciseDropdown.classList.remove("open");
       }
 
-      function highlightMatch(label, query) {
-        const safe = escapeHtml(label);
-        const q = String(query || "").trim();
-        if (!q) return safe;
-
-        const lowerLabel = label.toLowerCase();
-        const lowerQ = q.toLowerCase();
-        const index = lowerLabel.indexOf(lowerQ);
-        if (index < 0) return safe;
-
-        const start = escapeHtml(label.slice(0, index));
-        const mid = escapeHtml(label.slice(index, index + q.length));
-        const end = escapeHtml(label.slice(index + q.length));
-        return `${start}<mark>${mid}</mark>${end}`;
-      }
-
-      function scoreExerciseName(name, query) {
-        const normalizedName = normalizeSearchText(name);
-        const normalizedQuery = normalizeSearchText(query);
+      function scoreExerciseRecord(record, queryTokens, normalizedQuery) {
         if (!normalizedQuery) return 0;
-
-        if (normalizedName === normalizedQuery) return 1000;
-        if (normalizedName.startsWith(normalizedQuery)) return 800;
-        if (normalizedName.includes(` ${normalizedQuery}`)) return 700;
-        if (normalizedName.includes(normalizedQuery)) return 600;
-
-        const qTokens = tokenize(normalizedQuery);
-        if (!qTokens.length) return 0;
+        if (record.normalized === normalizedQuery) return 1000;
+        if (record.normalized.startsWith(normalizedQuery)) return 850;
+        if (record.normalized.includes(` ${normalizedQuery}`)) return 740;
+        if (record.normalized.includes(normalizedQuery)) return 620;
 
         let score = 0;
-        for (const token of qTokens) {
-          if (normalizedName.startsWith(token)) score += 120;
-          else if (normalizedName.includes(` ${token}`)) score += 90;
-          else if (normalizedName.includes(token)) score += 50;
+        for (const token of queryTokens) {
+          if (record.normalized.startsWith(token)) score += 120;
+          else if (record.normalized.includes(` ${token}`)) score += 90;
+          else if (record.normalized.includes(token)) score += 50;
           else return 0;
         }
-
         return score;
       }
 
-      function computeExerciseSearchResults(query) {
-        const names = state.exerciseCatalog.sorted;
-        if (!query.trim()) {
-          return names.slice(0, CONFIG.searchMaxResults);
+      function highlightTextByTokens(textValue, queryTokens) {
+        const text = String(textValue || "");
+        if (!queryTokens || !queryTokens.length) return escapeHtml(text);
+
+        const normalizedChars = [];
+        for (const ch of text) {
+          normalizedChars.push(ch.toLowerCase() === "ё" ? "е" : ch.toLowerCase());
+        }
+        const normalized = normalizedChars.join("");
+
+        const ranges = [];
+        queryTokens
+          .slice()
+          .sort((a, b) => b.length - a.length)
+          .forEach((token) => {
+            if (!token) return;
+            let from = 0;
+            while (from < normalized.length) {
+              const index = normalized.indexOf(token, from);
+              if (index < 0) break;
+              ranges.push([index, index + token.length]);
+              from = index + token.length;
+            }
+          });
+
+        if (!ranges.length) return escapeHtml(text);
+
+        ranges.sort((a, b) => a[0] - b[0]);
+        const merged = [];
+        for (const range of ranges) {
+          const last = merged[merged.length - 1];
+          if (!last || range[0] > last[1]) {
+            merged.push(range.slice());
+          } else {
+            last[1] = Math.max(last[1], range[1]);
+          }
         }
 
-        const scored = [];
-        for (const name of names) {
-          const score = scoreExerciseName(name, query);
-          if (score > 0) scored.push({ name, score });
+        let result = "";
+        let cursor = 0;
+        for (const [start, end] of merged) {
+          result += escapeHtml(text.slice(cursor, start));
+          result += `<span class="history-highlight">${escapeHtml(text.slice(start, end))}</span>`;
+          cursor = end;
         }
-
-        scored.sort((a, b) => {
-          if (b.score !== a.score) return b.score - a.score;
-          return a.name.localeCompare(b.name, "ru");
-        });
-
-        return scored.slice(0, CONFIG.searchMaxResults).map((item) => item.name);
+        result += escapeHtml(text.slice(cursor));
+        return result;
       }
 
       function renderExerciseSearchResults(force = false) {
         const query = el.exerciseInput.value.trim();
-        const nextResults = computeExerciseSearchResults(query);
+        const normalizedQuery = normalizeSearchText(query);
+        const queryTokens = tokenize(query);
+
+        let nextResults;
+        if (!normalizedQuery) {
+          nextResults = state.exerciseCatalog.searchIndex
+            .slice(0, CONFIG.searchMaxResults)
+            .map((item) => item.name);
+        } else {
+          nextResults = state.exerciseCatalog.searchIndex
+            .map((record) => ({
+              name: record.name,
+              score: scoreExerciseRecord(record, queryTokens, normalizedQuery)
+            }))
+            .filter((item) => item.score > 0)
+            .sort((a, b) => {
+              if (b.score !== a.score) return b.score - a.score;
+              return a.name.localeCompare(b.name, "ru");
+            })
+            .slice(0, CONFIG.searchMaxResults)
+            .map((item) => item.name);
+        }
 
         if (
           !force &&
@@ -2252,7 +2442,7 @@
         nextResults.forEach((name) => {
           const btn = make("button", "search-option");
           btn.type = "button";
-          btn.innerHTML = highlightMatch(name, query);
+          btn.innerHTML = highlightTextByTokens(name, queryTokens);
           btn.addEventListener("click", () => {
             selectExerciseSuggestion(name);
           });
@@ -2285,8 +2475,7 @@
         if (!ex) {
           ex = { id: id(), name, sets: [] };
           state.draft.exercises.push(ex);
-          registerExerciseName(name);
-          rebuildExerciseCatalogSorted();
+          addExerciseNameToIndex(name);
         }
 
         return ex;
@@ -2301,12 +2490,7 @@
           return;
         }
 
-        const existedBefore = state.draft.exercises.some((item) => sameName(item.name, name));
         getOrCreateDraftExercise(name).sets.push({ id: id(), ...parsed });
-
-        if (!existedBefore) {
-          rebuildExerciseCatalogSorted();
-        }
 
         el.weightInput.value = "";
         el.repsInput.value = "";
@@ -2393,11 +2577,9 @@
         ex.sets = ex.sets.filter((set) => set.id !== setId);
 
         if (!ex.sets.length) {
-          unregisterExerciseName(ex.name);
+          state.draft.exercises = state.draft.exercises.filter((item) => item.id !== exId);
+          removeExerciseNameFromIndexIfUnused(ex.name);
         }
-
-        state.draft.exercises = state.draft.exercises.filter((item) => item.sets.length);
-        rebuildExerciseCatalogSorted();
 
         haptic("medium");
         schedulePersist();
@@ -2464,22 +2646,19 @@
         oldExercise.sets.splice(index, 1);
 
         let target = workout.exercises.find((ex) => sameName(ex.name, newName));
-        const hadTarget = Boolean(target);
-
         if (!target) {
           target = { id: id(), name: newName, sets: [] };
           workout.exercises.push(target);
+          addExerciseNameToIndex(newName);
         }
 
         target.sets.push(updated);
 
-        const oldExerciseBecameEmpty = !oldExercise.sets.length;
-        workout.exercises = workout.exercises.filter((ex) => ex.sets.length);
-
-        if (!sameName(oldName, newName)) {
-          if (oldExerciseBecameEmpty) unregisterExerciseName(oldName);
-          if (!hadTarget) registerExerciseName(newName);
-          rebuildExerciseCatalogSorted();
+        if (!oldExercise.sets.length) {
+          workout.exercises = workout.exercises.filter((ex) => ex.id !== oldExercise.id);
+          if (!sameName(oldName, newName)) {
+            removeExerciseNameFromIndexIfUnused(oldName);
+          }
         }
 
         haptic();
@@ -2512,52 +2691,44 @@
         toast("Тренировка сохранена");
       }
 
-      function buildHistoryRow(workoutId) {
-        const workout = state.workoutsById.get(workoutId);
-        const stats = state.cache.statsByWorkoutId.get(workoutId);
-        const meta = state.cache.historyMetaByWorkoutId.get(workoutId);
-        if (!workout || !stats || !meta) return make("div", "");
+      function formatDateTitle(iso) {
+        const date = new Date(iso);
+        const now = new Date();
 
-        const row = make("div", "history-row");
-        row.dataset.id = workout.id;
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const diff = Math.round((today - day) / 86400000);
 
-        const open = make("button", "history-item");
-        open.type = "button";
-        open.onclick = () => openWorkout(workout.id);
-        open.append(
-          make("div", "history-title", meta.title),
-          make(
-            "div",
-            "muted",
-            `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
-          )
-        );
+        if (diff === 0) return "Сегодня";
+        if (diff === 1) return "Вчера";
 
-        const csv = make("button", "btn-card btn-accent icon-square", "CSV");
-        csv.type = "button";
-        csv.onclick = () => exportWorkoutCsv(workout.id);
+        return date.toLocaleDateString("ru-RU", {
+          day: "numeric",
+          month: "long"
+        });
+      }
 
-        const del = make("button", "btn-card btn-danger icon-square", "×");
-        del.type = "button";
-        del.onclick = () => confirmDeleteWorkout(workout.id, row);
-
-        row.append(open, csv, del);
-        return row;
+      function highlightHistorySummary(meta, stats, tokens) {
+        const plain = `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`;
+        return highlightTextByTokens(plain, tokens);
       }
 
       function applyHistoryFilter() {
         const query = state.historyUi.query.trim();
-        const ids = state.cache.historyOrderedIds;
+        const tokens = tokenize(query);
+        state.historyUi.queryTokens = tokens;
 
-        if (!query) {
-          state.historyUi.filteredIds = ids.slice();
+        if (!tokens.length) {
+          state.historyUi.filteredIds = state.cache.historyOrderedIds.slice();
         } else {
-          const tokens = tokenize(query);
-          state.historyUi.filteredIds = ids.filter((workoutId) => {
-            const meta = state.cache.historyMetaByWorkoutId.get(workoutId);
-            if (!meta) return false;
-            return tokens.every((token) => meta.searchText.includes(token));
-          });
+          const filtered = [];
+          for (const workoutId of state.cache.historyOrderedIds) {
+            const record = state.historyIndex.get(workoutId);
+            if (!record) continue;
+            const ok = tokens.every((token) => record.searchText.includes(token));
+            if (ok) filtered.push(workoutId);
+          }
+          state.historyUi.filteredIds = filtered;
         }
 
         rebuildVirtualHistoryItems();
@@ -2598,29 +2769,96 @@
         state.historyUi.virtualItems = items;
       }
 
+      function renderHistorySummary() {
+        text(el.historySummaryLeft, `${state.workouts.length} тренировок`);
+        text(el.historySummaryRight, `${state.historyUi.filteredIds.length} показано`);
+      }
+
+      function createHistoryPoolNode() {
+        const host = make("div", "history-recycle-item");
+        const month = make("div", "history-month-title");
+        month.style.display = "none";
+
+        const row = make("div", "history-row");
+        row.style.display = "none";
+
+        const open = make("button", "history-item");
+        open.type = "button";
+
+        const title = make("div", "history-title");
+        const meta = make("div", "muted");
+        open.append(title, meta);
+
+        const csv = make("button", "btn-card btn-accent icon-square", "CSV");
+        csv.type = "button";
+
+        const del = make("button", "btn-card btn-danger icon-square", "×");
+        del.type = "button";
+
+        row.append(open, csv, del);
+        host.append(month, row);
+
+        return {
+          host,
+          month,
+          row,
+          open,
+          title,
+          meta,
+          csv,
+          del,
+          boundKey: ""
+        };
+      }
+
       function ensureHistoryViewport() {
-        let viewport = el.historyList.querySelector(".history-viewport");
-        if (viewport) return viewport;
+        if (state.historyUi.viewportEl) return;
 
-        viewport = make("div", "history-viewport");
+        const viewport = make("div", "history-viewport");
         const spacer = make("div", "history-spacer");
-        const inner = make("div", "history-inner");
+        const layer = make("div", "history-recycle-layer");
 
-        viewport.append(spacer, inner);
+        viewport.append(spacer, layer);
         el.historyList.replaceChildren(viewport);
 
         viewport.addEventListener("scroll", onHistoryScroll, { passive: true });
+
+        state.historyUi.viewportEl = viewport;
+        state.historyUi.spacerEl = spacer;
+        state.historyUi.layerEl = layer;
 
         if ("ResizeObserver" in window) {
           historyViewportResizeObserver && historyViewportResizeObserver.disconnect();
           historyViewportResizeObserver = new ResizeObserver(() => {
             state.historyUi.viewportHeight = viewport.clientHeight;
-            renderHistoryVirtualWindow();
+            ensureHistoryPool();
+            renderHistoryVirtualWindow(true);
           });
           historyViewportResizeObserver.observe(viewport);
         }
+      }
 
-        return viewport;
+      function ensureHistoryPool() {
+        const viewport = state.historyUi.viewportEl;
+        const layer = state.historyUi.layerEl;
+        if (!viewport || !layer) return;
+
+        const viewportHeight = viewport.clientHeight || 0;
+        const needed = Math.max(
+          12,
+          Math.ceil((viewportHeight + CONFIG.historyOverscanPx * 2) / CONFIG.historyRowHeight) + CONFIG.historyPoolExtra
+        );
+
+        if (state.historyUi.poolSize >= needed) return;
+
+        const fragment = document.createDocumentFragment();
+        for (let i = state.historyUi.poolSize; i < needed; i += 1) {
+          const item = createHistoryPoolNode();
+          state.historyUi.pool.push(item);
+          fragment.appendChild(item.host);
+        }
+        state.historyUi.poolSize = needed;
+        layer.appendChild(fragment);
       }
 
       function onHistoryScroll(event) {
@@ -2628,46 +2866,44 @@
         renderHistoryVirtualWindow();
       }
 
-      function renderHistorySummary() {
-        text(el.historySummaryLeft, `${state.workouts.length} тренировок`);
-        text(el.historySummaryRight, `${state.historyUi.filteredIds.length} показано`);
-      }
-
       function renderHistory() {
         renderHistorySummary();
 
         if (!state.cache.historyOrderedIds.length) {
+          state.historyUi.viewportEl = null;
+          state.historyUi.spacerEl = null;
+          state.historyUi.layerEl = null;
+          state.historyUi.pool = [];
+          state.historyUi.poolSize = 0;
           el.historyList.replaceChildren(make("div", "empty", "Пока нет сохраненных тренировок"));
           return;
         }
 
         if (!state.historyUi.filteredIds.length) {
+          state.historyUi.viewportEl = null;
+          state.historyUi.spacerEl = null;
+          state.historyUi.layerEl = null;
+          state.historyUi.pool = [];
+          state.historyUi.poolSize = 0;
           el.historyList.replaceChildren(make("div", "empty", "Ничего не найдено"));
           return;
         }
 
-        const viewport = ensureHistoryViewport();
-        viewport.style.height = `min(${Math.max(320, Math.round(window.innerHeight * 0.68))}px, 68vh)`;
+        ensureHistoryViewport();
+        ensureHistoryPool();
 
-        const spacer = viewport.querySelector(".history-spacer");
-        spacer.style.height = `${state.historyUi.virtualItems.length ? state.historyUi.virtualItems[state.historyUi.virtualItems.length - 1].top + state.historyUi.virtualItems[state.historyUi.virtualItems.length - 1].height : 0}px`;
+        const items = state.historyUi.virtualItems;
+        const totalHeight = items.length
+          ? items[items.length - 1].top + items[items.length - 1].height
+          : 0;
 
-        state.historyUi.viewportHeight = viewport.clientHeight;
-        renderHistoryVirtualWindow();
+        state.historyUi.spacerEl.style.height = `${totalHeight}px`;
+        state.historyUi.viewportHeight = state.historyUi.viewportEl.clientHeight;
+        state.historyUi.scrollTop = state.historyUi.viewportEl.scrollTop;
+        renderHistoryVirtualWindow(true);
       }
 
-      function renderHistoryVirtualWindow() {
-        const viewport = el.historyList.querySelector(".history-viewport");
-        if (!viewport) return;
-
-        const inner = viewport.querySelector(".history-inner");
-        const items = state.historyUi.virtualItems;
-        const viewportHeight = state.historyUi.viewportHeight || viewport.clientHeight || 0;
-        const scrollTop = state.historyUi.scrollTop || viewport.scrollTop || 0;
-
-        const startY = Math.max(0, scrollTop - CONFIG.historyOverscan * CONFIG.historyRowHeight);
-        const endY = scrollTop + viewportHeight + CONFIG.historyOverscan * CONFIG.historyRowHeight;
-
+      function findVirtualRange(items, startY, endY) {
         let startIndex = 0;
         while (startIndex < items.length && items[startIndex].top + items[startIndex].height < startY) {
           startIndex += 1;
@@ -2678,24 +2914,351 @@
           endIndex += 1;
         }
 
-        const renderKey = `${startIndex}:${endIndex}:${items.length}`;
-        if (state.historyUi.lastRenderedKey === renderKey) return;
-        state.historyUi.lastRenderedKey = renderKey;
+        return [startIndex, endIndex];
+      }
 
-        const fragment = document.createDocumentFragment();
+      function bindHistoryPoolNode(poolNode, item, queryTokens) {
+        poolNode.host.style.transform = `translateY(${item.top}px)`;
+        poolNode.boundKey = item.key;
+
+        if (item.type === "month") {
+          poolNode.month.style.display = "block";
+          poolNode.row.style.display = "none";
+          poolNode.month.innerHTML = highlightTextByTokens(item.monthTitle, queryTokens);
+          return;
+        }
+
+        const workoutId = item.workoutId;
+        const workout = state.workoutsById.get(workoutId);
+        const stats = state.cache.statsByWorkoutId.get(workoutId);
+        const meta = state.cache.historyMetaByWorkoutId.get(workoutId);
+        if (!workout || !stats || !meta) {
+          poolNode.month.style.display = "none";
+          poolNode.row.style.display = "none";
+          return;
+        }
+
+        poolNode.month.style.display = "none";
+        poolNode.row.style.display = "grid";
+
+        poolNode.open.onclick = () => openWorkout(workoutId);
+        poolNode.csv.onclick = () => exportWorkoutCsv(workoutId);
+        poolNode.del.onclick = () => confirmDeleteWorkout(workoutId, poolNode.row);
+
+        poolNode.title.innerHTML = highlightTextByTokens(meta.title, queryTokens);
+        poolNode.meta.innerHTML = highlightHistorySummary(meta, stats, queryTokens);
+      }
+
+      function renderHistoryVirtualWindow(force = false) {
+        const viewport = state.historyUi.viewportEl;
+        if (!viewport) return;
+
+        const items = state.historyUi.virtualItems;
+        const viewportHeight = state.historyUi.viewportHeight || viewport.clientHeight || 0;
+        const scrollTop = state.historyUi.scrollTop || viewport.scrollTop || 0;
+        const startY = Math.max(0, scrollTop - CONFIG.historyOverscanPx);
+        const endY = scrollTop + viewportHeight + CONFIG.historyOverscanPx;
+
+        const [startIndex, endIndex] = findVirtualRange(items, startY, endY);
+        const rangeKey = `${startIndex}:${endIndex}:${items.length}:${state.historyUi.query}`;
+
+        if (!force && state.historyUi.lastRangeKey === rangeKey) return;
+        state.historyUi.lastRangeKey = rangeKey;
+
         const visible = items.slice(startIndex, endIndex);
-        const firstTop = visible.length ? visible[0].top : 0;
+        ensureHistoryPool();
 
-        visible.forEach((item) => {
-          if (item.type === "month") {
-            fragment.appendChild(make("div", "history-month-title", item.monthTitle));
-          } else {
-            fragment.appendChild(buildHistoryRow(item.workoutId));
+        const pool = state.historyUi.pool;
+        const queryTokens = state.historyUi.queryTokens;
+
+        for (let i = 0; i < pool.length; i += 1) {
+          const poolNode = pool[i];
+          const item = visible[i];
+
+          if (!item) {
+            poolNode.host.style.display = "none";
+            poolNode.boundKey = "";
+            continue;
           }
+
+          poolNode.host.style.display = "block";
+
+          if (!force && poolNode.boundKey === item.key) {
+            poolNode.host.style.transform = `translateY(${item.top}px)`;
+            continue;
+          }
+
+          bindHistoryPoolNode(poolNode, item, queryTokens);
+        }
+      }
+
+      function openWorkout(workoutId) {
+        const workout = state.workoutsById.get(workoutId);
+        if (!workout) return;
+
+        openSheet();
+        el.modalBody.replaceChildren();
+
+        const stats = state.cache.statsByWorkoutId.get(workout.id) || getStats(workout);
+
+        el.modalBody.append(
+          make("div", "title", formatDateTitle(workout.finishedAt || workout.createdAt)),
+          make(
+            "div",
+            "meta",
+            `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
+          )
+        );
+
+        workout.exercises.forEach((ex) => {
+          const box = make("div", "exercise");
+          box.appendChild(make("div", "exercise-name", ex.name));
+
+          ex.sets.forEach((set, index) => {
+            const row = make("div", "modal-set-row");
+            row.append(
+              make("div", "", `${index + 1}. ${set.weight} кг × ${set.reps}`),
+              make("div", "muted", `${Math.round(set.weight * set.reps)} кг`)
+            );
+            box.appendChild(row);
+          });
+
+          el.modalBody.appendChild(box);
         });
 
-        inner.style.transform = `translateY(${firstTop}px)`;
-        inner.replaceChildren(fragment);
+        const actions = make("div", "sheet-actions");
+        const edit = make("button", "btn-card btn-accent", "Редактировать");
+        edit.type = "button";
+        edit.onclick = () => openEditWorkout(workoutId);
+        actions.append(edit);
+        el.modalBody.appendChild(actions);
+      }
+
+      function removeEditSetCard(card) {
+        const group = card.closest(".edit-exercise-group");
+
+        if (!group) {
+          animateRemove(card, () => card.remove());
+          return;
+        }
+
+        const cards = [...group.querySelectorAll(".edit-set-card")];
+        if (cards.length <= 1) {
+          animateRemove(group, () => group.remove());
+          return;
+        }
+
+        animateRemove(card, () => card.remove());
+      }
+
+      function createEditSetCard(weightValue = "", repsValue = "") {
+        const card = make("div", "edit-set-card");
+        const nums = make("div", "form-numbers");
+
+        const weight = make("input", "");
+        weight.value = weightValue;
+        weight.inputMode = "decimal";
+        weight.dataset.kind = "weight";
+
+        const reps = make("input", "");
+        reps.value = repsValue;
+        reps.inputMode = "numeric";
+        reps.dataset.kind = "reps";
+
+        nums.append(weight, reps);
+
+        const del = make("button", "btn-card btn-danger icon-square", "×");
+        del.type = "button";
+        del.onclick = () => removeEditSetCard(card);
+
+        card.append(nums, del);
+        return card;
+      }
+
+      function createExerciseGroup(nameValue = "") {
+        const group = make("div", "edit-exercise-group");
+        const exId = id();
+        group.dataset.exId = exId;
+
+        const name = make("input", "");
+        name.value = nameValue;
+        name.dataset.exName = "1";
+
+        group.appendChild(name);
+        group.appendChild(createEditSetCard("", ""));
+        return group;
+      }
+
+      function openEditWorkout(workoutId) {
+        const workout = state.workoutsById.get(workoutId);
+        if (!workout) return;
+
+        openSheet();
+        el.modalBody.replaceChildren();
+
+        const header = make("div", "title-row");
+        const title = make("div", "title", "Редактировать тренировку");
+        const addBtn = make("button", "btn-card btn-accent icon-square", "+");
+        addBtn.type = "button";
+
+        header.append(title, addBtn);
+        el.modalBody.appendChild(header);
+
+        const form = make("div", "modal-form");
+
+        workout.exercises.forEach((ex) => {
+          const group = make("div", "edit-exercise-group");
+          group.dataset.exId = ex.id;
+
+          const name = make("input", "");
+          name.value = ex.name;
+          name.dataset.exName = "1";
+          group.appendChild(name);
+
+          ex.sets.forEach((set) => {
+            const card = createEditSetCard(String(set.weight), String(set.reps));
+            card.dataset.setId = set.id;
+            group.appendChild(card);
+          });
+
+          form.appendChild(group);
+        });
+
+        addBtn.onclick = () => {
+          const newGroup = createExerciseGroup("");
+          form.appendChild(newGroup);
+          haptic();
+          newGroup.scrollIntoView({ behavior: lowPerfMode ? "auto" : "smooth", block: "nearest" });
+        };
+
+        const actions = make("div", "sheet-actions");
+        const save = make("button", "btn-card btn-accent", "Сохранить");
+        save.type = "button";
+        save.onclick = () => saveWorkoutEdit(workoutId, form);
+        actions.append(save);
+
+        el.modalBody.append(form, actions);
+      }
+
+      function saveWorkoutEdit(workoutId, form) {
+        const oldWorkout = state.workoutsById.get(workoutId);
+        if (!oldWorkout) return;
+
+        const nextExercises = [];
+        const groups = [...form.querySelectorAll(".edit-exercise-group")];
+
+        for (const group of groups) {
+          const nameInput = group.querySelector('input[data-ex-name="1"]');
+          const name = nameInput ? nameInput.value.trim() : "";
+
+          if (!name) {
+            const hasCards = group.querySelector(".edit-set-card") !== null;
+            if (!hasCards) continue;
+            toast("Проверь название упражнения");
+            return;
+          }
+
+          const cards = [...group.querySelectorAll(".edit-set-card")];
+          if (!cards.length) continue;
+
+          const sets = [];
+
+          for (const card of cards) {
+            const weightEl = card.querySelector('[data-kind="weight"]');
+            const repsEl = card.querySelector('[data-kind="reps"]');
+            const parsed = parseSetInput(weightEl.value, repsEl.value);
+
+            if (!parsed) {
+              toast("Проверь вес и повторы");
+              return;
+            }
+
+            sets.push({
+              id: card.dataset.setId || id(),
+              weight: parsed.weight,
+              reps: parsed.reps
+            });
+          }
+
+          nextExercises.push({
+            id: group.dataset.exId || id(),
+            name,
+            sets
+          });
+        }
+
+        if (!nextExercises.length) {
+          toast("Нельзя сохранить пустую тренировку");
+          return;
+        }
+
+        const newWorkout = sanitizeWorkout({
+          ...oldWorkout,
+          exercises: nextExercises
+        });
+
+        const workoutIndex = state.workouts.findIndex((item) => item.id === workoutId);
+        if (workoutIndex < 0) return;
+
+        state.workouts[workoutIndex] = newWorkout;
+        replaceWorkoutInCaches(oldWorkout, newWorkout);
+        applyHistoryFilter();
+
+        haptic();
+        renderAll();
+        schedulePersist(true);
+        closeModal();
+        toast("Тренировка обновлена");
+      }
+
+      function exportWorkoutCsv(workoutId) {
+        const workout = state.workoutsById.get(workoutId);
+        if (!workout) return;
+
+        const csv = workout.exercises
+          .map((ex) =>
+            `"${[ex.name, ...ex.sets.map((set, index) => `${index + 1}й подход ${set.weight}кг х ${set.reps}`)]
+              .join("\n")
+              .replace(/"/g, '""')}"`
+          )
+          .join(";");
+
+        const blob = new Blob(["\uFEFF" + csv], {
+          type: "text/csv;charset=utf-8"
+        });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `workout-${new Date(workout.finishedAt || workout.createdAt).toISOString().slice(0, 10)}.csv`;
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+
+        toast("CSV-файл создан");
+      }
+
+      async function confirmDeleteWorkout(workoutId) {
+        const answer = await showPopup("Удалить тренировку?");
+        if (answer !== "ok") return;
+        deleteWorkout(workoutId);
+      }
+
+      function deleteWorkout(workoutId) {
+        const workout = state.workoutsById.get(workoutId);
+        if (!workout) return;
+
+        state.workouts = state.workouts.filter((item) => item.id !== workoutId);
+        removeWorkoutFromCaches(workout);
+        applyHistoryFilter();
+
+        closeModal();
+        haptic("medium");
+        renderAll();
+        schedulePersist(true);
+        toast("Тренировка удалена");
       }
 
       function renderProgress() {
@@ -3106,307 +3669,6 @@
         el.progressResult.appendChild(hero);
       }
 
-      function formatDateTitle(iso) {
-        const date = new Date(iso);
-        const now = new Date();
-
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        const diff = Math.round((today - day) / 86400000);
-
-        if (diff === 0) return "Сегодня";
-        if (diff === 1) return "Вчера";
-
-        return date.toLocaleDateString("ru-RU", {
-          day: "numeric",
-          month: "long"
-        });
-      }
-
-      function openWorkout(workoutId) {
-        const workout = state.workoutsById.get(workoutId);
-        if (!workout) return;
-
-        openSheet();
-        el.modalBody.replaceChildren();
-
-        const stats = state.cache.statsByWorkoutId.get(workout.id) || getStats(workout);
-
-        el.modalBody.append(
-          make("div", "title", formatDateTitle(workout.finishedAt || workout.createdAt)),
-          make(
-            "div",
-            "meta",
-            `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
-          )
-        );
-
-        workout.exercises.forEach((ex) => {
-          const box = make("div", "exercise");
-          box.appendChild(make("div", "exercise-name", ex.name));
-
-          ex.sets.forEach((set, index) => {
-            const row = make("div", "modal-set-row");
-            row.append(
-              make("div", "", `${index + 1}. ${set.weight} кг × ${set.reps}`),
-              make("div", "muted", `${Math.round(set.weight * set.reps)} кг`)
-            );
-            box.appendChild(row);
-          });
-
-          el.modalBody.appendChild(box);
-        });
-
-        const actions = make("div", "sheet-actions");
-        const edit = make("button", "btn-card btn-accent", "Редактировать");
-        edit.type = "button";
-        edit.onclick = () => openEditWorkout(workoutId);
-        actions.append(edit);
-        el.modalBody.appendChild(actions);
-      }
-
-      function removeEditSetCard(card) {
-        const group = card.closest(".edit-exercise-group");
-
-        if (!group) {
-          animateRemove(card, () => card.remove());
-          return;
-        }
-
-        const cards = [...group.querySelectorAll(".edit-set-card")];
-        if (cards.length <= 1) {
-          animateRemove(group, () => group.remove());
-          return;
-        }
-
-        animateRemove(card, () => card.remove());
-      }
-
-      function createEditSetCard(weightValue = "", repsValue = "") {
-        const card = make("div", "edit-set-card");
-        const nums = make("div", "form-numbers");
-
-        const weight = make("input", "");
-        weight.value = weightValue;
-        weight.inputMode = "decimal";
-        weight.dataset.kind = "weight";
-
-        const reps = make("input", "");
-        reps.value = repsValue;
-        reps.inputMode = "numeric";
-        reps.dataset.kind = "reps";
-
-        nums.append(weight, reps);
-
-        const del = make("button", "btn-card btn-danger icon-square", "×");
-        del.type = "button";
-        del.onclick = () => removeEditSetCard(card);
-
-        card.append(nums, del);
-        return card;
-      }
-
-      function createExerciseGroup(nameValue = "") {
-        const group = make("div", "edit-exercise-group");
-        const exId = id();
-        group.dataset.exId = exId;
-
-        const name = make("input", "");
-        name.value = nameValue;
-        name.dataset.exName = "1";
-
-        group.appendChild(name);
-        group.appendChild(createEditSetCard("", ""));
-        return group;
-      }
-
-      function openEditWorkout(workoutId) {
-        const workout = state.workoutsById.get(workoutId);
-        if (!workout) return;
-
-        openSheet();
-        el.modalBody.replaceChildren();
-
-        const header = make("div", "title-row");
-        const title = make("div", "title", "Редактировать тренировку");
-        const addBtn = make("button", "btn-card btn-accent icon-square", "+");
-        addBtn.type = "button";
-
-        header.append(title, addBtn);
-        el.modalBody.appendChild(header);
-
-        const form = make("div", "modal-form");
-
-        workout.exercises.forEach((ex) => {
-          const group = make("div", "edit-exercise-group");
-          group.dataset.exId = ex.id;
-
-          const name = make("input", "");
-          name.value = ex.name;
-          name.dataset.exName = "1";
-          group.appendChild(name);
-
-          ex.sets.forEach((set) => {
-            const card = createEditSetCard(String(set.weight), String(set.reps));
-            card.dataset.setId = set.id;
-            group.appendChild(card);
-          });
-
-          form.appendChild(group);
-        });
-
-        addBtn.onclick = () => {
-          const newGroup = createExerciseGroup("");
-          form.appendChild(newGroup);
-          haptic();
-          newGroup.scrollIntoView({ behavior: lowPerfMode ? "auto" : "smooth", block: "nearest" });
-        };
-
-        const actions = make("div", "sheet-actions");
-        const save = make("button", "btn-card btn-accent", "Сохранить");
-        save.type = "button";
-        save.onclick = () => saveWorkoutEdit(workoutId, form);
-        actions.append(save);
-
-        el.modalBody.append(form, actions);
-      }
-
-      function saveWorkoutEdit(workoutId, form) {
-        const oldWorkout = state.workoutsById.get(workoutId);
-        if (!oldWorkout) return;
-
-        const nextExercises = [];
-        const groups = [...form.querySelectorAll(".edit-exercise-group")];
-
-        for (const group of groups) {
-          const nameInput = group.querySelector('input[data-ex-name="1"]');
-          const name = nameInput ? nameInput.value.trim() : "";
-
-          if (!name) {
-            const hasCards = group.querySelector(".edit-set-card") !== null;
-            if (!hasCards) continue;
-            toast("Проверь название упражнения");
-            return;
-          }
-
-          const cards = [...group.querySelectorAll(".edit-set-card")];
-          if (!cards.length) continue;
-
-          const sets = [];
-
-          for (const card of cards) {
-            const weightEl = card.querySelector('[data-kind="weight"]');
-            const repsEl = card.querySelector('[data-kind="reps"]');
-            const parsed = parseSetInput(weightEl.value, repsEl.value);
-
-            if (!parsed) {
-              toast("Проверь вес и повторы");
-              return;
-            }
-
-            sets.push({
-              id: card.dataset.setId || id(),
-              weight: parsed.weight,
-              reps: parsed.reps
-            });
-          }
-
-          nextExercises.push({
-            id: group.dataset.exId || id(),
-            name,
-            sets
-          });
-        }
-
-        if (!nextExercises.length) {
-          toast("Нельзя сохранить пустую тренировку");
-          return;
-        }
-
-        const newWorkout = sanitizeWorkout({
-          ...oldWorkout,
-          exercises: nextExercises
-        });
-
-        const workoutIndex = state.workouts.findIndex((item) => item.id === workoutId);
-        if (workoutIndex < 0) return;
-
-        state.workouts[workoutIndex] = newWorkout;
-        replaceWorkoutInCaches(oldWorkout, newWorkout);
-
-        oldWorkout.exercises.forEach((ex) => unregisterExerciseName(ex.name));
-        newWorkout.exercises.forEach((ex) => registerExerciseName(ex.name));
-        rebuildExerciseCatalogSorted();
-
-        applyHistoryFilter();
-
-        haptic();
-        renderAll();
-        schedulePersist(true);
-        closeModal();
-        toast("Тренировка обновлена");
-      }
-
-      function exportWorkoutCsv(workoutId) {
-        const workout = state.workoutsById.get(workoutId);
-        if (!workout) return;
-
-        const csv = workout.exercises
-          .map((ex) =>
-            `"${[ex.name, ...ex.sets.map((set, index) => `${index + 1}й подход ${set.weight}кг х ${set.reps}`)]
-              .join("\n")
-              .replace(/"/g, '""')}"`
-          )
-          .join(";");
-
-        const blob = new Blob(["\uFEFF" + csv], {
-          type: "text/csv;charset=utf-8"
-        });
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `workout-${new Date(workout.finishedAt || workout.createdAt).toISOString().slice(0, 10)}.csv`;
-
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-
-        toast("CSV-файл создан");
-      }
-
-      async function confirmDeleteWorkout(workoutId, node) {
-        const answer = await showPopup("Удалить тренировку?");
-        if (answer !== "ok") return;
-
-        const row = node || el.historyList.querySelector(`[data-id="${workoutId}"]`);
-        if (row) {
-          animateRemove(row, () => deleteWorkout(workoutId));
-        } else {
-          deleteWorkout(workoutId);
-        }
-      }
-
-      function deleteWorkout(workoutId) {
-        const workout = state.workoutsById.get(workoutId);
-        if (!workout) return;
-
-        state.workouts = state.workouts.filter((item) => item.id !== workoutId);
-        removeWorkoutFromCaches(workout);
-
-        workout.exercises.forEach((ex) => unregisterExerciseName(ex.name));
-        rebuildExerciseCatalogSorted();
-
-        applyHistoryFilter();
-
-        closeModal();
-        haptic("medium");
-        renderAll();
-        schedulePersist(true);
-        toast("Тренировка удалена");
-      }
-
       function openSheet() {
         el.modal.classList.add("open");
         scheduleTimerViewportSync();
@@ -3585,8 +3847,11 @@
         el.historySearchInput.addEventListener("input", () => {
           state.historyUi.query = el.historySearchInput.value;
           applyHistoryFilter();
-          state.historyUi.scrollTop = 0;
-          state.historyUi.lastRenderedKey = "";
+          if (state.historyUi.viewportEl) {
+            state.historyUi.viewportEl.scrollTop = 0;
+            state.historyUi.scrollTop = 0;
+          }
+          state.historyUi.lastRangeKey = "";
           renderHistory();
         });
 
@@ -3629,14 +3894,14 @@
         window.addEventListener("resize", () => {
           scheduleTimerViewportSync();
           if (state.tab === "history") {
-            state.historyUi.lastRenderedKey = "";
+            state.historyUi.lastRangeKey = "";
             renderHistory();
           }
         }, { passive: true });
         window.addEventListener("orientationchange", () => {
           scheduleTimerViewportSync();
           if (state.tab === "history") {
-            state.historyUi.lastRenderedKey = "";
+            state.historyUi.lastRangeKey = "";
             renderHistory();
           }
         });
