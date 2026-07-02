@@ -16,12 +16,10 @@
       --bg: #070707;
       --bg-solid: #090909;
       --surface: rgba(255, 255, 255, 0.055);
-      --surface-strong: rgba(255, 255, 255, 0.075);
       --field: #171717;
       --line: rgba(255, 255, 255, 0.09);
       --text: #fff;
       --muted: rgba(255, 255, 255, 0.58);
-      --muted-2: rgba(255, 255, 255, 0.38);
       --accent: #ff6418;
       --accent-soft: rgba(255, 100, 24, 0.1);
       --accent-line: rgba(255, 100, 24, 0.24);
@@ -41,8 +39,7 @@
       --tab-index: 0;
     }
 
-    html,
-    body {
+    html, body {
       min-height: 100%;
       background: var(--bg-solid);
     }
@@ -60,9 +57,7 @@
       overflow-x: hidden;
     }
 
-    button,
-    input,
-    select {
+    button, input, select {
       font: inherit;
       color: inherit;
     }
@@ -90,8 +85,7 @@
       cursor: default;
     }
 
-    input,
-    select {
+    input, select {
       width: 100%;
       min-height: 48px;
       border: 1px solid var(--line);
@@ -111,8 +105,7 @@
       color: transparent;
     }
 
-    input:focus,
-    select:focus {
+    input:focus, select:focus {
       border-color: rgba(255, 100, 24, 0.75);
       box-shadow: 0 0 0 3px rgba(255, 100, 24, 0.13);
     }
@@ -129,7 +122,6 @@
       gap: 12px;
       margin-bottom: 16px;
       padding-right: clamp(138px, 35vw, 176px);
-      animation: softIn 0.18s ease both;
     }
 
     .top-copy {
@@ -160,7 +152,6 @@
 
     .section {
       margin-bottom: 16px;
-      animation: softIn 0.18s ease both;
     }
 
     .section-title {
@@ -176,7 +167,6 @@
       padding: 13px;
       margin-bottom: 10px;
       box-shadow: 0 14px 28px rgba(0, 0, 0, 0.14);
-      animation: softIn 0.18s ease both;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
     }
@@ -193,7 +183,6 @@
 
     .panel.active {
       display: block;
-      animation: panelSlide 0.18s cubic-bezier(.2, .8, .2, 1) both;
     }
 
     .splash {
@@ -227,12 +216,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(
-        180deg,
-        rgba(0, 0, 0, 0.08),
-        rgba(0, 0, 0, 0.18) 38%,
-        rgba(0, 0, 0, 0.92)
-      );
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.18) 38%, rgba(0, 0, 0, 0.92));
     }
 
     .splash-content {
@@ -289,7 +273,6 @@
       box-shadow:
         0 14px 28px rgba(0, 0, 0, 0.18),
         inset 0 1px 0 rgba(255, 255, 255, 0.08);
-      animation: softIn 0.18s ease both;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
     }
@@ -364,25 +347,11 @@
       overflow: hidden;
     }
 
-    .premium-type::after {
-      content: "";
-      position: absolute;
-      inset: auto -10% -30% auto;
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,100,24,0.14), transparent 68%);
-      pointer-events: none;
-    }
-
     .premium-type.active {
       border-color: rgba(255,100,24,0.34);
       background:
         linear-gradient(180deg, rgba(255,100,24,0.12), rgba(255,255,255,0.03)),
         rgba(255,255,255,0.035);
-      box-shadow:
-        0 18px 30px rgba(0,0,0,0.18),
-        inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
     .premium-icon {
@@ -399,8 +368,8 @@
     }
 
     .premium-icon svg {
-      width: 24px;
-      height: 24px;
+      width: 26px;
+      height: 26px;
       display: block;
     }
 
@@ -512,37 +481,65 @@
       flex: 1;
     }
 
-    .input-wrap {
-      position: relative;
-    }
-
-    .input-wrap input {
-      padding-right: 38px;
-    }
-
+    .input-wrap,
     .input-shell {
       position: relative;
       width: 100%;
     }
 
-    .input-shell input {
-      padding-right: 64px;
+    .input-shell-labeled input {
+      min-height: 56px;
+      padding-top: 18px;
+      padding-bottom: 10px;
+      padding-left: 112px;
+      padding-right: 42px;
+      text-align: right;
+      caret-color: #fff;
     }
 
-    .input-sidehint {
+    .input-shell-labeled input[name="exercise"],
+    .input-shell-labeled input.exercise-input {
+      padding-left: 112px;
+      padding-right: 42px;
+    }
+
+    .input-label-left,
+    .input-label-right {
       position: absolute;
       top: 50%;
-      right: 14px;
       transform: translateY(-50%);
-      font-size: 13px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.34);
       pointer-events: none;
-      transition: opacity 0.16s ease;
+      z-index: 1;
+      white-space: nowrap;
+      transition: opacity 0.16s ease, color 0.16s ease;
     }
 
-    .input-shell.has-value .input-sidehint,
-    .input-shell.focused .input-sidehint {
+    .input-label-left {
+      left: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.52);
+      text-align: left;
+      max-width: 50%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .input-label-right {
+      right: 14px;
+      font-size: 15px;
+      font-weight: 760;
+      color: rgba(255,255,255,0.34);
+      text-align: right;
+      max-width: calc(100% - 132px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .input-shell.has-value .input-label-right,
+    .input-shell.focused .input-label-right,
+    .input-wrap.has-value .input-label-right,
+    .input-wrap.focused .input-label-right {
       opacity: 0;
     }
 
@@ -597,7 +594,6 @@
 
     .search-dropdown.open {
       display: block;
-      animation: softIn 0.12s ease both;
     }
 
     .search-option {
@@ -648,8 +644,6 @@
       align-items: center;
       justify-content: center;
       white-space: nowrap;
-      overflow: visible;
-      text-overflow: clip;
       line-height: 1;
     }
 
@@ -690,7 +684,6 @@
     .exercise {
       padding: 16px 0;
       border-bottom: 1px solid var(--line);
-      animation: itemIn 0.16s cubic-bezier(.2, .8, .2, 1) both;
     }
 
     .exercise:last-child {
@@ -743,7 +736,6 @@
       align-items: stretch;
       min-height: 54px;
       margin-bottom: 10px;
-      animation: itemIn 0.16s cubic-bezier(.2, .8, .2, 1) both;
       overflow: hidden;
     }
 
@@ -926,7 +918,6 @@
       min-height: 92px;
       margin-bottom: 8px;
       overflow: visible;
-      animation: itemIn 0.16s cubic-bezier(.2, .8, .2, 1) both;
     }
 
     .history-item {
@@ -1052,7 +1043,6 @@
 
     .modal.open {
       display: flex;
-      animation: fadeIn 0.14s ease both;
     }
 
     .sheet {
@@ -1065,7 +1055,6 @@
       border: 1px solid var(--line);
       border-radius: 24px 24px 0 0;
       padding: 18px 14px calc(28px + var(--safe-bottom));
-      animation: sheetIn 0.2s cubic-bezier(.2, .9, .2, 1) both;
     }
 
     .handle {
@@ -1081,12 +1070,7 @@
       bottom: -14px;
       padding-top: 12px;
       margin-top: 12px;
-      background: linear-gradient(
-        180deg,
-        transparent,
-        rgba(11, 11, 11, 0.95) 44%,
-        #0b0b0b 90%
-      );
+      background: linear-gradient(180deg, transparent, rgba(11, 11, 11, 0.95) 44%, #0b0b0b 90%);
       display: grid;
       gap: 8px;
     }
@@ -1141,26 +1125,6 @@
       overflow: hidden;
     }
 
-    .remove-anim {
-      opacity: 0 !important;
-      transform: translateX(18px) scale(0.96) !important;
-      max-height: 0 !important;
-      margin-top: 0 !important;
-      margin-bottom: 0 !important;
-      padding-top: 0 !important;
-      padding-bottom: 0 !important;
-      transition:
-        opacity 0.18s ease,
-        transform 0.18s ease,
-        max-height 0.2s ease,
-        margin 0.2s ease,
-        padding 0.2s ease;
-    }
-
-    .flash {
-      animation: flash 0.32s ease both;
-    }
-
     .global-timer-layer {
       position: absolute;
       top: 0;
@@ -1178,8 +1142,6 @@
       top: calc(12px + var(--safe-top));
       right: calc(12px + var(--safe-right));
       pointer-events: none;
-      user-select: none;
-      -webkit-user-select: none;
     }
 
     .timer-widget {
@@ -1191,16 +1153,12 @@
       border-radius: 17px;
       border: 1px solid rgba(255, 255, 255, 0.09);
       background: rgba(10, 10, 10, 0.28);
-      box-shadow:
-        0 10px 20px rgba(0, 0, 0, 0.14),
-        inset 0 1px 0 rgba(255, 255, 255, 0.03);
       color: rgba(255, 255, 255, 0.92);
       pointer-events: auto;
       touch-action: manipulation;
     }
 
-    .timer-idle,
-    .timer-live {
+    .timer-idle, .timer-live {
       display: flex;
       align-items: center;
       gap: 10px;
@@ -1244,12 +1202,6 @@
       flex: none;
     }
 
-    .timer-mark svg {
-      width: 9px;
-      height: 9px;
-      display: block;
-    }
-
     .timer-widget.running .timer-idle {
       display: none;
     }
@@ -1258,60 +1210,24 @@
       display: none;
     }
 
-    button:active,
-    .history-item:active,
-    .history-category:active,
-    .premium-type:active {
-      transform: scale(0.98);
-    }
-
-    .toast.show {
-      animation: toastIn 0.16s ease both;
-    }
-
     @keyframes load {
       0% { transform: translateX(-120%); }
       100% { transform: translateX(260%); }
     }
 
-    @keyframes softIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes panelSlide {
-      from { opacity: 0; transform: translateX(10px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    @keyframes itemIn {
-      from { opacity: 0; transform: translateY(6px) scale(0.99); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    @keyframes toastIn {
-      from { opacity: 0; transform: translate(-50%, 8px); }
-      to { opacity: 1; transform: translate(-50%, 0); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes sheetIn {
-      from { opacity: 0; transform: translateY(20px) scale(0.99); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    @keyframes flash {
-      0% { box-shadow: 0 0 0 rgba(255, 100, 24, 0); }
-      35% {
-        box-shadow:
-          0 0 0 2px rgba(255, 100, 24, 0.14),
-          0 12px 20px rgba(255, 100, 24, 0.08);
+    @media (max-width: 420px) {
+      .input-shell-labeled input {
+        padding-left: 96px;
       }
-      100% { box-shadow: 0 14px 28px rgba(0, 0, 0, 0.14); }
+
+      .input-label-left {
+        max-width: 42%;
+        font-size: 12px;
+      }
+
+      .input-label-right {
+        max-width: calc(100% - 118px);
+      }
     }
   </style>
 </head>
@@ -1365,13 +1281,20 @@
             <div class="section-title">Добавить подход</div>
             <div class="card">
               <div class="form-stack">
-                <div class="input-wrap" id="exerciseInputWrap">
+                <div class="input-wrap input-shell input-shell-labeled" id="exerciseInputWrap">
+                  <span class="input-label-left" id="exerciseLabelLeft">Упражнение</span>
+                  <span class="input-label-right" id="exerciseLabelRight"></span>
+
                   <input
                     id="exerciseInput"
-                    placeholder="Название упражнения"
+                    class="exercise-input"
+                    name="exercise"
+                    placeholder=""
                     autocomplete="off"
                     spellcheck="false"
+                    aria-label="Упражнение"
                   />
+
                   <button
                     id="exerciseClearBtn"
                     class="input-clear"
@@ -1382,18 +1305,21 @@
                       <path d="M7.76 7.76a1 1 0 0 1 1.41 0L12 10.59l2.83-2.83a1 1 0 1 1 1.41 1.41L13.41 12l2.83 2.83a1 1 0 1 1-1.41 1.41L12 13.41l-2.83 2.83a1 1 0 1 1-1.41-1.41L10.59 12 7.76 9.17a1 1 0 0 1 0-1.41Z"></path>
                     </svg>
                   </button>
+
                   <div class="search-dropdown" id="exerciseDropdown"></div>
                 </div>
 
                 <div class="form-numbers">
-                  <div class="input-shell" id="weightShell">
-                    <input id="weightInput" placeholder="Вес, кг" inputmode="decimal" />
-                    <span class="input-sidehint" id="weightHint"></span>
+                  <div class="input-shell input-shell-labeled" id="weightShell">
+                    <span class="input-label-left" id="weightLabelLeft">Вес, кг</span>
+                    <span class="input-label-right" id="weightHint"></span>
+                    <input id="weightInput" placeholder="" inputmode="decimal" aria-label="Вес, кг" />
                   </div>
 
-                  <div class="input-shell" id="repsShell">
-                    <input id="repsInput" placeholder="Повторы" inputmode="numeric" />
-                    <span class="input-sidehint" id="repsHint"></span>
+                  <div class="input-shell input-shell-labeled" id="repsShell">
+                    <span class="input-label-left" id="repsLabelLeft">Повторения</span>
+                    <span class="input-label-right" id="repsHint"></span>
+                    <input id="repsInput" placeholder="" inputmode="numeric" aria-label="Повторения" />
                   </div>
                 </div>
 
@@ -1448,11 +1374,7 @@
         </span>
         <span class="timer-live">
           <span class="timer-readout" id="timerReadout">00:00.00</span>
-          <span class="timer-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <rect x="7" y="7" width="10" height="10" rx="2"></rect>
-            </svg>
-          </span>
+          <span class="timer-mark" aria-hidden="true">■</span>
         </span>
       </button>
     </div>
@@ -1472,13 +1394,12 @@
       "use strict";
 
       const CONFIG = {
-        storageKey: "workouts_v11",
-        draftKey: "draft_workout_v11",
-        localDataKey: "trainer_data_v8",
-        cloudDataKey: "trainer_cloud_data_v8",
+        storageKey: "workouts_v12",
+        draftKey: "draft_workout_v12",
+        localDataKey: "trainer_data_v9",
+        cloudDataKey: "trainer_cloud_data_v9",
         splashDelay: 900,
         toastDelay: 2300,
-        persistDelay: 80,
         cloudSaveDebounce: 180,
         searchDebounce: 70,
         searchMaxResults: 20,
@@ -1491,14 +1412,14 @@
           label: "Грудь",
           sub: "Жимы, разводки, акцент на силу и форму",
           icon: `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 10h3"></path>
-              <path d="M18 10h3"></path>
-              <path d="M6 8v4"></path>
-              <path d="M18 8v4"></path>
-              <path d="M9 12V8"></path>
-              <path d="M15 12V8"></path>
-              <path d="M9 10h6"></path>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 10h2"></path>
+              <path d="M19 10h2"></path>
+              <path d="M5 8v4"></path>
+              <path d="M19 8v4"></path>
+              <rect x="7" y="9" width="10" height="2" rx="1"></rect>
+              <path d="M9 7v6"></path>
+              <path d="M15 7v6"></path>
             </svg>
           `
         },
@@ -1506,13 +1427,14 @@
           label: "Спина",
           sub: "Тяги, ширина, толщина и контроль спины",
           icon: `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 4a2 2 0 1 0 0 4a2 2 0 0 0 0-4Z"></path>
-              <path d="M8.5 20c0-2.5 1-4.5 3.5-5 2.5.5 3.5 2.5 3.5 5"></path>
-              <path d="M7 10l3 2"></path>
-              <path d="M17 10l-3 2"></path>
-              <path d="M10 12l-1.5 4"></path>
-              <path d="M14 12l1.5 4"></path>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="5.5" r="2"></circle>
+              <path d="M9.5 10c.6 1.2 1.4 1.8 2.5 1.8S13.9 11.2 14.5 10"></path>
+              <path d="M8.5 9.5c-.8 2.6-1 4.6-1 7.5"></path>
+              <path d="M15.5 9.5c.8 2.6 1 4.6 1 7.5"></path>
+              <path d="M10 12.5l-1.5 6"></path>
+              <path d="M14 12.5l1.5 6"></path>
+              <path d="M9 9c1 .9 2 1.3 3 1.3S14 9.9 15 9"></path>
             </svg>
           `
         },
@@ -1520,14 +1442,14 @@
           label: "Ноги",
           sub: "Присед, разгибания, бёдра и объём нижней части",
           icon: `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 4h6"></path>
-              <path d="M10 4v6l-2 3"></path>
-              <path d="M14 4v6l2 3"></path>
-              <path d="M8 13l1 7"></path>
-              <path d="M16 13l-1 7"></path>
-              <path d="M10 20h-2"></path>
-              <path d="M16 20h-2"></path>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10 4h4"></path>
+              <path d="M10.5 4v5l-2.2 3.2"></path>
+              <path d="M13.5 4v5l2.2 3.2"></path>
+              <path d="M8.3 12.2L9.4 20"></path>
+              <path d="M15.7 12.2L14.6 20"></path>
+              <path d="M8.8 20H6.7"></path>
+              <path d="M17.3 20h-2.1"></path>
             </svg>
           `
         },
@@ -1535,11 +1457,9 @@
           label: "Своя тренировка",
           sub: "Свободный формат без сравнительных шаблонов",
           icon: `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M12 5v14"></path>
               <path d="M5 12h14"></path>
-              <path d="M7 7l10 10"></path>
-              <path d="M17 7L7 17"></path>
             </svg>
           `
         }
@@ -1607,12 +1527,16 @@
         exerciseInput: document.getElementById("exerciseInput"),
         exerciseClearBtn: document.getElementById("exerciseClearBtn"),
         exerciseDropdown: document.getElementById("exerciseDropdown"),
+        exerciseLabelLeft: document.getElementById("exerciseLabelLeft"),
+        exerciseLabelRight: document.getElementById("exerciseLabelRight"),
         weightInput: document.getElementById("weightInput"),
         repsInput: document.getElementById("repsInput"),
         weightShell: document.getElementById("weightShell"),
         repsShell: document.getElementById("repsShell"),
         weightHint: document.getElementById("weightHint"),
         repsHint: document.getElementById("repsHint"),
+        weightLabelLeft: document.getElementById("weightLabelLeft"),
+        repsLabelLeft: document.getElementById("repsLabelLeft"),
         prefillSetBtn: document.getElementById("prefillSetBtn"),
         addSetBtn: document.getElementById("addSetBtn"),
         formHint: document.getElementById("formHint"),
@@ -1630,16 +1554,13 @@
         timerReadout: document.getElementById("timerReadout")
       };
 
-      let persistTimer = 0;
       let cloudSaveTimer = 0;
       let cloudPollTimer = 0;
       let cloudResumeTimer = 0;
       let timerViewportRaf = 0;
 
       function id() {
-        return crypto.randomUUID
-          ? crypto.randomUUID()
-          : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
       }
 
       function createDraft() {
@@ -1798,12 +1719,9 @@
       function toast(message) {
         text(el.toast, message);
         el.toast.style.display = "block";
-        el.toast.classList.remove("show");
-        requestAnimationFrame(() => el.toast.classList.add("show"));
         clearTimeout(toast.timer);
         toast.timer = setTimeout(() => {
           el.toast.style.display = "none";
-          el.toast.classList.remove("show");
         }, CONFIG.toastDelay);
       }
 
@@ -2118,14 +2036,11 @@
       }
 
       function updateMeta() {
-        text(
-          el.screenTitle,
-          {
-            today: "Трена",
-            history: "История",
-            progress: "Прогресс"
-          }[state.tab]
-        );
+        text(el.screenTitle, {
+          today: "Трена",
+          history: "История",
+          progress: "Прогресс"
+        }[state.tab]);
 
         if (state.tab === "today") {
           if (!isTrainingStarted()) {
@@ -2194,7 +2109,6 @@
 
       function renderTodayMode() {
         const started = isTrainingStarted();
-
         el.typeChooserBlock.style.display = started ? "none" : "block";
         el.trainingScreen.style.display = started ? "block" : "none";
 
@@ -2241,11 +2155,13 @@
         return template.exercise.sets[currentCount] || null;
       }
 
-      function updatePlaceholdersByExercise() {
+      function updateInputHints() {
         const name = el.exerciseInput.value.trim();
 
-        el.weightInput.placeholder = "Вес, кг";
-        el.repsInput.placeholder = "Повторы";
+        el.exerciseLabelLeft.textContent = "Упражнение";
+        el.exerciseLabelRight.textContent = "";
+        el.weightLabelLeft.textContent = "Вес, кг";
+        el.repsLabelLeft.textContent = "Повторения";
         el.weightHint.textContent = "";
         el.repsHint.textContent = "";
 
@@ -2259,7 +2175,7 @@
       }
 
       function syncShellStates() {
-        [el.weightShell, el.repsShell].forEach((shell) => {
+        [el.weightShell, el.repsShell, el.exerciseInputWrap].forEach((shell) => {
           const input = shell.querySelector("input");
           shell.classList.toggle("has-value", Boolean(input.value.trim()));
         });
@@ -2274,13 +2190,10 @@
         el.prefillSetBtn.disabled = !getPrefillSetForCurrentExercise(name);
 
         updateExerciseClear();
-        updatePlaceholdersByExercise();
+        updateInputHints();
         syncShellStates();
 
-        text(
-          el.formHint,
-          valid ? "Готово к добавлению" : "Выбери упражнение, вес и повторы"
-        );
+        text(el.formHint, valid ? "Готово к добавлению" : "Выбери упражнение, вес и повторы");
       }
 
       function escapeHtml(value) {
@@ -2453,7 +2366,7 @@
       function selectExerciseSuggestion(name) {
         el.exerciseInput.value = name;
         closeExerciseDropdown();
-        updatePlaceholdersByExercise();
+        updateInputHints();
         fillSetPrefillForCurrentExercise();
         updateForm();
         haptic();
@@ -2500,7 +2413,7 @@
 
         el.weightInput.value = "";
         el.repsInput.value = "";
-        updatePlaceholdersByExercise();
+        updateInputHints();
         hideKeyboard();
         haptic();
 
@@ -2509,9 +2422,6 @@
         updateForm();
         updateMainActions();
         syncMainButtons();
-
-        el.draftList.classList.remove("flash");
-        requestAnimationFrame(() => el.draftList.classList.add("flash"));
       }
 
       function describeSetDelta(currentSet, previousSet) {
@@ -2630,7 +2540,7 @@
 
             const del = make("button", "btn-card btn-danger icon-square", "×");
             del.type = "button";
-            del.onclick = () => animateRemove(row, () => deleteDraftSet(ex.id, set.id));
+            del.onclick = () => deleteDraftSet(ex.id, set.id);
 
             row.append(setCard, edit, del);
             box.appendChild(row);
@@ -3237,9 +3147,7 @@
           .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(";"))
           .join("\n");
 
-        const blob = new Blob(["\uFEFF" + csv], {
-          type: "text/csv;charset=utf-8"
-        });
+        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
         const url = URL.createObjectURL(blob);
 
         const a = document.createElement("a");
@@ -3405,15 +3313,6 @@
         hideKeyboard();
       }
 
-      function animateRemove(node, done) {
-        node.style.maxHeight = node.scrollHeight + "px";
-        node.style.overflow = "hidden";
-        requestAnimationFrame(() => node.classList.add("remove-anim"));
-        setTimeout(() => {
-          if (done) done();
-        }, 220);
-      }
-
       function formatStopwatch(ms) {
         const centiseconds = Math.floor(ms / 10) % 100;
         const totalSeconds = Math.floor(ms / 1000);
@@ -3517,21 +3416,19 @@
           }, 120);
         });
 
-        el.exerciseInput.addEventListener("change", () => {
-          updatePlaceholdersByExercise();
-          updateForm();
-        });
-
         el.weightInput.addEventListener("input", updateForm);
         el.repsInput.addEventListener("input", updateForm);
 
-        [el.weightInput, el.repsInput].forEach((input) => {
+        [
+          { input: el.exerciseInput, shell: el.exerciseInputWrap },
+          { input: el.weightInput, shell: el.weightShell },
+          { input: el.repsInput, shell: el.repsShell }
+        ].forEach(({ input, shell }) => {
           input.addEventListener("focus", () => {
-            const shell = input === el.weightInput ? el.weightShell : el.repsShell;
             shell.classList.add("focused");
           });
+
           input.addEventListener("blur", () => {
-            const shell = input === el.weightInput ? el.weightShell : el.repsShell;
             shell.classList.remove("focused");
             syncShellStates();
           });
