@@ -18,8 +18,10 @@
       --surface: rgba(255, 255, 255, 0.055);
       --field: #171717;
       --line: rgba(255, 255, 255, 0.09);
+      --line-strong: rgba(255, 255, 255, 0.14);
       --text: #fff;
       --muted: rgba(255, 255, 255, 0.58);
+      --muted-strong: rgba(255, 255, 255, 0.72);
       --accent: #ff6418;
       --accent-soft: rgba(255, 100, 24, 0.1);
       --accent-line: rgba(255, 100, 24, 0.24);
@@ -102,7 +104,7 @@
     }
 
     input::placeholder {
-      color: transparent;
+      color: rgba(255, 255, 255, 0.22);
     }
 
     input:focus, select:focus {
@@ -463,13 +465,13 @@
     .form-stack,
     .modal-form {
       display: grid;
-      gap: 9px;
+      gap: 10px;
     }
 
     .form-numbers {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 9px;
+      gap: 10px;
     }
 
     .row {
@@ -487,60 +489,69 @@
       width: 100%;
     }
 
-    .input-shell-labeled input {
-      min-height: 56px;
-      padding-top: 18px;
-      padding-bottom: 10px;
-      padding-left: 112px;
-      padding-right: 42px;
-      text-align: right;
-      caret-color: #fff;
+    .smart-field {
+      position: relative;
+      min-height: 58px;
     }
 
-    .input-shell-labeled input[name="exercise"],
-    .input-shell-labeled input.exercise-input {
-      padding-left: 112px;
-      padding-right: 42px;
+    .smart-field input {
+      min-height: 58px;
+      padding: 26px 14px 11px 14px;
+      background: #161616;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.02),
+        0 6px 16px rgba(0,0,0,0.08);
     }
 
-    .input-label-left,
-    .input-label-right {
+    .smart-field input:focus {
+      border-color: rgba(255, 100, 24, 0.76);
+      box-shadow:
+        0 0 0 3px rgba(255, 100, 24, 0.13),
+        inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .smart-field-label {
       position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      pointer-events: none;
-      z-index: 1;
-      white-space: nowrap;
-      transition: opacity 0.16s ease, color 0.16s ease;
-    }
-
-    .input-label-left {
+      top: 10px;
       left: 14px;
-      font-size: 13px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.52);
-      text-align: left;
-      max-width: 50%;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      z-index: 1;
+      font-size: 11px;
+      line-height: 1;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: rgba(255,255,255,0.46);
+      pointer-events: none;
+      white-space: nowrap;
     }
 
-    .input-label-right {
+    .smart-field-right {
+      position: absolute;
+      top: 10px;
       right: 14px;
-      font-size: 15px;
-      font-weight: 760;
+      z-index: 1;
+      font-size: 12px;
+      line-height: 1;
+      font-weight: 800;
       color: rgba(255,255,255,0.34);
+      pointer-events: none;
       text-align: right;
-      max-width: calc(100% - 132px);
-      overflow: hidden;
-      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .input-shell.has-value .input-label-right,
-    .input-shell.focused .input-label-right,
-    .input-wrap.has-value .input-label-right,
-    .input-wrap.focused .input-label-right {
-      opacity: 0;
+    .smart-field.has-value .smart-field-right,
+    .smart-field.focused .smart-field-right {
+      opacity: 0.22;
+    }
+
+    .smart-field input::placeholder {
+      color: rgba(255,255,255,0.22);
+    }
+
+    .smart-field.exercise-field input {
+      padding-right: 42px;
     }
 
     .input-clear {
@@ -578,7 +589,7 @@
 
     .search-dropdown {
       position: absolute;
-      top: calc(100% + 6px);
+      top: calc(100% + 8px);
       left: 0;
       right: 0;
       z-index: 30;
@@ -587,7 +598,7 @@
       overflow: auto;
       border-radius: 16px;
       background: #121212;
-      border: 1px solid var(--line);
+      border: 1px solid rgba(255,255,255,0.08);
       box-shadow: 0 18px 36px rgba(0, 0, 0, 0.32);
       overscroll-behavior: contain;
     }
@@ -598,7 +609,7 @@
 
     .search-option {
       width: 100%;
-      min-height: 54px;
+      min-height: 56px;
       border: 0;
       border-radius: 0;
       background: transparent;
@@ -617,6 +628,8 @@
     .search-main {
       font-size: 15px;
       font-weight: 760;
+      line-height: 1.2;
+      word-break: break-word;
     }
 
     .search-secondary {
@@ -624,6 +637,7 @@
       color: rgba(255,255,255,0.45);
       font-size: 12px;
       font-weight: 500;
+      line-height: 1.3;
     }
 
     .history-highlight {
@@ -982,12 +996,15 @@
         radial-gradient(circle at 90% 100%, rgba(255, 84, 0, 0.12), transparent 28%),
         linear-gradient(180deg, rgba(22, 22, 22, 0.96), rgba(10, 10, 10, 0.98));
       text-align: center;
+      margin-top: 14px;
+      display: grid;
+      gap: 6px;
     }
 
     .progress-empty-card-title {
       font-size: 16px;
       font-weight: 820;
-      margin-bottom: 6px;
+      margin-bottom: 2px;
     }
 
     .sync-pill {
@@ -1004,6 +1021,7 @@
       font-size: 12px;
       font-weight: 700;
       width: fit-content;
+      justify-self: center;
     }
 
     .sync-dot {
@@ -1216,17 +1234,16 @@
     }
 
     @media (max-width: 420px) {
-      .input-shell-labeled input {
-        padding-left: 96px;
+      .form-numbers {
+        grid-template-columns: 1fr;
       }
 
-      .input-label-left {
-        max-width: 42%;
-        font-size: 12px;
+      .smart-field-right {
+        font-size: 11px;
       }
 
-      .input-label-right {
-        max-width: calc(100% - 118px);
+      .set-values {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -1281,15 +1298,13 @@
             <div class="section-title">Добавить подход</div>
             <div class="card">
               <div class="form-stack">
-                <div class="input-wrap input-shell input-shell-labeled" id="exerciseInputWrap">
-                  <span class="input-label-left" id="exerciseLabelLeft">Упражнение</span>
-                  <span class="input-label-right" id="exerciseLabelRight"></span>
+                <div class="input-wrap smart-field exercise-field" id="exerciseInputWrap">
+                  <span class="smart-field-label" id="exerciseLabelLeft">Упражнение</span>
+                  <span class="smart-field-right" id="exerciseLabelRight"></span>
 
                   <input
                     id="exerciseInput"
-                    class="exercise-input"
-                    name="exercise"
-                    placeholder=""
+                    placeholder="Начни вводить название упражнения"
                     autocomplete="off"
                     spellcheck="false"
                     aria-label="Упражнение"
@@ -1310,16 +1325,16 @@
                 </div>
 
                 <div class="form-numbers">
-                  <div class="input-shell input-shell-labeled" id="weightShell">
-                    <span class="input-label-left" id="weightLabelLeft">Вес, кг</span>
-                    <span class="input-label-right" id="weightHint"></span>
-                    <input id="weightInput" placeholder="" inputmode="decimal" aria-label="Вес, кг" />
+                  <div class="input-shell smart-field" id="weightShell">
+                    <span class="smart-field-label">Вес, кг</span>
+                    <span class="smart-field-right" id="weightHint"></span>
+                    <input id="weightInput" placeholder="Введи вес" inputmode="decimal" aria-label="Вес, кг" />
                   </div>
 
-                  <div class="input-shell input-shell-labeled" id="repsShell">
-                    <span class="input-label-left" id="repsLabelLeft">Повторения</span>
-                    <span class="input-label-right" id="repsHint"></span>
-                    <input id="repsInput" placeholder="" inputmode="numeric" aria-label="Повторения" />
+                  <div class="input-shell smart-field" id="repsShell">
+                    <span class="smart-field-label">Повторения</span>
+                    <span class="smart-field-right" id="repsHint"></span>
+                    <input id="repsInput" placeholder="Введи количество повторений" inputmode="numeric" aria-label="Повторения" />
                   </div>
                 </div>
 
@@ -1394,10 +1409,10 @@
       "use strict";
 
       const CONFIG = {
-        storageKey: "workouts_v12",
-        draftKey: "draft_workout_v12",
-        localDataKey: "trainer_data_v9",
-        cloudDataKey: "trainer_cloud_data_v9",
+        storageKey: "workouts_v14",
+        draftKey: "draft_workout_v14",
+        localDataKey: "trainer_data_v14",
+        cloudDataKey: "trainer_cloud_data_v14",
         splashDelay: 900,
         toastDelay: 2300,
         cloudSaveDebounce: 180,
@@ -1468,7 +1483,6 @@
       const MAIN_TYPES = ["chest", "back", "legs"];
       const HISTORY_TYPE_ORDER = ["chest", "back", "legs", "custom"];
       const tabOrder = ["today", "history", "progress"];
-
       const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
       const state = {
@@ -1535,8 +1549,6 @@
         repsShell: document.getElementById("repsShell"),
         weightHint: document.getElementById("weightHint"),
         repsHint: document.getElementById("repsHint"),
-        weightLabelLeft: document.getElementById("weightLabelLeft"),
-        repsLabelLeft: document.getElementById("repsLabelLeft"),
         prefillSetBtn: document.getElementById("prefillSetBtn"),
         addSetBtn: document.getElementById("addSetBtn"),
         formHint: document.getElementById("formHint"),
@@ -1821,11 +1833,8 @@
 
         state.cloud.saveInFlight = false;
 
-        if (ok) {
-          markSyncStatus("synced");
-        } else {
-          markSyncStatus("failed");
-        }
+        if (ok) markSyncStatus("synced");
+        else markSyncStatus("failed");
 
         if (state.cloud.pendingSave) {
           state.cloud.pendingSave = false;
@@ -2155,17 +2164,16 @@
         return template.exercise.sets[currentCount] || null;
       }
 
-      function updateInputHints() {
+      function updateFieldHints() {
         const name = el.exerciseInput.value.trim();
 
         el.exerciseLabelLeft.textContent = "Упражнение";
         el.exerciseLabelRight.textContent = "";
-        el.weightLabelLeft.textContent = "Вес, кг";
-        el.repsLabelLeft.textContent = "Повторения";
         el.weightHint.textContent = "";
         el.repsHint.textContent = "";
 
-        if (!name || !isComparableType(state.draft.trainingType)) return;
+        if (!name) return;
+        if (!isComparableType(state.draft.trainingType)) return;
 
         const prefill = getPrefillSetForCurrentExercise(name);
         if (!prefill) return;
@@ -2175,9 +2183,9 @@
       }
 
       function syncShellStates() {
-        [el.weightShell, el.repsShell, el.exerciseInputWrap].forEach((shell) => {
+        [el.exerciseInputWrap, el.weightShell, el.repsShell].forEach((shell) => {
           const input = shell.querySelector("input");
-          shell.classList.toggle("has-value", Boolean(input.value.trim()));
+          shell.classList.toggle("has-value", Boolean(input && input.value.trim()));
         });
       }
 
@@ -2190,10 +2198,20 @@
         el.prefillSetBtn.disabled = !getPrefillSetForCurrentExercise(name);
 
         updateExerciseClear();
-        updateInputHints();
+        updateFieldHints();
         syncShellStates();
 
-        text(el.formHint, valid ? "Готово к добавлению" : "Выбери упражнение, вес и повторы");
+        if (!name) {
+          text(el.formHint, "Сначала выбери упражнение");
+          return;
+        }
+
+        if (!parsed) {
+          text(el.formHint, "Введи вес и количество повторений");
+          return;
+        }
+
+        text(el.formHint, "Готово к добавлению");
       }
 
       function escapeHtml(value) {
@@ -2231,11 +2249,8 @@
         const merged = [];
         for (const range of ranges) {
           const last = merged[merged.length - 1];
-          if (!last || range[0] > last[1]) {
-            merged.push(range.slice());
-          } else {
-            last[1] = Math.max(last[1], range[1]);
-          }
+          if (!last || range[0] > last[1]) merged.push(range.slice());
+          else last[1] = Math.max(last[1], range[1]);
         }
 
         let result = "";
@@ -2309,7 +2324,7 @@
         state.search.results = nextResults;
         el.exerciseDropdown.replaceChildren();
 
-        if (!document.activeElement || document.activeElement !== el.exerciseInput) {
+        if (document.activeElement !== el.exerciseInput) {
           closeExerciseDropdown();
           return;
         }
@@ -2357,8 +2372,8 @@
         const prefill = getPrefillSetForCurrentExercise(exerciseName);
         if (!prefill) return false;
 
-        el.weightInput.value = prefill.weight;
-        el.repsInput.value = prefill.reps;
+        el.weightInput.value = String(prefill.weight);
+        el.repsInput.value = String(prefill.reps);
         updateForm();
         return true;
       }
@@ -2366,7 +2381,7 @@
       function selectExerciseSuggestion(name) {
         el.exerciseInput.value = name;
         closeExerciseDropdown();
-        updateInputHints();
+        updateFieldHints();
         fillSetPrefillForCurrentExercise();
         updateForm();
         haptic();
@@ -2384,10 +2399,7 @@
         const clean = String(name || "").trim();
         if (!clean) return;
         const key = exerciseKey(clean);
-        if (!state.exerciseCatalog.namesByKey.has(key)) {
-          state.exerciseCatalog.namesByKey.set(key, clean);
-          rebuildIndexes();
-        }
+        if (!state.exerciseCatalog.namesByKey.has(key)) rebuildIndexes();
       }
 
       function getOrCreateDraftExercise(name) {
@@ -2413,10 +2425,11 @@
 
         el.weightInput.value = "";
         el.repsInput.value = "";
-        updateInputHints();
+        updateFieldHints();
         hideKeyboard();
         haptic();
 
+        rebuildIndexes();
         persistCritical();
         renderDraft();
         updateForm();
@@ -2561,6 +2574,7 @@
           state.draft.exercises = state.draft.exercises.filter((item) => item.id !== exId);
         }
 
+        rebuildIndexes();
         haptic("medium");
         persistCritical();
         renderDraft();
@@ -2588,14 +2602,14 @@
         const nums = make("div", "form-numbers");
 
         const weight = document.createElement("input");
-        weight.value = set.weight;
+        weight.value = String(set.weight);
         weight.inputMode = "decimal";
         weight.placeholder = "Вес, кг";
 
         const reps = document.createElement("input");
-        reps.value = set.reps;
+        reps.value = String(set.reps);
         reps.inputMode = "numeric";
-        reps.placeholder = "Повторы";
+        reps.placeholder = "Повторения";
 
         nums.append(weight, reps);
 
@@ -2711,6 +2725,7 @@
         el.repsInput.value = "";
 
         haptic();
+        rebuildIndexes();
         persistCritical();
         renderAll();
         syncMainButtons();
@@ -2731,6 +2746,7 @@
         el.repsInput.value = "";
         closeExerciseDropdown();
 
+        rebuildIndexes();
         persistCritical();
         renderAll();
         syncMainButtons();
@@ -2935,7 +2951,7 @@
         const actions = make("div", "sheet-actions");
         const edit = make("button", "btn-card btn-accent", "Редактировать");
         edit.type = "button";
-        edit.onclick = () => openEditWorkout(workoutId);
+        edit.onclick = () => openEditWorkout(workout.id);
         actions.append(edit);
         el.modalBody.appendChild(actions);
       }
@@ -2953,7 +2969,7 @@
         const reps = make("input", "");
         reps.value = repsValue;
         reps.inputMode = "numeric";
-        reps.placeholder = "Повторы";
+        reps.placeholder = "Повторения";
         reps.dataset.kind = "reps";
 
         nums.append(weight, reps);
@@ -3382,13 +3398,8 @@
             const nextTab = tab.dataset.tab;
             if (state.tab === nextTab) return;
 
-            if (state.tab === "history" && nextTab !== "history") {
-              resetHistorySelection();
-            }
-
-            if (nextTab === "history") {
-              resetHistorySelection();
-            }
+            if (state.tab === "history" && nextTab !== "history") resetHistorySelection();
+            if (nextTab === "history") resetHistorySelection();
 
             state.tab = nextTab;
             haptic();
@@ -3406,10 +3417,14 @@
         });
 
         el.exerciseInput.addEventListener("focus", () => {
+          el.exerciseInputWrap.classList.add("focused");
           renderExerciseSearchResults(true);
         });
 
         el.exerciseInput.addEventListener("blur", () => {
+          el.exerciseInputWrap.classList.remove("focused");
+          syncShellStates();
+
           setTimeout(() => {
             if (document.activeElement && el.exerciseDropdown.contains(document.activeElement)) return;
             closeExerciseDropdown();
@@ -3420,7 +3435,6 @@
         el.repsInput.addEventListener("input", updateForm);
 
         [
-          { input: el.exerciseInput, shell: el.exerciseInputWrap },
           { input: el.weightInput, shell: el.weightShell },
           { input: el.repsInput, shell: el.repsShell }
         ].forEach(({ input, shell }) => {
@@ -3473,9 +3487,7 @@
         });
 
         document.addEventListener("click", (event) => {
-          if (!el.exerciseInputWrap.contains(event.target)) {
-            closeExerciseDropdown();
-          }
+          if (!el.exerciseInputWrap.contains(event.target)) closeExerciseDropdown();
         });
 
         el.timerToggleBtn.addEventListener("click", toggleTimer);
