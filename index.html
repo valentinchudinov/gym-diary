@@ -26,6 +26,9 @@
       --accent: #ff6418;
       --accent-soft: rgba(255, 100, 24, 0.1);
       --accent-line: rgba(255, 100, 24, 0.24);
+      --success: #3ddc84;
+      --success-soft: rgba(61, 220, 132, 0.12);
+      --success-line: rgba(61, 220, 132, 0.28);
       --danger-soft: rgba(255, 70, 70, 0.12);
       --danger-line: rgba(255, 90, 90, 0.28);
       --danger-text: #ff8a8a;
@@ -45,7 +48,10 @@
     body {
       position: relative;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
-      background: var(--bg-solid);
+      background:
+        radial-gradient(circle at top right, rgba(255, 100, 24, 0.12), transparent 28%),
+        radial-gradient(circle at top left, rgba(255, 100, 24, 0.05), transparent 22%),
+        var(--bg-solid);
       color: var(--text);
       padding: max(14px, var(--safe-top)) 14px calc(28px + var(--safe-bottom));
       font-size: 15px;
@@ -325,17 +331,9 @@
       box-sizing: border-box;
     }
 
-    .tabs[data-active="0"] {
-      --tab-index: 0;
-    }
-
-    .tabs[data-active="1"] {
-      --tab-index: 1;
-    }
-
-    .tabs[data-active="2"] {
-      --tab-index: 2;
-    }
+    .tabs[data-active="0"] { --tab-index: 0; }
+    .tabs[data-active="1"] { --tab-index: 1; }
+    .tabs[data-active="2"] { --tab-index: 2; }
 
     .tab {
       position: relative;
@@ -373,10 +371,6 @@
 
     .row > * {
       flex: 1;
-    }
-
-    #formHint {
-      text-align: center;
     }
 
     .input-wrap {
@@ -422,14 +416,6 @@
       width: 14px;
       height: 14px;
       display: block;
-    }
-
-    .input-clear:hover {
-      color: rgba(255, 255, 255, 0.84);
-    }
-
-    .input-clear:active {
-      transform: translateY(-50%) scale(0.9);
     }
 
     .search-dropdown {
@@ -505,6 +491,12 @@
       border-color: var(--accent-line);
     }
 
+    .btn-success {
+      color: var(--success);
+      background: var(--success-soft);
+      border-color: var(--success-line);
+    }
+
     .btn-danger {
       color: var(--danger-text);
       background: var(--danger-soft);
@@ -518,6 +510,106 @@
       padding: 0;
       font-size: 18px;
       flex-shrink: 0;
+    }
+
+    .type-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .type-btn {
+      min-height: 72px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--line);
+      color: #fff;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 0 16px;
+      text-align: left;
+      box-shadow: none;
+    }
+
+    .type-btn.active {
+      background: var(--accent-soft);
+      border-color: var(--accent-line);
+      color: var(--accent);
+    }
+
+    .type-btn.custom {
+      grid-column: 1 / -1;
+    }
+
+    .pill-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(255, 100, 24, 0.12);
+      border: 1px solid rgba(255, 100, 24, 0.22);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 760;
+    }
+
+    .link-btn {
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--line);
+      box-shadow: none;
+      color: rgba(255,255,255,0.86);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .template-box {
+      display: none;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      margin-top: 2px;
+    }
+
+    .template-box.show {
+      display: grid;
+      animation: softIn 0.16s ease both;
+    }
+
+    .template-title {
+      color: rgba(255,255,255,0.5);
+      font-size: 12px;
+      font-weight: 760;
+    }
+
+    .template-sub {
+      color: rgba(255,255,255,0.35);
+      font-size: 11px;
+    }
+
+    .template-lines {
+      display: grid;
+      gap: 4px;
+    }
+
+    .template-line {
+      color: rgba(255,255,255,0.5);
+      font-size: 14px;
+      font-weight: 700;
     }
 
     #repeatSetBtn,
@@ -561,13 +653,34 @@
       display: flex;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
+      align-items: flex-start;
     }
 
     .exercise-name {
       font-size: 16px;
       font-weight: 800;
       overflow-wrap: anywhere;
+    }
+
+    .exercise-sub {
+      margin-top: 4px;
+      color: rgba(255,255,255,0.42);
+      font-size: 12px;
+    }
+
+    .exercise-template-inline {
+      display: grid;
+      gap: 4px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .exercise-template-inline .template-line {
+      font-size: 13px;
     }
 
     .set-row {
@@ -578,6 +691,13 @@
       min-height: 46px;
       animation: itemIn 0.16s cubic-bezier(.2, .8, .2, 1) both;
       overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .set-content {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
     }
 
     .set-value {
@@ -592,75 +712,71 @@
       font-weight: 700;
     }
 
-    #draftList .set-row {
-      grid-template-columns: 1fr 58px 58px;
-      align-items: stretch;
-      min-height: 54px;
-      margin-bottom: 9px;
+    .progress-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--success-soft);
+      border: 1px solid var(--success-line);
+      color: var(--success);
+      font-size: 12px;
+      font-weight: 760;
     }
 
-    .history-controls {
+    .progress-chip.muted {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.55);
+    }
+
+    .history-categories {
       display: grid;
       gap: 10px;
-      margin-bottom: 12px;
     }
 
-    .history-summary {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
+    .history-category {
+      width: 100%;
+      min-height: 92px;
+      text-align: left;
+      display: block;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
+        rgba(255, 255, 255, 0.025);
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      box-shadow: none;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .history-category.custom {
+      margin-top: 8px;
+      border-color: rgba(255,100,24,0.16);
+    }
+
+    .history-category-title {
+      font-weight: 820;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .history-category-sub {
       color: var(--muted);
       font-size: 13px;
-      padding: 0 2px;
+      line-height: 1.35;
     }
 
-    .history-search-wrap {
-      position: relative;
-    }
-
-    .history-viewport {
-      position: relative;
-      min-height: 320px;
-      height: min(68vh, 780px);
-      overflow-y: auto;
-      overflow-x: hidden;
-      overscroll-behavior: contain;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      background: transparent;
-    }
-
-    .history-viewport::-webkit-scrollbar {
-      display: none;
-    }
-
-    .history-spacer {
-      height: 0;
-      pointer-events: none;
-    }
-
-    .history-recycle-layer {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      pointer-events: none;
-    }
-
-    .history-recycle-item {
-      position: absolute;
-      left: 0;
-      width: 100%;
-      pointer-events: auto;
-      will-change: transform;
-    }
-
-    .history-month-title {
-      margin: 22px 2px 16px;
-      font-size: 15px;
-      font-weight: 850;
-      color: rgba(255, 255, 255, 0.78);
-      animation: itemIn 0.16s cubic-bezier(.2, .8, .2, 1) both;
+    .history-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
     }
 
     .history-row {
@@ -746,157 +862,6 @@
       margin-top: 12px;
     }
 
-    .progress-hero {
-      position: relative;
-      overflow: hidden;
-      border-radius: 28px;
-      padding: 18px 16px 16px;
-      min-height: 438px;
-      background:
-        radial-gradient(circle at 95% 100%, rgba(255, 84, 0, 0.18), transparent 30%),
-        radial-gradient(circle at 30% -10%, rgba(255, 84, 0, 0.06), transparent 40%),
-        linear-gradient(180deg, rgba(22, 22, 22, 0.96), rgba(10, 10, 10, 0.98));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow:
-        0 18px 40px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.03);
-    }
-
-    .progress-kicker {
-      position: relative;
-      z-index: 1;
-      font-size: 12px;
-      line-height: 1;
-      letter-spacing: 0.11em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.88);
-      font-weight: 820;
-    }
-
-    .progress-big {
-      position: relative;
-      z-index: 1;
-      margin-top: 12px;
-      font-size: clamp(42px, 12vw, 64px);
-      line-height: 0.95;
-      letter-spacing: -0.045em;
-      font-weight: 860;
-      color: #fff;
-      text-wrap: balance;
-    }
-
-    .progress-focus {
-      position: relative;
-      z-index: 1;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 12px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .progress-focus-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-      flex: none;
-    }
-
-    .progress-focus-text {
-      font-size: 12px;
-      font-weight: 760;
-      color: rgba(255, 255, 255, 0.92);
-      letter-spacing: 0.01em;
-    }
-
-    .progress-sub {
-      position: relative;
-      z-index: 1;
-      margin-top: 10px;
-      color: rgba(255, 255, 255, 0.62);
-      font-size: 13px;
-      line-height: 1.35;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .progress-hint {
-      position: relative;
-      z-index: 1;
-      margin-top: 8px;
-      color: rgba(255, 255, 255, 0.44);
-      font-size: 12px;
-      line-height: 1.35;
-    }
-
-    .progress-chart {
-      position: relative;
-      z-index: 1;
-      margin-top: 12px;
-      margin-bottom: 0;
-      padding-bottom: 0;
-      overflow: hidden;
-      touch-action: manipulation;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    .progress-chart svg {
-      width: 100%;
-      height: auto;
-      display: block;
-      overflow: hidden;
-    }
-
-    .progress-range {
-      position: relative;
-      z-index: 1;
-      margin-top: 6px;
-      text-align: center;
-      font-size: 12px;
-      line-height: 1.3;
-      color: rgba(255, 255, 255, 0.46);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .progress-mini-stats {
-      position: relative;
-      z-index: 2;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 18px;
-    }
-
-    .progress-mini-stat {
-      min-width: 0;
-      padding: 10px 10px 11px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.035);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-    }
-
-    .progress-mini-value {
-      font-size: 16px;
-      font-weight: 820;
-      color: #fff;
-      line-height: 1.1;
-      overflow-wrap: anywhere;
-    }
-
-    .progress-mini-label {
-      margin-top: 5px;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.52);
-    }
-
     .progress-empty-card {
       border-radius: 22px;
       padding: 24px 16px;
@@ -973,6 +938,8 @@
         rgba(11, 11, 11, 0.95) 44%,
         #0b0b0b 90%
       );
+      display: grid;
+      gap: 8px;
     }
 
     .sheet-actions > .btn-card {
@@ -1086,10 +1053,6 @@
         opacity 0.18s ease;
     }
 
-    .timer-widget:active {
-      transform: scale(0.97);
-    }
-
     .timer-idle,
     .timer-live {
       display: flex;
@@ -1157,7 +1120,8 @@
     }
 
     button:active,
-    .history-item:active {
+    .history-item:active,
+    .history-category:active {
       transform: scale(0.975);
     }
 
@@ -1166,18 +1130,9 @@
     }
 
     .lite .card,
-    .lite .progress-mini-stat,
     .lite .timer-widget,
     .lite .tabs-shell {
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
-    }
-
-    .lite .progress-hero::after {
-      display: none;
-    }
-
-    .lite .splash-img {
-      filter: none;
     }
 
     .lite * {
@@ -1296,6 +1251,25 @@
     <main>
       <section class="panel active" id="todayPanel">
         <section class="section">
+          <div class="section-title">Тип тренировки</div>
+          <div class="card">
+            <div class="type-grid" id="typeGrid">
+              <button class="type-btn" type="button" data-type="chest">Грудь</button>
+              <button class="type-btn" type="button" data-type="back">Спина</button>
+              <button class="type-btn" type="button" data-type="legs">Ноги</button>
+              <button class="type-btn custom" type="button" data-type="custom">Своя тренировка</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="pill-row">
+            <div class="pill" id="currentTypePill">Тип не выбран</div>
+            <button class="link-btn" id="changeTypeBtn" type="button" disabled>Сменить тип</button>
+          </div>
+        </section>
+
+        <section class="section">
           <div class="section-title">Добавить подход</div>
           <div class="card">
             <div class="form-stack">
@@ -1305,6 +1279,7 @@
                   placeholder="Упражнение"
                   autocomplete="off"
                   spellcheck="false"
+                  disabled
                 />
                 <button
                   id="exerciseClearBtn"
@@ -1319,9 +1294,15 @@
                 <div class="search-dropdown" id="exerciseDropdown"></div>
               </div>
 
+              <div class="template-box" id="templateBox">
+                <div class="template-title">Прошлый раз</div>
+                <div class="template-sub" id="templateSub"></div>
+                <div class="template-lines" id="templateLines"></div>
+              </div>
+
               <div class="form-numbers">
-                <input id="weightInput" placeholder="кг" inputmode="decimal" />
-                <input id="repsInput" placeholder="Повторений" inputmode="numeric" />
+                <input id="weightInput" placeholder="кг" inputmode="decimal" disabled />
+                <input id="repsInput" placeholder="раз" inputmode="numeric" disabled />
               </div>
 
               <div class="row">
@@ -1329,7 +1310,7 @@
                 <button id="addSetBtn" type="button" disabled>Добавить</button>
               </div>
 
-              <div class="muted" id="formHint">Выбери упражнение, вес и повторы</div>
+              <div class="muted" id="formHint">Сначала выбери тип тренировки</div>
             </div>
           </div>
         </section>
@@ -1344,17 +1325,6 @@
       </section>
 
       <section class="panel" id="historyPanel">
-        <div class="card">
-          <div class="history-controls">
-            <div class="history-search-wrap">
-              <input id="historySearchInput" placeholder="Поиск по дате, упражнению, объёму..." autocomplete="off" spellcheck="false" />
-            </div>
-            <div class="history-summary">
-              <span id="historySummaryLeft">0 тренировок</span>
-              <span id="historySummaryRight">0 показано</span>
-            </div>
-          </div>
-        </div>
         <div id="historyList"></div>
       </section>
 
@@ -1423,25 +1393,28 @@
       "use strict";
 
       const CONFIG = {
-        storageKey: "workouts_v6",
-        draftKey: "draft_workout_v6",
-        localDataKey: "trainer_data_v3",
-        cloudDataKey: "trainer_cloud_data_v3",
-        legacyStorageKey: "workouts_v5",
-        legacyDraftKey: "draft_workout_v5",
-        legacyLocalDataKey: "trainer_data_v2",
-        splashDelay: 1400,
-        toastDelay: 2200,
+        storageKey: "workouts_v7",
+        draftKey: "draft_workout_v7",
+        localDataKey: "trainer_data_v4",
+        cloudDataKey: "trainer_cloud_data_v4",
+        splashDelay: 1200,
+        toastDelay: 2400,
         persistDelay: 250,
         searchDebounce: 70,
         searchMaxResults: 12,
-        historyRowHeight: 100,
-        historyMonthHeight: 52,
-        historyOverscanPx: 900,
-        historyPoolExtra: 12,
         cloudPollInterval: 12000,
         cloudResumeDebounce: 1200
       };
+
+      const TRAINING_TYPES = {
+        chest: "Грудь",
+        back: "Спина",
+        legs: "Ноги",
+        custom: "Своя тренировка"
+      };
+
+      const MAIN_TYPES = ["chest", "back", "legs"];
+      const HISTORY_TYPE_ORDER = ["chest", "back", "legs", "custom"];
 
       const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
@@ -1464,7 +1437,6 @@
           namesByKey: new Map(),
           searchIndex: []
         },
-        historyIndex: new Map(),
         progressMetric: "weight",
         progressSelection: {
           exercise: "",
@@ -1483,17 +1455,7 @@
           lastLoadedAt: 0,
           lastSavedAt: 0,
           polling: false,
-          syncInFlight: false,
-          lastSeenUpdatedAt: 0,
-          lastAppliedUpdatedAt: 0,
-          lastPullAt: 0
-        },
-        cache: {
-          statsByWorkoutId: new Map(),
-          historyMetaByWorkoutId: new Map(),
-          historyOrderedIds: [],
-          progressByExercise: new Map(),
-          lastCompletedSetByExercise: new Map()
+          syncInFlight: false
         },
         search: {
           exerciseQuery: "",
@@ -1502,18 +1464,7 @@
           debounceTimer: 0
         },
         historyUi: {
-          query: "",
-          queryTokens: [],
-          filteredIds: [],
-          virtualItems: [],
-          viewportHeight: 0,
-          scrollTop: 0,
-          lastRangeKey: "",
-          viewportEl: null,
-          spacerEl: null,
-          layerEl: null,
-          pool: [],
-          poolSize: 0
+          activeType: ""
         }
       };
 
@@ -1525,6 +1476,9 @@
         screenMeta: document.getElementById("screenMeta"),
         tabsNav: document.getElementById("tabsNav"),
         tabs: [...document.querySelectorAll(".tab")],
+        typeButtons: [...document.querySelectorAll(".type-btn")],
+        currentTypePill: document.getElementById("currentTypePill"),
+        changeTypeBtn: document.getElementById("changeTypeBtn"),
         panels: {
           today: document.getElementById("todayPanel"),
           history: document.getElementById("historyPanel"),
@@ -1534,6 +1488,9 @@
         exerciseInput: document.getElementById("exerciseInput"),
         exerciseClearBtn: document.getElementById("exerciseClearBtn"),
         exerciseDropdown: document.getElementById("exerciseDropdown"),
+        templateBox: document.getElementById("templateBox"),
+        templateSub: document.getElementById("templateSub"),
+        templateLines: document.getElementById("templateLines"),
         weightInput: document.getElementById("weightInput"),
         repsInput: document.getElementById("repsInput"),
         addSetBtn: document.getElementById("addSetBtn"),
@@ -1542,9 +1499,6 @@
         draftList: document.getElementById("draftList"),
         fallbackFinishBtn: document.getElementById("fallbackFinishBtn"),
         historyList: document.getElementById("historyList"),
-        historySearchInput: document.getElementById("historySearchInput"),
-        historySummaryLeft: document.getElementById("historySummaryLeft"),
-        historySummaryRight: document.getElementById("historySummaryRight"),
         progressSelect: document.getElementById("progressSelect"),
         progressResult: document.getElementById("progressResult"),
         progressMetricBtns: [...document.querySelectorAll(".progress-mode-btn")],
@@ -1557,12 +1511,10 @@
       };
 
       let timerViewportRaf = 0;
-      let timerResizeObserver = null;
       let persistTimer = 0;
       let cloudSaveTimer = 0;
       let cloudPollTimer = 0;
       let cloudResumeTimer = 0;
-      let historyViewportResizeObserver = null;
 
       function id() {
         return crypto.randomUUID
@@ -1574,7 +1526,10 @@
         return {
           id: id(),
           status: "draft",
+          trainingType: "",
           createdAt: new Date().toISOString(),
+          performedAt: new Date().toISOString(),
+          syncStatus: "pending",
           exercises: []
         };
       }
@@ -1590,15 +1545,15 @@
         return node;
       }
 
-      function sameName(a, b) {
-        return normalizeName(a) === normalizeName(b);
-      }
-
       function normalizeName(value) {
         return String(value || "")
           .trim()
           .toLowerCase()
           .replace(/ё/g, "е");
+      }
+
+      function sameName(a, b) {
+        return normalizeName(a) === normalizeName(b);
       }
 
       function exerciseKey(value) {
@@ -1619,12 +1574,6 @@
         return normalized ? normalized.split(" ") : [];
       }
 
-      function getWorkoutTimestamp(workout) {
-        const raw = workout.finishedAt || workout.createdAt || 0;
-        const ts = new Date(raw).getTime();
-        return Number.isFinite(ts) ? ts : 0;
-      }
-
       function normalizeNumber(value) {
         return Number(String(value).trim().replace(",", "."));
       }
@@ -1633,36 +1582,6 @@
         const rounded = Math.round(Number(value) * 10) / 10;
         if (Number.isInteger(rounded)) return String(rounded);
         return String(rounded).replace(".", ",");
-      }
-
-      function formatMetricValue(value, metric) {
-        if (metric === "volume") return `${Math.round(value)} кг`;
-        if (metric === "reps") return `${Math.round(value)} повт.`;
-        return `${trimNumber(value)} кг`;
-      }
-
-      function formatDeltaValue(value, metric) {
-        if (Math.abs(value) < 0.0001) return "0";
-        const sign = value > 0 ? "+" : "−";
-        return `${sign}${formatMetricValue(Math.abs(value), metric)}`;
-      }
-
-      function escapeSvgText(value) {
-        return String(value)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#39;");
-      }
-
-      function escapeHtml(value) {
-        return String(value)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#39;");
       }
 
       function parseSetInput(weightValue, repsValue) {
@@ -1701,6 +1620,29 @@
         }
       }
 
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function getTypeLabel(type) {
+        return TRAINING_TYPES[type] || "Без типа";
+      }
+
+      function isComparableType(type) {
+        return MAIN_TYPES.includes(type);
+      }
+
+      function getWorkoutTimestamp(workout) {
+        const raw = workout.finishedAt || workout.performedAt || workout.createdAt || 0;
+        const ts = new Date(raw).getTime();
+        return Number.isFinite(ts) ? ts : 0;
+      }
+
       function getStats(workout) {
         const exercises = workout.exercises.length;
         const sets = workout.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
@@ -1711,20 +1653,16 @@
         return { exercises, sets, volume };
       }
 
-      function isValidDraft(value) {
-        return value && value.status === "draft" && Array.isArray(value.exercises);
-      }
-
-      function capitalize(value) {
-        return String(value || "").replace(/^./, (ch) => ch.toUpperCase());
-      }
-
       function sanitizeWorkout(workout) {
         return {
           id: workout.id || id(),
+          userId: workout.userId || "",
+          trainingType: workout.trainingType || "",
           status: workout.status || "completed",
           createdAt: workout.createdAt || new Date().toISOString(),
           finishedAt: workout.finishedAt,
+          performedAt: workout.performedAt || workout.finishedAt || workout.createdAt || new Date().toISOString(),
+          syncStatus: workout.syncStatus || "pending",
           exercises: (workout.exercises || [])
             .filter((ex) => ex && ex.name && Array.isArray(ex.sets))
             .map((ex) => ({
@@ -1746,6 +1684,10 @@
             }))
             .filter((ex) => ex.name && ex.sets.length)
         };
+      }
+
+      function isValidDraft(value) {
+        return value && value.status === "draft" && Array.isArray(value.exercises);
       }
 
       function toast(message) {
@@ -1797,20 +1739,11 @@
         };
       }
 
-      function getLocalSnapshotForCompare() {
-        const localSnapshot = safeJsonParse(safeStorageGet(CONFIG.localDataKey), null);
-        if (localSnapshot && Array.isArray(localSnapshot.workouts) && localSnapshot.draft) {
-          return localSnapshot;
-        }
-        return buildSnapshot();
-      }
-
       function persistNowLocal() {
         const snapshot = buildSnapshot();
         safeStorageSet(CONFIG.localDataKey, JSON.stringify(snapshot));
         safeStorageSet(CONFIG.storageKey, JSON.stringify(state.workouts));
         safeStorageSet(CONFIG.draftKey, JSON.stringify(state.draft));
-        state.cloud.lastSeenUpdatedAt = Math.max(state.cloud.lastSeenUpdatedAt, Number(snapshot.updatedAt) || 0);
       }
 
       function cloudGetItem(key) {
@@ -1853,17 +1786,10 @@
 
       async function persistNowCloud() {
         if (!state.cloud.enabled) return false;
-
         const snapshot = buildSnapshot();
         state.cloud.saving = true;
         const ok = await cloudSetItem(CONFIG.cloudDataKey, JSON.stringify(snapshot));
         state.cloud.saving = false;
-
-        if (ok) {
-          state.cloud.lastSavedAt = Date.now();
-          state.cloud.lastSeenUpdatedAt = Math.max(state.cloud.lastSeenUpdatedAt, Number(snapshot.updatedAt) || 0);
-        }
-
         return ok;
       }
 
@@ -1898,340 +1824,12 @@
         scheduleCloudPersist(false);
       }
 
-      function migrateLegacyDataIfNeeded() {
-        const hasNewSnapshot = safeStorageGet(CONFIG.localDataKey);
-        const hasNewWorkouts = safeStorageGet(CONFIG.storageKey);
-        const hasNewDraft = safeStorageGet(CONFIG.draftKey);
-
-        if (hasNewSnapshot || hasNewWorkouts || hasNewDraft) {
-          return;
-        }
-
-        const legacySnapshot = safeJsonParse(safeStorageGet(CONFIG.legacyLocalDataKey), null);
-        const legacyWorkouts = safeJsonParse(safeStorageGet(CONFIG.legacyStorageKey), null);
-        const legacyDraft = safeJsonParse(safeStorageGet(CONFIG.legacyDraftKey), null);
-
-        if (!legacySnapshot && !Array.isArray(legacyWorkouts) && !legacyDraft) {
-          return;
-        }
-
-        let workouts = [];
-        let draft = createDraft();
-
-        if (legacySnapshot && Array.isArray(legacySnapshot.workouts)) {
-          workouts = legacySnapshot.workouts
-            .map(sanitizeWorkout)
-            .filter((workout) => workout.exercises.length);
-
-          draft = isValidDraft(legacySnapshot.draft)
-            ? sanitizeWorkout(legacySnapshot.draft)
-            : createDraft();
-          draft.status = "draft";
-        } else {
-          workouts = (Array.isArray(legacyWorkouts) ? legacyWorkouts : [])
-            .map(sanitizeWorkout)
-            .filter((workout) => workout.exercises.length);
-
-          draft = isValidDraft(legacyDraft)
-            ? sanitizeWorkout(legacyDraft)
-            : createDraft();
-          draft.status = "draft";
-        }
-
-        const nextSnapshot = {
-          updatedAt: Date.now(),
-          migratedFrom: "v5",
-          workouts,
-          draft
-        };
-
-        safeStorageSet(CONFIG.localDataKey, JSON.stringify(nextSnapshot));
-        safeStorageSet(CONFIG.storageKey, JSON.stringify(workouts));
-        safeStorageSet(CONFIG.draftKey, JSON.stringify(draft));
-      }
-
-      function buildWorkoutHistoryMeta(workout, stats) {
-        const ts = getWorkoutTimestamp(workout);
-        const date = new Date(ts || Date.now());
-        const title = formatDateTitle(workout.finishedAt || workout.createdAt);
-        const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
-        const monthTitle = capitalize(
-          date.toLocaleDateString("ru-RU", {
-            month: "long",
-            year: "numeric"
-          })
-        );
-        const exerciseNames = workout.exercises.map((ex) => ex.name);
-
-        return {
-          id: workout.id,
-          workoutId: workout.id,
-          ts,
-          title,
-          monthKey,
-          monthTitle,
-          exerciseNames
-        };
-      }
-
-      function buildWorkoutSearchRecord(workout, meta, stats) {
-        const rawParts = [
-          meta.title,
-          meta.monthTitle,
-          workout.finishedAt || workout.createdAt,
-          `${stats.exercises} упражнений`,
-          `${stats.sets} подходов`,
-          `${Math.round(stats.volume)} кг`,
-          ...meta.exerciseNames
-        ];
-        const rawText = rawParts.join(" · ");
-        const searchText = normalizeSearchText(rawText);
-        const tokens = tokenize(rawText);
-
-        return {
-          workoutId: workout.id,
-          rawText,
-          searchText,
-          tokens
-        };
-      }
-
-      function buildWorkoutProgressEntries(workout) {
-        const perWorkout = new Map();
-
-        workout.exercises.forEach((ex) => {
-          const key = exerciseKey(ex.name);
-          let bucket = perWorkout.get(key);
-
-          if (!bucket) {
-            bucket = {
-              key,
-              name: ex.name,
-              sets: []
-            };
-            perWorkout.set(key, bucket);
-          }
-
-          ex.sets.forEach((set) => bucket.sets.push(set));
-        });
-
-        const entries = [];
-        perWorkout.forEach((bucket) => {
-          if (!bucket.sets.length) return;
-
-          let bestWeight = 0;
-          let volume = 0;
-          let reps = 0;
-
-          bucket.sets.forEach((set) => {
-            if (set.weight > bestWeight) bestWeight = set.weight;
-            volume += set.weight * set.reps;
-            reps += set.reps;
-          });
-
-          entries.push({
-            key: bucket.key,
-            name: bucket.name,
-            date: workout.finishedAt || workout.createdAt,
-            weight: bestWeight,
-            volume,
-            reps,
-            sets: bucket.sets.length,
-            lastSet: bucket.sets[bucket.sets.length - 1],
-            workoutId: workout.id
-          });
-        });
-
-        return entries;
-      }
-
-      function insertSortedHistoryWorkoutId(workoutId) {
-        const meta = state.cache.historyMetaByWorkoutId.get(workoutId);
-        if (!meta) return;
-
-        const ids = state.cache.historyOrderedIds;
-        let left = 0;
-        let right = ids.length;
-
-        while (left < right) {
-          const mid = (left + right) >> 1;
-          const midMeta = state.cache.historyMetaByWorkoutId.get(ids[mid]);
-          const midTs = midMeta ? midMeta.ts : 0;
-          if (meta.ts > midTs) {
-            right = mid;
-          } else {
-            left = mid + 1;
-          }
-        }
-
-        ids.splice(left, 0, workoutId);
-      }
-
-      function removeHistoryWorkoutId(workoutId) {
-        const index = state.cache.historyOrderedIds.indexOf(workoutId);
-        if (index >= 0) state.cache.historyOrderedIds.splice(index, 1);
-      }
-
-      function insertProgressEntry(entry) {
-        let arr = state.cache.progressByExercise.get(entry.key);
-        if (!arr) {
-          arr = [];
-          state.cache.progressByExercise.set(entry.key, arr);
-        }
-
-        let left = 0;
-        let right = arr.length;
-        const ts = new Date(entry.date).getTime();
-
-        while (left < right) {
-          const mid = (left + right) >> 1;
-          const midTs = new Date(arr[mid].date).getTime();
-          if (ts < midTs) {
-            right = mid;
-          } else {
-            left = mid + 1;
-          }
-        }
-
-        arr.splice(left, 0, entry);
-      }
-
-      function removeProgressEntriesByWorkoutId(workoutId) {
-        for (const [key, arr] of state.cache.progressByExercise.entries()) {
-          const next = arr.filter((item) => item.workoutId !== workoutId);
-          if (next.length) {
-            state.cache.progressByExercise.set(key, next);
-          } else {
-            state.cache.progressByExercise.delete(key);
-          }
-        }
-      }
-
-      function rebuildLastCompletedSetByExercise() {
-        const next = new Map();
-
-        for (const [key, arr] of state.cache.progressByExercise.entries()) {
-          if (arr.length) next.set(key, arr[arr.length - 1].lastSet);
-        }
-
-        state.cache.lastCompletedSetByExercise = next;
-      }
-
-      function rebuildExerciseSearchIndex() {
-        state.exerciseCatalog.sorted = [...state.exerciseCatalog.namesByKey.values()]
-          .sort((a, b) => a.localeCompare(b, "ru"));
-
-        state.exerciseCatalog.searchIndex = state.exerciseCatalog.sorted.map((name) => ({
-          name,
-          normalized: normalizeSearchText(name),
-          tokens: tokenize(name)
-        }));
-      }
-
-      function addExerciseNameToIndex(name) {
-        const clean = String(name || "").trim();
-        if (!clean) return;
-        const key = exerciseKey(clean);
-        if (!state.exerciseCatalog.namesByKey.has(key)) {
-          state.exerciseCatalog.namesByKey.set(key, clean);
-          rebuildExerciseSearchIndex();
-        }
-      }
-
-      function removeExerciseNameFromIndexIfUnused(name) {
-        const key = exerciseKey(name);
-        let stillUsed = false;
-
-        for (const workout of state.workouts) {
-          if (workout.exercises.some((ex) => exerciseKey(ex.name) === key)) {
-            stillUsed = true;
-            break;
-          }
-        }
-
-        if (!stillUsed) {
-          if (state.draft.exercises.some((ex) => exerciseKey(ex.name) === key)) {
-            stillUsed = true;
-          }
-        }
-
-        if (!stillUsed && state.exerciseCatalog.namesByKey.has(key)) {
-          state.exerciseCatalog.namesByKey.delete(key);
-          rebuildExerciseSearchIndex();
-        }
-      }
-
-      function upsertIndexesForWorkout(workout, meta, stats) {
-        state.historyIndex.set(workout.id, buildWorkoutSearchRecord(workout, meta, stats));
-        workout.exercises.forEach((ex) => addExerciseNameToIndex(ex.name));
-      }
-
-      function removeIndexesForWorkout(workout) {
-        state.historyIndex.delete(workout.id);
-        workout.exercises.forEach((ex) => removeExerciseNameFromIndexIfUnused(ex.name));
-      }
-
-      function addWorkoutToCaches(workout) {
-        state.workoutsById.set(workout.id, workout);
-
-        const stats = getStats(workout);
-        state.cache.statsByWorkoutId.set(workout.id, stats);
-
-        const historyMeta = buildWorkoutHistoryMeta(workout, stats);
-        state.cache.historyMetaByWorkoutId.set(workout.id, historyMeta);
-        insertSortedHistoryWorkoutId(workout.id);
-
-        const progressEntries = buildWorkoutProgressEntries(workout);
-        progressEntries.forEach(insertProgressEntry);
-
-        rebuildLastCompletedSetByExercise();
-        upsertIndexesForWorkout(workout, historyMeta, stats);
-      }
-
-      function removeWorkoutFromCaches(workout) {
-        state.workoutsById.delete(workout.id);
-        state.cache.statsByWorkoutId.delete(workout.id);
-        state.cache.historyMetaByWorkoutId.delete(workout.id);
-        removeHistoryWorkoutId(workout.id);
-        removeProgressEntriesByWorkoutId(workout.id);
-        rebuildLastCompletedSetByExercise();
-        removeIndexesForWorkout(workout);
-      }
-
-      function replaceWorkoutInCaches(oldWorkout, newWorkout) {
-        removeWorkoutFromCaches(oldWorkout);
-        addWorkoutToCaches(newWorkout);
-      }
-
-      function fullRebuildWorkoutCaches() {
+      function fullRebuildIndexes() {
         state.workoutsById = new Map();
-        state.cache.statsByWorkoutId = new Map();
-        state.cache.historyMetaByWorkoutId = new Map();
-        state.cache.historyOrderedIds = [];
-        state.cache.progressByExercise = new Map();
-        state.cache.lastCompletedSetByExercise = new Map();
-        state.historyIndex = new Map();
+        state.exerciseCatalog.namesByKey = new Map();
 
         state.workouts.forEach((workout) => {
           state.workoutsById.set(workout.id, workout);
-          const stats = getStats(workout);
-          state.cache.statsByWorkoutId.set(workout.id, stats);
-          const meta = buildWorkoutHistoryMeta(workout, stats);
-          state.cache.historyMetaByWorkoutId.set(workout.id, meta);
-          insertSortedHistoryWorkoutId(workout.id);
-          buildWorkoutProgressEntries(workout).forEach(insertProgressEntry);
-          state.historyIndex.set(workout.id, buildWorkoutSearchRecord(workout, meta, stats));
-        });
-
-        rebuildLastCompletedSetByExercise();
-      }
-
-      function fullRebuildIndexes() {
-        state.exerciseCatalog.sorted = [];
-        state.exerciseCatalog.namesByKey = new Map();
-        state.exerciseCatalog.searchIndex = [];
-
-        state.workouts.forEach((workout) => {
           workout.exercises.forEach((ex) => {
             const key = exerciseKey(ex.name);
             if (!state.exerciseCatalog.namesByKey.has(key)) {
@@ -2247,7 +1845,14 @@
           }
         });
 
-        rebuildExerciseSearchIndex();
+        state.exerciseCatalog.sorted = [...state.exerciseCatalog.namesByKey.values()]
+          .sort((a, b) => a.localeCompare(b, "ru"));
+
+        state.exerciseCatalog.searchIndex = state.exerciseCatalog.sorted.map((name) => ({
+          name,
+          normalized: normalizeSearchText(name),
+          tokens: tokenize(name)
+        }));
       }
 
       function applySnapshot(snapshot) {
@@ -2255,143 +1860,51 @@
           .map(sanitizeWorkout)
           .filter((workout) => workout.exercises.length);
 
+        state.workouts.sort((a, b) => getWorkoutTimestamp(b) - getWorkoutTimestamp(a));
+
         state.draft = isValidDraft(snapshot.draft)
           ? sanitizeWorkout(snapshot.draft)
           : createDraft();
 
         state.draft.status = "draft";
+        if (!state.draft.trainingType) {
+          state.draft.trainingType = "";
+        }
 
-        fullRebuildWorkoutCaches();
         fullRebuildIndexes();
-        applyHistoryFilter();
-      }
-
-      async function pullCloudSnapshot() {
-        if (!state.cloud.enabled) return null;
-        const cloudRaw = await cloudGetItem(CONFIG.cloudDataKey);
-        const cloudSnapshot = safeJsonParse(cloudRaw, null);
-        if (cloudSnapshot && Array.isArray(cloudSnapshot.workouts) && cloudSnapshot.draft) {
-          state.cloud.lastLoadedAt = Date.now();
-          state.cloud.lastPullAt = Date.now();
-          state.cloud.lastSeenUpdatedAt = Math.max(
-            state.cloud.lastSeenUpdatedAt,
-            Number(cloudSnapshot.updatedAt) || 0
-          );
-          return cloudSnapshot;
-        }
-        return null;
-      }
-
-      async function syncFromCloud(options = {}) {
-        const {
-          force = false,
-          silent = true
-        } = options;
-
-        if (!state.cloud.enabled) return false;
-        if (state.cloud.syncInFlight) return false;
-
-        state.cloud.syncInFlight = true;
-        state.cloud.loading = true;
-
-        try {
-          const cloudSnapshot = await pullCloudSnapshot();
-          if (!cloudSnapshot) return false;
-
-          const cloudUpdatedAt = Number(cloudSnapshot.updatedAt) || 0;
-          const localSnapshot = getLocalSnapshotForCompare();
-          const localUpdatedAt = Number(localSnapshot.updatedAt) || 0;
-
-          if (!force && cloudUpdatedAt <= localUpdatedAt) {
-            return false;
-          }
-
-          applySnapshot(cloudSnapshot);
-          persistNowLocal();
-          state.cloud.lastAppliedUpdatedAt = cloudUpdatedAt;
-
-          if (!silent) {
-            toast("Данные обновлены из облака");
-          }
-
-          renderAll();
-          return true;
-        } finally {
-          state.cloud.loading = false;
-          state.cloud.syncInFlight = false;
-        }
-      }
-
-      function startCloudPolling() {
-        stopCloudPolling();
-
-        if (!state.cloud.enabled) return;
-
-        state.cloud.polling = true;
-
-        cloudPollTimer = setInterval(() => {
-          if (document.visibilityState !== "visible") return;
-          syncFromCloud({ force: false, silent: true });
-        }, CONFIG.cloudPollInterval);
-      }
-
-      function stopCloudPolling() {
-        state.cloud.polling = false;
-        clearInterval(cloudPollTimer);
-        cloudPollTimer = 0;
-      }
-
-      function scheduleCloudResumeSync() {
-        clearTimeout(cloudResumeTimer);
-
-        if (!state.cloud.enabled) return;
-
-        cloudResumeTimer = setTimeout(() => {
-          syncFromCloud({ force: false, silent: true });
-        }, CONFIG.cloudResumeDebounce);
       }
 
       async function loadData() {
-        migrateLegacyDataIfNeeded();
-
         const localSnapshot = safeJsonParse(safeStorageGet(CONFIG.localDataKey), null);
         const localWorkouts = safeJsonParse(safeStorageGet(CONFIG.storageKey), []);
         const localDraft = safeJsonParse(safeStorageGet(CONFIG.draftKey), null);
 
-        let fallbackSnapshot = null;
+        let finalSnapshot = null;
 
         if (localSnapshot && Array.isArray(localSnapshot.workouts) && localSnapshot.draft) {
-          fallbackSnapshot = localSnapshot;
+          finalSnapshot = localSnapshot;
         } else {
-          fallbackSnapshot = {
+          finalSnapshot = {
             updatedAt: Date.now(),
             workouts: Array.isArray(localWorkouts) ? localWorkouts : [],
             draft: isValidDraft(localDraft) ? localDraft : createDraft()
           };
         }
 
-        let finalSnapshot = fallbackSnapshot;
-
         if (state.cloud.enabled) {
-          state.cloud.loading = true;
           const cloudRaw = await cloudGetItem(CONFIG.cloudDataKey);
           const cloudSnapshot = safeJsonParse(cloudRaw, null);
-          state.cloud.loading = false;
 
-          const localUpdatedAt = Number(fallbackSnapshot && fallbackSnapshot.updatedAt) || 0;
+          const localUpdatedAt = Number(finalSnapshot.updatedAt) || 0;
           const cloudUpdatedAt = Number(cloudSnapshot && cloudSnapshot.updatedAt) || 0;
 
           if (cloudSnapshot && Array.isArray(cloudSnapshot.workouts) && cloudSnapshot.draft) {
-            state.cloud.lastSeenUpdatedAt = cloudUpdatedAt;
             if (cloudUpdatedAt >= localUpdatedAt) {
               finalSnapshot = cloudSnapshot;
-              state.cloud.lastAppliedUpdatedAt = cloudUpdatedAt;
             } else {
-              finalSnapshot = fallbackSnapshot;
               scheduleCloudPersist(true);
             }
-            state.cloud.lastLoadedAt = Date.now();
-          } else if (fallbackSnapshot) {
+          } else {
             scheduleCloudPersist(true);
           }
         }
@@ -2406,14 +1919,61 @@
         }, CONFIG.splashDelay);
       }
 
+      function syncFromCloud() {
+        if (!state.cloud.enabled || state.cloud.syncInFlight) return;
+        state.cloud.syncInFlight = true;
+
+        cloudGetItem(CONFIG.cloudDataKey)
+          .then((raw) => {
+            const snapshot = safeJsonParse(raw, null);
+            if (!snapshot || !Array.isArray(snapshot.workouts) || !snapshot.draft) return;
+            applySnapshot(snapshot);
+            persistNowLocal();
+            renderAll();
+          })
+          .finally(() => {
+            state.cloud.syncInFlight = false;
+          });
+      }
+
+      function startCloudPolling() {
+        stopCloudPolling();
+        if (!state.cloud.enabled) return;
+
+        state.cloud.polling = true;
+        cloudPollTimer = setInterval(() => {
+          if (document.visibilityState !== "visible") return;
+          syncFromCloud();
+        }, CONFIG.cloudPollInterval);
+      }
+
+      function stopCloudPolling() {
+        state.cloud.polling = false;
+        clearInterval(cloudPollTimer);
+        cloudPollTimer = 0;
+      }
+
+      function scheduleCloudResumeSync() {
+        clearTimeout(cloudResumeTimer);
+        if (!state.cloud.enabled) return;
+
+        cloudResumeTimer = setTimeout(() => {
+          syncFromCloud();
+        }, CONFIG.cloudResumeDebounce);
+      }
+
       function renderShell() {
         updateMeta();
         renderTabs();
+        renderTypeButtons();
+        updateTypeUi();
         updateMainActions();
       }
 
       function renderTodayOnly() {
         updateMeta();
+        renderTypeButtons();
+        updateTypeUi();
         renderDraft();
         updateForm();
         renderExerciseSearchResults(true);
@@ -2455,12 +2015,21 @@
         );
 
         if (state.tab === "today") {
-          text(
-            el.screenMeta,
-            `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
-          );
+          if (state.draft.trainingType) {
+            text(
+              el.screenMeta,
+              `${getTypeLabel(state.draft.trainingType)} · ${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
+            );
+          } else {
+            text(el.screenMeta, "Выбери тип тренировки");
+          }
         } else if (state.tab === "history") {
-          text(el.screenMeta, `${state.workouts.length} тренировок сохранено`);
+          if (state.historyUi.activeType) {
+            const count = getWorkoutsByType(state.historyUi.activeType).length;
+            text(el.screenMeta, `${getTypeLabel(state.historyUi.activeType)} · ${count} тренировок`);
+          } else {
+            text(el.screenMeta, "4 раздела по типам тренировок");
+          }
         } else {
           text(el.screenMeta, "Следи за прогрессом по упражнениям");
         }
@@ -2476,6 +2045,27 @@
         });
       }
 
+      function renderTypeButtons() {
+        el.typeButtons.forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.type === state.draft.trainingType);
+        });
+      }
+
+      function updateTypeUi() {
+        const type = state.draft.trainingType;
+        text(el.currentTypePill, type ? `Сегодня: ${getTypeLabel(type)}` : "Тип не выбран");
+        el.changeTypeBtn.disabled = !type;
+
+        const enabled = Boolean(type);
+        el.exerciseInput.disabled = !enabled;
+        el.weightInput.disabled = !enabled;
+        el.repsInput.disabled = !enabled;
+
+        if (!enabled) {
+          hideTemplateBox();
+        }
+      }
+
       function updateExerciseClear() {
         const hasValue = Boolean(el.exerciseInput.value.trim());
         el.exerciseInputWrap.classList.toggle("has-value", hasValue);
@@ -2483,7 +2073,7 @@
 
       function updateMainActions() {
         const hasSets = getStats(state.draft).sets > 0;
-        const shouldShow = hasSets && state.tab === "today";
+        const shouldShow = hasSets && state.tab === "today" && Boolean(state.draft.trainingType);
         const mainButton = tg && tg.MainButton ? tg.MainButton : null;
 
         el.fallbackFinishBtn.style.display = shouldShow && !mainButton ? "block" : "none";
@@ -2503,14 +2093,89 @@
         mainButton.show();
       }
 
+      function getTemplateReference(exerciseName) {
+        const type = state.draft.trainingType;
+        if (!exerciseName || !type || !isComparableType(type)) return null;
+
+        const key = exerciseKey(exerciseName);
+        for (const workout of state.workouts) {
+          if (workout.trainingType !== type) continue;
+          const ex = workout.exercises.find((item) => exerciseKey(item.name) === key);
+          if (ex) {
+            return {
+              workout,
+              exercise: ex
+            };
+          }
+        }
+        return null;
+      }
+
+      function getLastSet(name) {
+        if (!name) return null;
+
+        const draftExercise = state.draft.exercises.find((ex) => sameName(ex.name, name));
+        if (draftExercise && draftExercise.sets.length) {
+          return draftExercise.sets[draftExercise.sets.length - 1];
+        }
+
+        const template = getTemplateReference(name);
+        if (template && template.exercise.sets.length) {
+          return template.exercise.sets[template.exercise.sets.length - 1];
+        }
+
+        return null;
+      }
+
+      function showTemplateForExercise(name) {
+        const type = state.draft.trainingType;
+
+        if (!type || !isComparableType(type) || !name) {
+          hideTemplateBox();
+          return;
+        }
+
+        const template = getTemplateReference(name);
+        if (!template) {
+          hideTemplateBox();
+          return;
+        }
+
+        text(
+          el.templateSub,
+          `${getTypeLabel(type)} · ${formatDateWithWeekday(template.workout.performedAt || template.workout.finishedAt || template.workout.createdAt)}`
+        );
+
+        el.templateLines.replaceChildren();
+        template.exercise.sets.forEach((set, index) => {
+          const line = make("div", "template-line", `${index + 1}. ${trimNumber(set.weight)} кг × ${set.reps}`);
+          el.templateLines.appendChild(line);
+        });
+
+        el.templateBox.classList.add("show");
+      }
+
+      function hideTemplateBox() {
+        el.templateBox.classList.remove("show");
+        el.templateLines.replaceChildren();
+        text(el.templateSub, "");
+      }
+
       function updateForm() {
+        const type = state.draft.trainingType;
         const name = el.exerciseInput.value.trim();
         const parsed = parseSetInput(el.weightInput.value, el.repsInput.value);
-        const valid = Boolean(name) && Boolean(parsed);
+        const valid = Boolean(type) && Boolean(name) && Boolean(parsed);
 
         el.addSetBtn.disabled = !valid;
-        el.repeatSetBtn.disabled = !getLastSet(name);
+        el.repeatSetBtn.disabled = !(type && getLastSet(name));
         updateExerciseClear();
+        showTemplateForExercise(name);
+
+        if (!type) {
+          text(el.formHint, "Сначала выбери тип тренировки");
+          return;
+        }
 
         text(
           el.formHint,
@@ -2522,6 +2187,7 @@
         el.exerciseInput.value = "";
         state.search.exerciseQuery = "";
         closeExerciseDropdown();
+        hideTemplateBox();
         updateForm();
         el.exerciseInput.focus();
       }
@@ -2593,6 +2259,11 @@
       }
 
       function renderExerciseSearchResults(force = false) {
+        if (!state.draft.trainingType) {
+          closeExerciseDropdown();
+          return;
+        }
+
         const query = el.exerciseInput.value.trim();
         const normalizedQuery = normalizeSearchText(query);
         const queryTokens = tokenize(query);
@@ -2671,6 +2342,21 @@
         haptic();
       }
 
+      function addExerciseNameToIndex(name) {
+        const clean = String(name || "").trim();
+        if (!clean) return;
+        const key = exerciseKey(clean);
+        if (!state.exerciseCatalog.namesByKey.has(key)) {
+          state.exerciseCatalog.namesByKey.set(key, clean);
+          state.exerciseCatalog.sorted = [...state.exerciseCatalog.namesByKey.values()].sort((a, b) => a.localeCompare(b, "ru"));
+          state.exerciseCatalog.searchIndex = state.exerciseCatalog.sorted.map((value) => ({
+            name: value,
+            normalized: normalizeSearchText(value),
+            tokens: tokenize(value)
+          }));
+        }
+      }
+
       function getOrCreateDraftExercise(name) {
         let ex = state.draft.exercises.find((item) => sameName(item.name, name));
 
@@ -2684,8 +2370,14 @@
       }
 
       function addSet() {
+        const type = state.draft.trainingType;
         const name = el.exerciseInput.value.trim();
         const parsed = parseSetInput(el.weightInput.value, el.repsInput.value);
+
+        if (!type) {
+          toast("Сначала выбери тип тренировки");
+          return;
+        }
 
         if (!name || !parsed) {
           toast("Проверь вес и повторы");
@@ -2706,17 +2398,6 @@
         requestAnimationFrame(() => el.draftList.classList.add("flash"));
       }
 
-      function getLastSet(name) {
-        if (!name) return null;
-
-        const draftExercise = state.draft.exercises.find((ex) => sameName(ex.name, name));
-        if (draftExercise && draftExercise.sets.length) {
-          return draftExercise.sets[draftExercise.sets.length - 1];
-        }
-
-        return state.cache.lastCompletedSetByExercise.get(exerciseKey(name)) || null;
-      }
-
       function fillLastSet() {
         const last = getLastSet(el.exerciseInput.value.trim());
         if (!last) return;
@@ -2726,8 +2407,38 @@
         updateForm();
       }
 
+      function compareSetWithTemplate(exerciseName, setIndex, currentSet) {
+        const type = state.draft.trainingType;
+        if (!isComparableType(type)) return null;
+
+        const template = getTemplateReference(exerciseName);
+        if (!template) return null;
+
+        const prevSet = template.exercise.sets[setIndex];
+        if (!prevSet) return null;
+
+        if (currentSet.weight > prevSet.weight) {
+          return `+${trimNumber(currentSet.weight - prevSet.weight)} кг ↑`;
+        }
+
+        if (currentSet.weight === prevSet.weight && currentSet.reps > prevSet.reps) {
+          return `+${currentSet.reps - prevSet.reps} повтор ↑`;
+        }
+
+        if (currentSet.weight === prevSet.weight && currentSet.reps === prevSet.reps) {
+          return "Без изменений";
+        }
+
+        return null;
+      }
+
       function renderDraft() {
         el.draftList.replaceChildren();
+
+        if (!state.draft.trainingType) {
+          el.draftList.appendChild(make("div", "empty", "Сначала выбери тип тренировки"));
+          return;
+        }
 
         if (!state.draft.exercises.length) {
           el.draftList.appendChild(make("div", "empty", "Пока нет подходов"));
@@ -2741,18 +2452,55 @@
           const volume = ex.sets.reduce((sum, set) => sum + set.weight * set.reps, 0);
 
           const head = make("div", "exercise-head");
+          const headLeft = make("div", "");
+          headLeft.append(
+            make("div", "exercise-name", ex.name)
+          );
+
+          if (isComparableType(state.draft.trainingType)) {
+            const template = getTemplateReference(ex.name);
+            if (template) {
+              headLeft.append(make("div", "exercise-sub", "Ориентир с прошлого выполнения"));
+            }
+          }
+
           head.append(
-            make("div", "exercise-name", ex.name),
+            headLeft,
             make("div", "muted", `${ex.sets.length} подходов · ${Math.round(volume)} кг`)
           );
 
           box.appendChild(head);
 
+          if (isComparableType(state.draft.trainingType)) {
+            const template = getTemplateReference(ex.name);
+            if (template) {
+              const templateInline = make("div", "exercise-template-inline");
+              templateInline.appendChild(make("div", "template-title", "Прошлый раз"));
+              template.exercise.sets.forEach((set, index) => {
+                templateInline.appendChild(
+                  make("div", "template-line", `${index + 1}. ${trimNumber(set.weight)} кг × ${set.reps}`)
+                );
+              });
+              box.appendChild(templateInline);
+            }
+          }
+
           ex.sets.forEach((set, index) => {
             const row = make("div", "set-row");
-            row.appendChild(
-              make("div", "set-value", `${index + 1}. ${set.weight} кг × ${set.reps}`)
+            const content = make("div", "set-content");
+            content.appendChild(
+              make("div", "set-value", `${index + 1}. ${trimNumber(set.weight)} кг × ${set.reps}`)
             );
+
+            const compare = compareSetWithTemplate(ex.name, index, set);
+            if (compare) {
+              const chip = make(
+                "div",
+                compare === "Без изменений" ? "progress-chip muted" : "progress-chip",
+                compare
+              );
+              content.appendChild(chip);
+            }
 
             const edit = make("button", "btn-card btn-accent icon-square", "✎");
             edit.type = "button";
@@ -2762,7 +2510,7 @@
             del.type = "button";
             del.onclick = () => animateRemove(row, () => deleteDraftSet(ex.id, set.id));
 
-            row.append(edit, del);
+            row.append(content, edit, del);
             box.appendChild(row);
           });
 
@@ -2780,7 +2528,6 @@
 
         if (!ex.sets.length) {
           state.draft.exercises = state.draft.exercises.filter((item) => item.id !== exId);
-          removeExerciseNameFromIndexIfUnused(ex.name);
         }
 
         haptic("medium");
@@ -2802,16 +2549,19 @@
 
         const name = document.createElement("input");
         name.value = ex.name;
+        name.placeholder = "Упражнение";
 
         const nums = make("div", "form-numbers");
 
         const weight = document.createElement("input");
         weight.value = set.weight;
         weight.inputMode = "decimal";
+        weight.placeholder = "кг";
 
         const reps = document.createElement("input");
         reps.value = set.reps;
         reps.inputMode = "numeric";
+        reps.placeholder = "раз";
 
         nums.append(weight, reps);
 
@@ -2840,7 +2590,6 @@
         const oldExercise = workout.exercises.find((ex) => ex.id === exId);
         if (!oldExercise) return;
 
-        const oldName = oldExercise.name;
         const index = oldExercise.sets.findIndex((set) => set.id === setId);
         if (index < 0) return;
 
@@ -2858,9 +2607,6 @@
 
         if (!oldExercise.sets.length) {
           workout.exercises = workout.exercises.filter((ex) => ex.id !== oldExercise.id);
-          if (!sameName(oldName, newName)) {
-            removeExerciseNameFromIndexIfUnused(oldName);
-          }
         }
 
         haptic();
@@ -2869,23 +2615,72 @@
         toast("Подход обновлен");
       }
 
-      async function finishWorkout() {
-        if (!getStats(state.draft).sets) return;
+      async function selectTrainingType(type) {
+        if (state.draft.trainingType === type) return;
 
-        const answer = await showPopup("Завершить тренировку?");
+        const hasSets = getStats(state.draft).sets > 0;
+        if (state.draft.trainingType && hasSets) {
+          const answer = await showPopup("Сменить тип тренировки?\nТекущая тренировка будет сброшена без сохранения. Продолжить?");
+          if (answer !== "ok") return;
+          state.draft = createDraft();
+        }
+
+        state.draft.trainingType = type;
+        state.draft.createdAt = new Date().toISOString();
+        state.draft.performedAt = new Date().toISOString();
+        el.exerciseInput.value = "";
+        el.weightInput.value = "";
+        el.repsInput.value = "";
+        hideTemplateBox();
+
+        haptic();
+        schedulePersist();
+        renderTodayOnly();
+      }
+
+      async function changeTrainingType() {
+        if (!state.draft.trainingType) return;
+
+        const hasSets = getStats(state.draft).sets > 0;
+        if (!hasSets) {
+          state.draft = createDraft();
+          schedulePersist();
+          renderTodayOnly();
+          return;
+        }
+
+        const answer = await showPopup("Сменить тип тренировки?\nТекущая тренировка будет сброшена без сохранения. Продолжить?");
         if (answer !== "ok") return;
 
-        const completedWorkout = {
+        state.draft = createDraft();
+        haptic("medium");
+        schedulePersist();
+        renderTodayOnly();
+      }
+
+      async function finishWorkout() {
+        if (!state.draft.trainingType) {
+          toast("Сначала выбери тип тренировки");
+          return;
+        }
+
+        if (!getStats(state.draft).sets) return;
+
+        const answer = await showPopup(`Завершить тренировку "${getTypeLabel(state.draft.trainingType)}"?`);
+        if (answer !== "ok") return;
+
+        const completedWorkout = sanitizeWorkout({
           ...state.draft,
           status: "completed",
-          finishedAt: new Date().toISOString()
-        };
+          finishedAt: new Date().toISOString(),
+          performedAt: state.draft.performedAt || new Date().toISOString(),
+          syncStatus: "pending"
+        });
 
-        state.workouts.push(completedWorkout);
+        state.workouts.unshift(completedWorkout);
         state.draft = createDraft();
 
-        addWorkoutToCaches(completedWorkout);
-        applyHistoryFilter();
+        fullRebuildIndexes();
 
         haptic("heavy");
         renderAll();
@@ -2906,294 +2701,139 @@
 
         return date.toLocaleDateString("ru-RU", {
           day: "numeric",
-          month: "long"
+          month: "long",
+          year: "numeric"
         });
       }
 
-      function highlightHistorySummary(stats, tokens) {
-        const plain = `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`;
-        return highlightTextByTokens(plain, tokens);
+      function formatDateWithWeekday(iso) {
+        const date = new Date(iso);
+        const now = new Date();
+
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const diff = Math.round((today - day) / 86400000);
+
+        const weekday = date.toLocaleDateString("ru-RU", { weekday: "long" });
+        if (diff === 0) return `сегодня, ${weekday}`;
+
+        return `${weekday}, ${date.toLocaleDateString("ru-RU")}`;
       }
 
-      function applyHistoryFilter() {
-        const query = state.historyUi.query.trim();
-        const tokens = tokenize(query);
-        state.historyUi.queryTokens = tokens;
-
-        if (!tokens.length) {
-          state.historyUi.filteredIds = state.cache.historyOrderedIds.slice();
-        } else {
-          const filtered = [];
-          for (const workoutId of state.cache.historyOrderedIds) {
-            const record = state.historyIndex.get(workoutId);
-            if (!record) continue;
-            const ok = tokens.every((token) => record.searchText.includes(token));
-            if (ok) filtered.push(workoutId);
-          }
-          state.historyUi.filteredIds = filtered;
-        }
-
-        rebuildVirtualHistoryItems();
+      function formatDateInputValue(iso) {
+        const d = new Date(iso);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        return `${yyyy}-${mm}-${dd}`;
       }
 
-      function rebuildVirtualHistoryItems() {
-        const items = [];
-        const filteredIds = state.historyUi.filteredIds;
-        let prevMonthKey = "";
-        let offsetTop = 0;
-
-        filteredIds.forEach((workoutId) => {
-          const meta = state.cache.historyMetaByWorkoutId.get(workoutId);
-          if (!meta) return;
-
-          if (meta.monthKey !== prevMonthKey) {
-            items.push({
-              type: "month",
-              key: `m:${meta.monthKey}:${workoutId}`,
-              monthTitle: meta.monthTitle,
-              top: offsetTop,
-              height: CONFIG.historyMonthHeight
-            });
-            offsetTop += CONFIG.historyMonthHeight;
-            prevMonthKey = meta.monthKey;
-          }
-
-          items.push({
-            type: "row",
-            key: `w:${workoutId}`,
-            workoutId,
-            top: offsetTop,
-            height: CONFIG.historyRowHeight
-          });
-          offsetTop += CONFIG.historyRowHeight;
-        });
-
-        state.historyUi.virtualItems = items;
+      function getWorkoutsByType(type) {
+        return state.workouts
+          .filter((workout) => workout.trainingType === type)
+          .sort((a, b) => getWorkoutTimestamp(b) - getWorkoutTimestamp(a));
       }
 
-      function renderHistorySummary() {
-        text(el.historySummaryLeft, `${state.workouts.length} тренировок`);
-        text(el.historySummaryRight, `${state.historyUi.filteredIds.length} показано`);
-      }
-
-      function createHistoryPoolNode() {
-        const host = make("div", "history-recycle-item");
-        const month = make("div", "history-month-title");
-        month.style.display = "none";
-
-        const row = make("div", "history-row");
-        row.style.display = "none";
-
-        const open = make("button", "history-item");
-        open.type = "button";
-
-        const title = make("div", "history-title");
-        const meta = make("div", "muted");
-        open.append(title, meta);
-
-        const csv = make("button", "btn-card btn-accent icon-square", "CSV");
-        csv.type = "button";
-
-        const del = make("button", "btn-card btn-danger icon-square", "×");
-        del.type = "button";
-        del.setAttribute("aria-label", "Удалить тренировку");
-        del.title = "Удалить тренировку";
-
-        row.append(open, csv, del);
-        host.append(month, row);
-
-        return {
-          host,
-          month,
-          row,
-          open,
-          title,
-          meta,
-          csv,
-          del,
-          boundKey: ""
-        };
-      }
-
-      function ensureHistoryViewport() {
-        if (state.historyUi.viewportEl) return;
-
-        const viewport = make("div", "history-viewport");
-        const spacer = make("div", "history-spacer");
-        const layer = make("div", "history-recycle-layer");
-
-        viewport.append(spacer, layer);
-        el.historyList.replaceChildren(viewport);
-
-        viewport.addEventListener("scroll", onHistoryScroll, { passive: true });
-
-        state.historyUi.viewportEl = viewport;
-        state.historyUi.spacerEl = spacer;
-        state.historyUi.layerEl = layer;
-
-        if ("ResizeObserver" in window) {
-          historyViewportResizeObserver && historyViewportResizeObserver.disconnect();
-          historyViewportResizeObserver = new ResizeObserver(() => {
-            state.historyUi.viewportHeight = viewport.clientHeight;
-            ensureHistoryPool();
-            renderHistoryVirtualWindow(true);
-          });
-          historyViewportResizeObserver.observe(viewport);
-        }
-      }
-
-      function ensureHistoryPool() {
-        const viewport = state.historyUi.viewportEl;
-        const layer = state.historyUi.layerEl;
-        if (!viewport || !layer) return;
-
-        const viewportHeight = viewport.clientHeight || 0;
-        const needed = Math.max(
-          12,
-          Math.ceil((viewportHeight + CONFIG.historyOverscanPx * 2) / CONFIG.historyRowHeight) + CONFIG.historyPoolExtra
-        );
-
-        if (state.historyUi.poolSize >= needed) return;
-
-        const fragment = document.createDocumentFragment();
-        for (let i = state.historyUi.poolSize; i < needed; i += 1) {
-          const item = createHistoryPoolNode();
-          state.historyUi.pool.push(item);
-          fragment.appendChild(item.host);
-        }
-        state.historyUi.poolSize = needed;
-        layer.appendChild(fragment);
-      }
-
-      function onHistoryScroll(event) {
-        state.historyUi.scrollTop = event.currentTarget.scrollTop;
-        renderHistoryVirtualWindow();
+      function getLastWorkoutByType(type) {
+        return getWorkoutsByType(type)[0] || null;
       }
 
       function renderHistory() {
-        renderHistorySummary();
+        el.historyList.replaceChildren();
 
-        if (!state.cache.historyOrderedIds.length) {
-          state.historyUi.viewportEl = null;
-          state.historyUi.spacerEl = null;
-          state.historyUi.layerEl = null;
-          state.historyUi.pool = [];
-          state.historyUi.poolSize = 0;
-          el.historyList.replaceChildren(make("div", "empty", "Пока нет сохраненных тренировок"));
-          return;
+        if (!state.historyUi.activeType) {
+          renderHistoryCategories();
+        } else {
+          renderHistoryTypeList(state.historyUi.activeType);
         }
-
-        if (!state.historyUi.filteredIds.length) {
-          state.historyUi.viewportEl = null;
-          state.historyUi.spacerEl = null;
-          state.historyUi.layerEl = null;
-          state.historyUi.pool = [];
-          state.historyUi.poolSize = 0;
-          el.historyList.replaceChildren(make("div", "empty", "Ничего не найдено"));
-          return;
-        }
-
-        ensureHistoryViewport();
-        ensureHistoryPool();
-
-        const items = state.historyUi.virtualItems;
-        const totalHeight = items.length
-          ? items[items.length - 1].top + items[items.length - 1].height
-          : 0;
-
-        state.historyUi.spacerEl.style.height = `${totalHeight}px`;
-        state.historyUi.viewportHeight = state.historyUi.viewportEl.clientHeight;
-        state.historyUi.scrollTop = state.historyUi.viewportEl.scrollTop;
-        renderHistoryVirtualWindow(true);
       }
 
-      function findVirtualRange(items, startY, endY) {
-        let startIndex = 0;
-        while (startIndex < items.length && items[startIndex].top + items[startIndex].height < startY) {
-          startIndex += 1;
-        }
+      function renderHistoryCategories() {
+        const wrap = make("div", "history-categories");
 
-        let endIndex = startIndex;
-        while (endIndex < items.length && items[endIndex].top <= endY) {
-          endIndex += 1;
-        }
+        HISTORY_TYPE_ORDER.forEach((type) => {
+          const lastWorkout = getLastWorkoutByType(type);
+          const btn = make(
+            "button",
+            `history-category${type === "custom" ? " custom" : ""}`
+          );
+          btn.type = "button";
+          btn.onclick = () => {
+            state.historyUi.activeType = type;
+            renderAll();
+          };
 
-        return [startIndex, endIndex];
+          btn.append(
+            make("div", "history-category-title", getTypeLabel(type)),
+            make(
+              "div",
+              "history-category-sub",
+              lastWorkout
+                ? formatDateWithWeekday(lastWorkout.performedAt || lastWorkout.finishedAt || lastWorkout.createdAt)
+                : "Пока нет тренировок"
+            )
+          );
+
+          wrap.appendChild(btn);
+        });
+
+        el.historyList.appendChild(wrap);
       }
 
-      function bindHistoryPoolNode(poolNode, item, queryTokens) {
-        poolNode.host.style.transform = `translateY(${item.top}px)`;
-        poolNode.boundKey = item.key;
+      function renderHistoryTypeList(type) {
+        const workouts = getWorkoutsByType(type);
 
-        if (item.type === "month") {
-          poolNode.month.style.display = "block";
-          poolNode.row.style.display = "none";
-          poolNode.month.innerHTML = highlightTextByTokens(item.monthTitle, queryTokens);
+        const breadcrumb = make("div", "history-breadcrumb");
+        const back = make("button", "link-btn", "← Назад");
+        back.type = "button";
+        back.onclick = () => {
+          state.historyUi.activeType = "";
+          renderAll();
+        };
+        breadcrumb.append(
+          back,
+          make("div", "pill", getTypeLabel(type))
+        );
+        el.historyList.appendChild(breadcrumb);
+
+        if (!workouts.length) {
+          el.historyList.appendChild(make("div", "empty", "Пока нет тренировок"));
           return;
         }
 
-        const workoutId = item.workoutId;
-        const workout = state.workoutsById.get(workoutId);
-        const stats = state.cache.statsByWorkoutId.get(workoutId);
-        const meta = state.cache.historyMetaByWorkoutId.get(workoutId);
-        if (!workout || !stats || !meta) {
-          poolNode.month.style.display = "none";
-          poolNode.row.style.display = "none";
-          return;
-        }
+        workouts.forEach((workout) => {
+          const stats = getStats(workout);
+          const row = make("div", "history-row");
 
-        poolNode.month.style.display = "none";
-        poolNode.row.style.display = "grid";
+          const open = make("button", "history-item");
+          open.type = "button";
+          open.onclick = () => openWorkout(workout.id);
 
-        poolNode.open.onclick = () => openWorkout(workoutId);
-        poolNode.csv.onclick = () => exportWorkoutCsv(workoutId);
-        poolNode.del.onclick = () => confirmDeleteWorkout(workoutId);
+          const title = make("div", "history-title", formatDateTitle(workout.performedAt || workout.finishedAt || workout.createdAt));
+          const meta = make(
+            "div",
+            "muted",
+            `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
+          );
+          open.append(title, meta);
 
-        poolNode.title.innerHTML = highlightTextByTokens(meta.title, queryTokens);
-        poolNode.meta.innerHTML = highlightHistorySummary(stats, queryTokens);
-      }
+          const csv = make("button", "btn-card btn-accent icon-square", "CSV");
+          csv.type = "button";
+          csv.onclick = (e) => {
+            e.stopPropagation();
+            exportWorkoutCsv(workout.id);
+          };
 
-      function renderHistoryVirtualWindow(force = false) {
-        const viewport = state.historyUi.viewportEl;
-        if (!viewport) return;
+          const del = make("button", "btn-card btn-danger icon-square", "×");
+          del.type = "button";
+          del.onclick = (e) => {
+            e.stopPropagation();
+            confirmDeleteWorkout(workout.id);
+          };
 
-        const items = state.historyUi.virtualItems;
-        const viewportHeight = state.historyUi.viewportHeight || viewport.clientHeight || 0;
-        const scrollTop = state.historyUi.scrollTop || viewport.scrollTop || 0;
-        const startY = Math.max(0, scrollTop - CONFIG.historyOverscanPx);
-        const endY = scrollTop + viewportHeight + CONFIG.historyOverscanPx;
-
-        const [startIndex, endIndex] = findVirtualRange(items, startY, endY);
-        const rangeKey = `${startIndex}:${endIndex}:${items.length}:${state.historyUi.query}`;
-
-        if (!force && state.historyUi.lastRangeKey === rangeKey) return;
-        state.historyUi.lastRangeKey = rangeKey;
-
-        const visible = items.slice(startIndex, endIndex);
-        ensureHistoryPool();
-
-        const pool = state.historyUi.pool;
-        const queryTokens = state.historyUi.queryTokens;
-
-        for (let i = 0; i < pool.length; i += 1) {
-          const poolNode = pool[i];
-          const item = visible[i];
-
-          if (!item) {
-            poolNode.host.style.display = "none";
-            poolNode.boundKey = "";
-            continue;
-          }
-
-          poolNode.host.style.display = "block";
-
-          if (!force && poolNode.boundKey === item.key) {
-            poolNode.host.style.transform = `translateY(${item.top}px)`;
-            continue;
-          }
-
-          bindHistoryPoolNode(poolNode, item, queryTokens);
-        }
+          row.append(open, csv, del);
+          el.historyList.appendChild(row);
+        });
       }
 
       function openWorkout(workoutId) {
@@ -3203,14 +2843,14 @@
         openSheet();
         el.modalBody.replaceChildren();
 
-        const stats = state.cache.statsByWorkoutId.get(workout.id) || getStats(workout);
+        const stats = getStats(workout);
 
         el.modalBody.append(
-          make("div", "title", formatDateTitle(workout.finishedAt || workout.createdAt)),
+          make("div", "title", getTypeLabel(workout.trainingType)),
           make(
             "div",
             "meta",
-            `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
+            `${formatDateWithWeekday(workout.performedAt || workout.finishedAt || workout.createdAt)} · ${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
           )
         );
 
@@ -3221,7 +2861,7 @@
           ex.sets.forEach((set, index) => {
             const row = make("div", "modal-set-row");
             row.append(
-              make("div", "", `${index + 1}. ${set.weight} кг × ${set.reps}`),
+              make("div", "", `${index + 1}. ${trimNumber(set.weight)} кг × ${set.reps}`),
               make("div", "muted", `${Math.round(set.weight * set.reps)} кг`)
             );
             box.appendChild(row);
@@ -3231,9 +2871,11 @@
         });
 
         const actions = make("div", "sheet-actions");
+
         const edit = make("button", "btn-card btn-accent", "Редактировать");
         edit.type = "button";
         edit.onclick = () => openEditWorkout(workoutId);
+
         actions.append(edit);
         el.modalBody.appendChild(actions);
       }
@@ -3262,11 +2904,13 @@
         const weight = make("input", "");
         weight.value = weightValue;
         weight.inputMode = "decimal";
+        weight.placeholder = "кг";
         weight.dataset.kind = "weight";
 
         const reps = make("input", "");
         reps.value = repsValue;
         reps.inputMode = "numeric";
+        reps.placeholder = "раз";
         reps.dataset.kind = "reps";
 
         nums.append(weight, reps);
@@ -3286,6 +2930,7 @@
 
         const name = make("input", "");
         name.value = nameValue;
+        name.placeholder = "Упражнение";
         name.dataset.exName = "1";
 
         group.appendChild(name);
@@ -3308,7 +2953,14 @@
         header.append(title, addBtn);
         el.modalBody.appendChild(header);
 
+        const dateInput = document.createElement("input");
+        dateInput.type = "date";
+        dateInput.value = formatDateInputValue(workout.performedAt || workout.finishedAt || workout.createdAt);
+
+        const typeInfo = make("div", "pill", getTypeLabel(workout.trainingType));
+
         const form = make("div", "modal-form");
+        form.append(dateInput, typeInfo);
 
         workout.exercises.forEach((ex) => {
           const group = make("div", "edit-exercise-group");
@@ -3336,15 +2988,23 @@
         };
 
         const actions = make("div", "sheet-actions");
+
+        const addExerciseBtn = make("button", "btn-card btn-muted", "Добавить упражнение");
+        addExerciseBtn.type = "button";
+        addExerciseBtn.onclick = () => {
+          const newGroup = createExerciseGroup("");
+          form.appendChild(newGroup);
+        };
+
         const save = make("button", "btn-card btn-accent", "Сохранить");
         save.type = "button";
-        save.onclick = () => saveWorkoutEdit(workoutId, form);
-        actions.append(save);
+        save.onclick = () => saveWorkoutEdit(workoutId, form, dateInput);
 
+        actions.append(addExerciseBtn, save);
         el.modalBody.append(form, actions);
       }
 
-      function saveWorkoutEdit(workoutId, form) {
+      function saveWorkoutEdit(workoutId, form, dateInput) {
         const oldWorkout = state.workoutsById.get(workoutId);
         if (!oldWorkout) return;
 
@@ -3396,36 +3056,54 @@
           return;
         }
 
+        const selectedDate = dateInput.value
+          ? new Date(`${dateInput.value}T12:00:00`).toISOString()
+          : oldWorkout.performedAt || oldWorkout.finishedAt || oldWorkout.createdAt;
+
         const newWorkout = sanitizeWorkout({
           ...oldWorkout,
-          exercises: nextExercises
+          performedAt: selectedDate,
+          exercises: nextExercises,
+          syncStatus: "pending"
         });
 
         const workoutIndex = state.workouts.findIndex((item) => item.id === workoutId);
         if (workoutIndex < 0) return;
 
         state.workouts[workoutIndex] = newWorkout;
-        replaceWorkoutInCaches(oldWorkout, newWorkout);
-        applyHistoryFilter();
+        state.workouts.sort((a, b) => getWorkoutTimestamp(b) - getWorkoutTimestamp(a));
+        fullRebuildIndexes();
 
         haptic();
         renderAll();
         schedulePersist(true);
         closeModal();
-        toast("Тренировка обновлена");
+        toast("Значения тренировки уже были отправлены в таблицу");
       }
 
       function exportWorkoutCsv(workoutId) {
         const workout = state.workoutsById.get(workoutId);
         if (!workout) return;
 
-        const csv = workout.exercises
-          .map((ex) =>
-            `"${[ex.name, ...ex.sets.map((set, index) => `${index + 1}й подход ${set.weight}кг х ${set.reps}`)]
-              .join("\n")
-              .replace(/"/g, '""')}"`
-          )
-          .join(";");
+        const rows = [["Дата", "Тип", "Упражнение", "Подход", "Вес", "Повторы", "Объём"]];
+
+        workout.exercises.forEach((ex) => {
+          ex.sets.forEach((set, index) => {
+            rows.push([
+              formatDateTitle(workout.performedAt || workout.finishedAt || workout.createdAt),
+              getTypeLabel(workout.trainingType),
+              ex.name,
+              String(index + 1),
+              String(set.weight),
+              String(set.reps),
+              String(Math.round(set.weight * set.reps))
+            ]);
+          });
+        });
+
+        const csv = rows
+          .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(";"))
+          .join("\n");
 
         const blob = new Blob(["\uFEFF" + csv], {
           type: "text/csv;charset=utf-8"
@@ -3434,7 +3112,7 @@
 
         const a = document.createElement("a");
         a.href = url;
-        a.download = `workout-${new Date(workout.finishedAt || workout.createdAt).toISOString().slice(0, 10)}.csv`;
+        a.download = `${new Date(workout.performedAt || workout.finishedAt || workout.createdAt).toISOString().slice(0, 10)}_${getTypeLabel(workout.trainingType).replace(/\s+/g, "-")}.csv`;
 
         document.body.appendChild(a);
         a.click();
@@ -3455,8 +3133,7 @@
         if (!workout) return;
 
         state.workouts = state.workouts.filter((item) => item.id !== workoutId);
-        removeWorkoutFromCaches(workout);
-        applyHistoryFilter();
+        fullRebuildIndexes();
 
         closeModal();
         haptic("medium");
@@ -3465,28 +3142,72 @@
         toast("Тренировка удалена");
       }
 
+      function getAllProgressEntriesByExercise() {
+        const map = new Map();
+
+        state.workouts.forEach((workout) => {
+          workout.exercises.forEach((ex) => {
+            const key = exerciseKey(ex.name);
+            if (!map.has(key)) {
+              map.set(key, []);
+            }
+
+            const sets = ex.sets.slice();
+            let bestWeight = 0;
+            let volume = 0;
+            let reps = 0;
+
+            sets.forEach((set) => {
+              if (set.weight > bestWeight) bestWeight = set.weight;
+              volume += set.weight * set.reps;
+              reps += set.reps;
+            });
+
+            map.get(key).push({
+              key,
+              name: ex.name,
+              date: workout.performedAt || workout.finishedAt || workout.createdAt,
+              weight: bestWeight,
+              volume,
+              reps,
+              workoutId: workout.id
+            });
+          });
+        });
+
+        for (const arr of map.values()) {
+          arr.sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+
+        return map;
+      }
+
       function renderProgress() {
         const selected = el.progressSelect.value;
         const fragment = document.createDocumentFragment();
+
+        const all = getAllProgressEntriesByExercise();
 
         const empty = document.createElement("option");
         empty.value = "";
         text(empty, "Выбери упражнение");
         fragment.appendChild(empty);
 
-        state.exerciseCatalog.sorted.forEach((name) => {
-          const option = document.createElement("option");
-          option.value = name;
-          text(option, name);
-          fragment.appendChild(option);
-        });
+        [...all.values()]
+          .map((items) => items[0].name)
+          .sort((a, b) => a.localeCompare(b, "ru"))
+          .forEach((name) => {
+            const option = document.createElement("option");
+            option.value = name;
+            text(option, name);
+            fragment.appendChild(option);
+          });
 
         el.progressSelect.replaceChildren(fragment);
-        el.progressSelect.value =
-          selected && state.exerciseCatalog.sorted.includes(selected) ? selected : "";
+        el.progressSelect.value = selected ? selected : "";
 
         renderProgressMetricButtons();
-        showProgress();
+        showProgress(all);
       }
 
       function renderProgressMetricButtons() {
@@ -3495,265 +3216,7 @@
         });
       }
 
-      function getExerciseProgressEntries(name) {
-        return state.cache.progressByExercise.get(exerciseKey(name)) || [];
-      }
-
-      function formatProgressAxisLabel(iso) {
-        const date = new Date(iso);
-        return date.toLocaleDateString("ru-RU", {
-          day: "2-digit",
-          month: "2-digit"
-        });
-      }
-
-      function formatProgressMetaDate(iso) {
-        const date = new Date(iso);
-        return date.toLocaleDateString("ru-RU", {
-          day: "numeric",
-          month: "short"
-        }).replace(".", "");
-      }
-
-      function formatExactDate(iso) {
-        return new Date(iso).toLocaleDateString("ru-RU", {
-          day: "numeric",
-          month: "long",
-          year: "numeric"
-        });
-      }
-
-      function buildSmoothPath(points) {
-        if (points.length < 2) return "";
-
-        const tension = 0.18;
-        let path = `M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`;
-
-        for (let i = 0; i < points.length - 1; i++) {
-          const p0 = points[i - 1] || points[i];
-          const p1 = points[i];
-          const p2 = points[i + 1];
-          const p3 = points[i + 2] || p2;
-
-          const cp1x = p1.x + (p2.x - p0.x) * tension;
-          const cp1y = p1.y + (p2.y - p0.y) * tension;
-          const cp2x = p2.x - (p3.x - p1.x) * tension;
-          const cp2y = p2.y - (p3.y - p1.y) * tension;
-
-          path += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
-        }
-
-        return path;
-      }
-
-      function buildProgressSvg(entries, metric, selectedIndex) {
-        const width = 360;
-        const height = 260;
-        const left = 16;
-        const right = 12;
-        const top = 24;
-        const bottom = 34;
-        const baseY = height - bottom;
-        const chartHeight = baseY - top;
-
-        const values = entries.map((entry) => entry[metric]);
-        let minValue = Math.min(...values);
-        let maxValue = Math.max(...values);
-
-        if (minValue === maxValue) {
-          minValue = Math.max(0, minValue - 1);
-          maxValue = maxValue + 1;
-        } else {
-          const span = maxValue - minValue;
-          minValue = Math.max(0, minValue - span * 0.18);
-          maxValue = maxValue + span * 0.12;
-        }
-
-        const innerWidth = width - left - right;
-        const stepX = entries.length > 1 ? innerWidth / (entries.length - 1) : 0;
-
-        const points = entries.map((entry, index) => {
-          const ratio = (entry[metric] - minValue) / (maxValue - minValue || 1);
-          return {
-            x: entries.length > 1 ? left + stepX * index : left + innerWidth / 2,
-            y: baseY - ratio * chartHeight,
-            value: entry[metric],
-            label: formatProgressAxisLabel(entry.date)
-          };
-        });
-
-        const safeSelectedIndex = Math.min(
-          Math.max(Number(selectedIndex) || 0, 0),
-          Math.max(points.length - 1, 0)
-        );
-        const selected = points[safeSelectedIndex];
-
-        const smoothPath = buildSmoothPath(points);
-        const areaPath = smoothPath
-          ? `${smoothPath} L ${points[points.length - 1].x.toFixed(2)} ${baseY} L ${points[0].x.toFixed(2)} ${baseY} Z`
-          : "";
-
-        const selectedLabel = escapeSvgText(formatMetricValue(selected.value, metric));
-        const labelAnchor = selected.x > width - 90 ? "end" : "start";
-        const labelX = selected.x > width - 90 ? selected.x - 12 : selected.x + 12;
-        const labelY = Math.max(18, selected.y - 14);
-
-        const horizontalGrid = Array.from({ length: 4 }, (_, index) => {
-          const y = top + (chartHeight / 3) * index;
-          return `
-            <line
-              x1="${left}"
-              y1="${y.toFixed(2)}"
-              x2="${width - right}"
-              y2="${y.toFixed(2)}"
-              stroke="white"
-              stroke-opacity="${index === 3 ? "0.08" : "0.05"}"
-              stroke-width="1"
-            />
-          `;
-        }).join("");
-
-        const pointsMarkup = points
-          .map((point, index) => {
-            const isSelected = index === safeSelectedIndex;
-            return `
-              <g data-point-index="${index}">
-                <circle
-                  cx="${point.x.toFixed(2)}"
-                  cy="${point.y.toFixed(2)}"
-                  r="18"
-                  fill="transparent"
-                  style="pointer-events:all;cursor:pointer"
-                  data-point-index="${index}"
-                ></circle>
-
-                ${isSelected ? `
-                  <circle
-                    cx="${point.x.toFixed(2)}"
-                    cy="${point.y.toFixed(2)}"
-                    r="10"
-                    fill="#ff6418"
-                    fill-opacity="0.12"
-                  ></circle>
-                ` : ""}
-
-                <circle
-                  cx="${point.x.toFixed(2)}"
-                  cy="${point.y.toFixed(2)}"
-                  r="${isSelected ? "5.2" : "3"}"
-                  fill="${isSelected ? "#ffffff" : "rgba(255,130,80,0.92)"}"
-                  stroke="${isSelected ? "#ff6418" : "none"}"
-                  stroke-width="${isSelected ? "2.6" : "0"}"
-                  data-point-index="${index}"
-                  style="pointer-events:all;cursor:pointer"
-                ></circle>
-              </g>
-            `;
-          })
-          .join("");
-
-        const singlePointLine = points.length === 1
-          ? `
-            <line
-              x1="${(selected.x - 34).toFixed(2)}"
-              y1="${selected.y.toFixed(2)}"
-              x2="${(selected.x + 34).toFixed(2)}"
-              y2="${selected.y.toFixed(2)}"
-              stroke="url(#progressLineGradient)"
-              stroke-width="4"
-              stroke-linecap="round"
-            />
-          `
-          : "";
-
-        return `
-          <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <defs>
-              <linearGradient id="progressAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#ff6418" stop-opacity="0.28"></stop>
-                <stop offset="72%" stop-color="#ff6418" stop-opacity="0.08"></stop>
-                <stop offset="100%" stop-color="#ff6418" stop-opacity="0"></stop>
-              </linearGradient>
-
-              <linearGradient id="progressLineGradient" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#ff8a40"></stop>
-                <stop offset="100%" stop-color="#ff5a00"></stop>
-              </linearGradient>
-            </defs>
-
-            <rect
-              x="0.5"
-              y="0.5"
-              width="${width - 1}"
-              height="${height - 1}"
-              rx="24"
-              fill="transparent"
-              stroke="rgba(255,255,255,0.04)"
-            ></rect>
-
-            ${horizontalGrid}
-
-            <line
-              x1="${selected.x.toFixed(2)}"
-              y1="${selected.y.toFixed(2)}"
-              x2="${selected.x.toFixed(2)}"
-              y2="${baseY}"
-              stroke="#ff6418"
-              stroke-opacity="0.28"
-              stroke-width="2"
-            />
-
-            ${areaPath ? `<path d="${areaPath}" fill="url(#progressAreaGradient)"></path>` : ""}
-            ${smoothPath ? `
-              <path
-                d="${smoothPath}"
-                fill="none"
-                stroke="url(#progressLineGradient)"
-                stroke-width="3.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>
-            ` : ""}
-            ${singlePointLine}
-
-            <text
-              x="${labelX.toFixed(2)}"
-              y="${labelY.toFixed(2)}"
-              text-anchor="${labelAnchor}"
-              font-size="12"
-              font-weight="800"
-              fill="rgba(255,255,255,0.9)"
-            >${selectedLabel}</text>
-
-            ${pointsMarkup}
-          </svg>
-        `;
-      }
-
-      function buildProgressEmpty(title, subtitle) {
-        const box = make("div", "progress-empty-card");
-        box.append(
-          make("div", "progress-empty-card-title", title),
-          make("div", "muted", subtitle)
-        );
-        return box;
-      }
-
-      function findPointIndex(target, root) {
-        let node = target;
-
-        while (node && node !== root) {
-          if (node.dataset && node.dataset.pointIndex !== undefined) {
-            const index = Number(node.dataset.pointIndex);
-            return Number.isInteger(index) ? index : -1;
-          }
-          node = node.parentNode;
-        }
-
-        return -1;
-      }
-
-      function showProgress() {
+      function showProgress(progressMap) {
         const name = el.progressSelect.value;
         el.progressResult.replaceChildren();
 
@@ -3767,9 +3230,8 @@
           return;
         }
 
-        const allEntries = getExerciseProgressEntries(name);
-
-        if (!allEntries.length) {
+        const entries = progressMap.get(exerciseKey(name)) || [];
+        if (!entries.length) {
           el.progressResult.appendChild(
             buildProgressEmpty(
               "Пока нет данных",
@@ -3780,97 +3242,28 @@
         }
 
         const metric = state.progressMetric;
-        const visibleEntries = allEntries.slice(-12);
+        const first = entries[0];
+        const last = entries[entries.length - 1];
+        const best = entries.reduce((max, item) => item[metric] >= max[metric] ? item : max, entries[0]);
 
-        const savedDate =
-          state.progressSelection.exercise === name ? state.progressSelection.date : "";
-
-        const selectedEntry =
-          visibleEntries.find((entry) => entry.date === savedDate) ||
-          visibleEntries[visibleEntries.length - 1];
-
-        state.progressSelection.exercise = name;
-        state.progressSelection.date = selectedEntry.date;
-
-        const selectedIndex = visibleEntries.findIndex(
-          (entry) => entry.date === selectedEntry.date
+        const box = make("div", "progress-empty-card");
+        box.append(
+          make("div", "progress-empty-card-title", name),
+          make("div", "muted", `Последнее: ${trimNumber(last[metric])}${metric === "reps" ? " повт." : " кг"}`),
+          make("div", "muted", `Лучшее: ${trimNumber(best[metric])}${metric === "reps" ? " повт." : " кг"} · ${formatDateTitle(best.date)}`),
+          make("div", "muted", `Старт: ${trimNumber(first[metric])}${metric === "reps" ? " повт." : " кг"}`)
         );
 
-        const bestEntry = allEntries.reduce((best, current) => {
-          return current[metric] >= best[metric] ? current : best;
-        }, allEntries[0]);
+        el.progressResult.appendChild(box);
+      }
 
-        const lastEntry = allEntries[allEntries.length - 1];
-        const firstEntry = allEntries[0];
-        const delta = lastEntry[metric] - firstEntry[metric];
-
-        const intervalText =
-          visibleEntries.length === 1
-            ? `Дата: ${formatProgressAxisLabel(visibleEntries[0].date)}`
-            : `Интервал: ${formatProgressAxisLabel(visibleEntries[0].date)} — ${formatProgressAxisLabel(visibleEntries[visibleEntries.length - 1].date)}`;
-
-        const hero = make("div", "progress-hero");
-        hero.append(
-          make("div", "progress-kicker", "Прогресс упражнения"),
-          make("div", "progress-big", formatMetricValue(selectedEntry[metric], metric))
+      function buildProgressEmpty(title, subtitle) {
+        const box = make("div", "progress-empty-card");
+        box.append(
+          make("div", "progress-empty-card-title", title),
+          make("div", "muted", subtitle)
         );
-
-        const focus = make("div", "progress-focus");
-        const focusDot = make("span", "progress-focus-dot");
-        const focusText = make("div", "progress-focus-text", formatExactDate(selectedEntry.date));
-        focus.append(focusDot, focusText);
-        hero.appendChild(focus);
-
-        hero.append(
-          make("div", "progress-sub", `Динамика по выбранному упражнению · ${name}`)
-        );
-
-        if (visibleEntries.length > 1) {
-          hero.append(
-            make("div", "progress-hint", "Тапни по точке графика, чтобы посмотреть конкретную тренировку")
-          );
-        }
-
-        const chart = make("div", "progress-chart");
-        chart.innerHTML = buildProgressSvg(visibleEntries, metric, selectedIndex);
-
-        chart.addEventListener("click", (event) => {
-          const pointIndex = findPointIndex(event.target, chart);
-          if (pointIndex < 0 || !visibleEntries[pointIndex]) return;
-
-          state.progressSelection.exercise = name;
-          state.progressSelection.date = visibleEntries[pointIndex].date;
-          haptic();
-          showProgress();
-        });
-
-        hero.appendChild(chart);
-        hero.appendChild(make("div", "progress-range", intervalText));
-
-        const miniStats = make("div", "progress-mini-stats");
-
-        const stat1 = make("div", "progress-mini-stat");
-        stat1.append(
-          make("div", "progress-mini-value", formatMetricValue(bestEntry[metric], metric)),
-          make("div", "progress-mini-label", `PR · ${formatProgressMetaDate(bestEntry.date)}`)
-        );
-
-        const stat2 = make("div", "progress-mini-stat");
-        stat2.append(
-          make("div", "progress-mini-value", formatMetricValue(lastEntry[metric], metric)),
-          make("div", "progress-mini-label", `Последняя · ${formatProgressMetaDate(lastEntry.date)}`)
-        );
-
-        const stat3 = make("div", "progress-mini-stat");
-        stat3.append(
-          make("div", "progress-mini-value", formatDeltaValue(delta, metric)),
-          make("div", "progress-mini-label", "Дельта")
-        );
-
-        miniStats.append(stat1, stat2, stat3);
-        hero.appendChild(miniStats);
-
-        el.progressResult.appendChild(hero);
+        return box;
       }
 
       function openSheet() {
@@ -4008,6 +3401,14 @@
           });
         });
 
+        el.typeButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            selectTrainingType(btn.dataset.type);
+          });
+        });
+
+        el.changeTypeBtn.addEventListener("click", changeTrainingType);
+
         el.exerciseInput.addEventListener("input", () => {
           updateForm();
           scheduleExerciseSearchRender();
@@ -4048,21 +3449,17 @@
           }
         });
 
-        el.historySearchInput.addEventListener("input", () => {
-          state.historyUi.query = el.historySearchInput.value;
-          applyHistoryFilter();
-          if (state.historyUi.viewportEl) {
-            state.historyUi.viewportEl.scrollTop = 0;
-            state.historyUi.scrollTop = 0;
+        el.repsInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !el.addSetBtn.disabled) {
+            e.preventDefault();
+            addSet();
           }
-          state.historyUi.lastRangeKey = "";
-          renderHistory();
         });
 
         el.progressSelect.addEventListener("change", () => {
           state.progressSelection.exercise = el.progressSelect.value;
           state.progressSelection.date = "";
-          showProgress();
+          renderProgress();
         });
 
         el.progressMetricBtns.forEach((btn) => {
@@ -4070,20 +3467,13 @@
             if (state.progressMetric === btn.dataset.metric) return;
             state.progressMetric = btn.dataset.metric;
             renderProgressMetricButtons();
-            showProgress();
+            renderProgress();
             haptic();
           });
         });
 
         el.modal.addEventListener("click", (e) => {
           if (e.target === el.modal) closeModal();
-        });
-
-        el.repsInput.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" && !el.addSetBtn.disabled) {
-            e.preventDefault();
-            addSet();
-          }
         });
 
         document.addEventListener("click", (event) => {
@@ -4095,20 +3485,8 @@
         el.timerToggleBtn.addEventListener("click", toggleTimer);
 
         window.addEventListener("scroll", scheduleTimerViewportSync, { passive: true });
-        window.addEventListener("resize", () => {
-          scheduleTimerViewportSync();
-          if (state.tab === "history") {
-            state.historyUi.lastRangeKey = "";
-            renderHistory();
-          }
-        }, { passive: true });
-        window.addEventListener("orientationchange", () => {
-          scheduleTimerViewportSync();
-          if (state.tab === "history") {
-            state.historyUi.lastRangeKey = "";
-            renderHistory();
-          }
-        });
+        window.addEventListener("resize", scheduleTimerViewportSync, { passive: true });
+        window.addEventListener("orientationchange", scheduleTimerViewportSync);
 
         window.addEventListener("focus", () => {
           scheduleCloudResumeSync();
@@ -4117,14 +3495,6 @@
         if (window.visualViewport) {
           window.visualViewport.addEventListener("scroll", scheduleTimerViewportSync, { passive: true });
           window.visualViewport.addEventListener("resize", scheduleTimerViewportSync, { passive: true });
-        }
-
-        if ("ResizeObserver" in window) {
-          timerResizeObserver = new ResizeObserver(() => {
-            scheduleTimerViewportSync();
-          });
-          timerResizeObserver.observe(document.body);
-          timerResizeObserver.observe(document.documentElement);
         }
 
         window.addEventListener("pagehide", () => {
