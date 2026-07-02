@@ -19,10 +19,9 @@
       --surface-strong: rgba(255, 255, 255, 0.075);
       --field: #171717;
       --line: rgba(255, 255, 255, 0.09);
-      --line-strong: rgba(255, 255, 255, 0.14);
       --text: #fff;
       --muted: rgba(255, 255, 255, 0.58);
-      --muted-2: rgba(255, 255, 255, 0.4);
+      --muted-2: rgba(255, 255, 255, 0.38);
       --accent: #ff6418;
       --accent-soft: rgba(255, 100, 24, 0.1);
       --accent-line: rgba(255, 100, 24, 0.24);
@@ -109,7 +108,7 @@
     }
 
     input::placeholder {
-      color: rgba(255, 255, 255, 0.38);
+      color: transparent;
     }
 
     input:focus,
@@ -121,7 +120,6 @@
     .app {
       max-width: 560px;
       margin: 0 auto;
-      background: transparent;
     }
 
     .top {
@@ -191,7 +189,6 @@
 
     .panel {
       display: none;
-      background: transparent;
     }
 
     .panel.active {
@@ -335,7 +332,6 @@
       color: rgba(255, 255, 255, 0.72);
       box-shadow: none;
       font-size: 14px;
-      transition: color 0.18s ease, transform 0.14s ease;
     }
 
     .tab.active {
@@ -400,8 +396,6 @@
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.08);
       color: var(--accent);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
     }
 
     .premium-icon svg {
@@ -452,11 +446,7 @@
     }
 
     .start-cta {
-      margin-top: 4px;
-      min-height: 58px;
-      border-radius: 18px;
-      font-size: 16px;
-      font-weight: 800;
+      display: none;
     }
 
     .training-head {
@@ -509,7 +499,7 @@
 
     .form-numbers {
       display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
+      grid-template-columns: 1fr 1fr;
       gap: 9px;
     }
 
@@ -528,6 +518,32 @@
 
     .input-wrap input {
       padding-right: 38px;
+    }
+
+    .input-shell {
+      position: relative;
+      width: 100%;
+    }
+
+    .input-shell input {
+      padding-right: 64px;
+    }
+
+    .input-sidehint {
+      position: absolute;
+      top: 50%;
+      right: 14px;
+      transform: translateY(-50%);
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.34);
+      pointer-events: none;
+      transition: opacity 0.16s ease;
+    }
+
+    .input-shell.has-value .input-sidehint,
+    .input-shell.focused .input-sidehint {
+      opacity: 0;
     }
 
     .input-clear {
@@ -550,10 +566,6 @@
       justify-content: center;
       opacity: 0;
       pointer-events: none;
-      transition:
-        opacity 0.16s ease,
-        transform 0.16s ease,
-        color 0.16s ease;
     }
 
     .input-wrap.has-value .input-clear {
@@ -705,15 +717,23 @@
       font-size: 12px;
     }
 
-    .previous-summary {
-      margin-bottom: 10px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.07);
-      color: rgba(255,255,255,0.55);
-      font-size: 12px;
-      line-height: 1.35;
+    .compare-text {
+      margin-top: 2px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .compare-text.progress {
+      color: var(--success);
+      text-shadow: 0 0 16px rgba(49,214,123,0.16);
+    }
+
+    .compare-text.regress {
+      color: var(--danger);
+    }
+
+    .compare-text.equal {
+      color: var(--warn);
     }
 
     .set-row {
@@ -798,11 +818,21 @@
     }
 
     .value-box.current {
-      background: rgba(255,255,255,0.045);
+      background: rgba(255,255,255,0.05);
     }
 
     .value-box.previous {
-      background: rgba(255,255,255,0.025);
+      background: rgba(255,255,255,0.018);
+      border-color: rgba(255,255,255,0.045);
+      opacity: 0.8;
+    }
+
+    .value-box.previous .value-label {
+      color: rgba(255,255,255,0.28);
+    }
+
+    .value-box.previous .value-main {
+      color: rgba(255,255,255,0.48);
     }
 
     .value-label {
@@ -836,9 +866,6 @@
       padding: 12px 14px;
       border-radius: var(--radius);
       border: 1px solid var(--line);
-      box-shadow: none;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
     }
 
     .history-category.custom {
@@ -915,9 +942,6 @@
       padding: 10px 12px;
       border-radius: var(--radius);
       border: 1px solid var(--line);
-      box-shadow: none;
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
       overflow: hidden;
     }
 
@@ -1114,7 +1138,6 @@
       margin-bottom: 8px;
       border-radius: 14px;
       background: rgba(255, 255, 255, 0.045);
-      box-shadow: none;
       overflow: hidden;
     }
 
@@ -1363,8 +1386,15 @@
                 </div>
 
                 <div class="form-numbers">
-                  <input id="weightInput" placeholder="Вес, кг" inputmode="decimal" />
-                  <input id="repsInput" placeholder="Повторы" inputmode="numeric" />
+                  <div class="input-shell" id="weightShell">
+                    <input id="weightInput" placeholder="Вес, кг" inputmode="decimal" />
+                    <span class="input-sidehint" id="weightHint"></span>
+                  </div>
+
+                  <div class="input-shell" id="repsShell">
+                    <input id="repsInput" placeholder="Повторы" inputmode="numeric" />
+                    <span class="input-sidehint" id="repsHint"></span>
+                  </div>
                 </div>
 
                 <div class="row">
@@ -1442,10 +1472,10 @@
       "use strict";
 
       const CONFIG = {
-        storageKey: "workouts_v10",
-        draftKey: "draft_workout_v10",
-        localDataKey: "trainer_data_v7",
-        cloudDataKey: "trainer_cloud_data_v7",
+        storageKey: "workouts_v11",
+        draftKey: "draft_workout_v11",
+        localDataKey: "trainer_data_v8",
+        cloudDataKey: "trainer_cloud_data_v8",
         splashDelay: 900,
         toastDelay: 2300,
         persistDelay: 80,
@@ -1579,6 +1609,10 @@
         exerciseDropdown: document.getElementById("exerciseDropdown"),
         weightInput: document.getElementById("weightInput"),
         repsInput: document.getElementById("repsInput"),
+        weightShell: document.getElementById("weightShell"),
+        repsShell: document.getElementById("repsShell"),
+        weightHint: document.getElementById("weightHint"),
+        repsHint: document.getElementById("repsHint"),
         prefillSetBtn: document.getElementById("prefillSetBtn"),
         addSetBtn: document.getElementById("addSetBtn"),
         formHint: document.getElementById("formHint"),
@@ -1903,22 +1937,6 @@
         scheduleCloudPersist(true);
       }
 
-      function schedulePersist(immediate = false) {
-        clearTimeout(persistTimer);
-
-        if (immediate) {
-          persistNowLocal();
-          scheduleCloudPersist(true);
-          return;
-        }
-
-        persistTimer = setTimeout(() => {
-          persistNowLocal();
-        }, CONFIG.persistDelay);
-
-        scheduleCloudPersist(false);
-      }
-
       function rebuildIndexes() {
         state.workoutsById = new Map();
         state.exerciseCatalog.namesByKey = new Map();
@@ -2030,6 +2048,7 @@
         applySnapshot(finalSnapshot);
         persistNowLocal();
         renderAll();
+        syncMainButtons();
         startCloudPolling();
 
         setTimeout(() => {
@@ -2164,6 +2183,7 @@
           btn.addEventListener("click", () => {
             state.selectedStartType = type;
             renderTodayMode();
+            syncMainButtons();
             haptic();
           });
           el.typeChooser.appendChild(btn);
@@ -2224,21 +2244,25 @@
       function updatePlaceholdersByExercise() {
         const name = el.exerciseInput.value.trim();
 
-        if (!name || !isComparableType(state.draft.trainingType)) {
-          el.weightInput.placeholder = "Вес, кг";
-          el.repsInput.placeholder = "Повторы";
-          return;
-        }
+        el.weightInput.placeholder = "Вес, кг";
+        el.repsInput.placeholder = "Повторы";
+        el.weightHint.textContent = "";
+        el.repsHint.textContent = "";
+
+        if (!name || !isComparableType(state.draft.trainingType)) return;
 
         const prefill = getPrefillSetForCurrentExercise(name);
-        if (!prefill) {
-          el.weightInput.placeholder = "Вес, кг";
-          el.repsInput.placeholder = "Повторы";
-          return;
-        }
+        if (!prefill) return;
 
-        el.weightInput.placeholder = `Вес, кг · напр. ${trimNumber(prefill.weight)}`;
-        el.repsInput.placeholder = `Повторы · напр. ${prefill.reps}`;
+        el.weightHint.textContent = trimNumber(prefill.weight);
+        el.repsHint.textContent = String(prefill.reps);
+      }
+
+      function syncShellStates() {
+        [el.weightShell, el.repsShell].forEach((shell) => {
+          const input = shell.querySelector("input");
+          shell.classList.toggle("has-value", Boolean(input.value.trim()));
+        });
       }
 
       function updateForm() {
@@ -2251,6 +2275,7 @@
 
         updateExerciseClear();
         updatePlaceholdersByExercise();
+        syncShellStates();
 
         text(
           el.formHint,
@@ -2482,6 +2507,8 @@
         persistCritical();
         renderDraft();
         updateForm();
+        updateMainActions();
+        syncMainButtons();
 
         el.draftList.classList.remove("flash");
         requestAnimationFrame(() => el.draftList.classList.add("flash"));
@@ -2564,16 +2591,6 @@
           );
           box.appendChild(head);
 
-          if (template && isComparableType(state.draft.trainingType)) {
-            box.appendChild(
-              make(
-                "div",
-                "previous-summary",
-                "Показываем текущие значения рядом с соответствующими подходами прошлого выполнения этого упражнения."
-              )
-            );
-          }
-
           ex.sets.forEach((set, index) => {
             const row = make("div", "set-row");
             const setCard = make("div", "set-card");
@@ -2603,7 +2620,7 @@
 
             values.append(currentBox, previousBox);
 
-            const compareText = make("div", "exercise-sub", delta.compareText);
+            const compareText = make("div", `compare-text ${delta.status}`, delta.compareText);
 
             setCard.append(topline, values, compareText);
 
@@ -2638,6 +2655,8 @@
         persistCritical();
         renderDraft();
         updateForm();
+        updateMainActions();
+        syncMainButtons();
         toast("Подход удален");
       }
 
@@ -2718,29 +2737,55 @@
         persistCritical();
         renderDraft();
         updateForm();
+        updateMainActions();
+        syncMainButtons();
         toast("Подход обновлен");
       }
 
       function updateMainActions() {
         const hasSets = getStats(state.draft).sets > 0;
-        const shouldShow = hasSets && state.tab === "today" && isTrainingStarted();
+        const shouldShowFallback = hasSets && state.tab === "today" && isTrainingStarted();
+        el.fallbackFinishBtn.style.display = shouldShowFallback && !(tg && tg.MainButton) ? "block" : "none";
+      }
+
+      function syncMainButtons() {
         const mainButton = tg && tg.MainButton ? tg.MainButton : null;
-
-        el.fallbackFinishBtn.style.display = shouldShow && !mainButton ? "block" : "none";
-
         if (!mainButton) return;
 
+        mainButton.offClick(startTraining);
         mainButton.offClick(finishWorkout);
 
-        if (!shouldShow) {
+        const hasStarted = isTrainingStarted();
+        const hasSelectedType = Boolean(state.selectedStartType);
+        const hasSets = getStats(state.draft).sets > 0;
+
+        if (state.tab !== "today") {
           mainButton.hide();
           return;
         }
 
-        mainButton.setText("Завершить тренировку");
-        mainButton.setParams({ color: "#ff6418", text_color: "#ffffff" });
-        mainButton.onClick(finishWorkout);
-        mainButton.show();
+        if (!hasStarted) {
+          if (!hasSelectedType) {
+            mainButton.hide();
+            return;
+          }
+
+          mainButton.setText("Начать тренировку");
+          mainButton.setParams({ color: "#ff6418", text_color: "#ffffff", is_active: true, is_visible: true });
+          mainButton.onClick(startTraining);
+          mainButton.show();
+          return;
+        }
+
+        if (hasSets) {
+          mainButton.setText("Завершить тренировку");
+          mainButton.setParams({ color: "#ff6418", text_color: "#ffffff", is_active: true, is_visible: true });
+          mainButton.onClick(finishWorkout);
+          mainButton.show();
+          return;
+        }
+
+        mainButton.hide();
       }
 
       function startTraining() {
@@ -2758,6 +2803,7 @@
         haptic();
         persistCritical();
         renderAll();
+        syncMainButtons();
       }
 
       async function requestChangeTrainingType() {
@@ -2777,6 +2823,7 @@
 
         persistCritical();
         renderAll();
+        syncMainButtons();
       }
 
       async function finishWorkout() {
@@ -2805,6 +2852,7 @@
         haptic("heavy");
         persistCritical();
         renderAll();
+        syncMainButtons();
         toast("Тренировка сохранена");
       }
 
@@ -3446,6 +3494,7 @@
             state.tab = nextTab;
             haptic();
             renderAll();
+            syncMainButtons();
           });
         });
 
@@ -3475,6 +3524,18 @@
 
         el.weightInput.addEventListener("input", updateForm);
         el.repsInput.addEventListener("input", updateForm);
+
+        [el.weightInput, el.repsInput].forEach((input) => {
+          input.addEventListener("focus", () => {
+            const shell = input === el.weightInput ? el.weightShell : el.repsShell;
+            shell.classList.add("focused");
+          });
+          input.addEventListener("blur", () => {
+            const shell = input === el.weightInput ? el.weightShell : el.repsShell;
+            shell.classList.remove("focused");
+            syncShellStates();
+          });
+        });
 
         el.exerciseClearBtn.addEventListener("click", clearExerciseInput);
         el.prefillSetBtn.addEventListener("click", fillSetPrefillForCurrentExercise);
@@ -3560,6 +3621,7 @@
         tg.expand();
 
         if (tg.MainButton) {
+          tg.MainButton.offClick(startTraining);
           tg.MainButton.offClick(finishWorkout);
           tg.MainButton.hide();
         }
