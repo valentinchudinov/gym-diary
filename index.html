@@ -125,9 +125,7 @@
       padding-right: clamp(138px, 35vw, 176px);
     }
 
-    .top-copy {
-      min-width: 0;
-    }
+    .top-copy { min-width: 0; }
 
     .title {
       font-size: 28px;
@@ -146,14 +144,9 @@
       text-overflow: ellipsis;
     }
 
-    .muted {
-      color: var(--muted);
-      font-size: 13px;
-    }
+    .muted { color: var(--muted); font-size: 13px; }
 
-    .section {
-      margin-bottom: 16px;
-    }
+    .section { margin-bottom: 16px; }
 
     .section-title {
       font-size: 18px;
@@ -178,13 +171,8 @@
       color: var(--muted);
     }
 
-    .panel {
-      display: none;
-    }
-
-    .panel.active {
-      display: block;
-    }
+    .panel { display: none; }
+    .panel.active { display: block; }
 
     .splash {
       position: fixed;
@@ -233,9 +221,7 @@
       font-weight: 850;
     }
 
-    .splash-title span {
-      color: var(--accent);
-    }
+    .splash-title span { color: var(--accent); }
 
     .splash-sub {
       margin-top: 12px;
@@ -318,15 +304,9 @@
       font-size: 14px;
     }
 
-    .tab.active {
-      color: var(--accent);
-    }
+    .tab.active { color: var(--accent); }
 
-    .premium-chooser {
-      display: grid;
-      gap: 12px;
-      margin-top: 4px;
-    }
+    .premium-chooser { display: grid; gap: 12px; margin-top: 4px; }
 
     .premium-type {
       position: relative;
@@ -368,17 +348,8 @@
       color: var(--accent);
     }
 
-    .premium-icon svg {
-      width: 26px;
-      height: 26px;
-      display: block;
-    }
-
-    .premium-copy {
-      min-width: 0;
-      flex: 1;
-      display: block;
-    }
+    .premium-icon svg { width: 26px; height: 26px; display: block; }
+    .premium-copy { min-width: 0; flex: 1; display: block; }
 
     .premium-title {
       display: block;
@@ -415,9 +386,7 @@
       background: rgba(255,100,24,0.78);
     }
 
-    .start-cta {
-      display: none;
-    }
+    .start-cta { display: none; }
 
     .training-head {
       width: 100%;
@@ -435,17 +404,8 @@
       box-shadow: 0 14px 28px rgba(0,0,0,0.14);
     }
 
-    .training-head-title {
-      font-size: 22px;
-      font-weight: 840;
-      line-height: 1.08;
-    }
-
-    .training-head-sub {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 12px;
-    }
+    .training-head-title { font-size: 22px; font-weight: 840; line-height: 1.08; }
+    .training-head-sub { margin-top: 4px; color: var(--muted); font-size: 12px; }
 
     .training-head-arrow {
       min-width: 36px;
@@ -461,37 +421,13 @@
       flex: none;
     }
 
-    .form-stack,
-    .modal-form {
-      display: grid;
-      gap: 10px;
-    }
+    .form-stack, .modal-form { display: grid; gap: 10px; }
+    .form-numbers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row { display: flex; gap: 10px; }
+    .row > * { flex: 1; }
+    .input-wrap, .input-shell { position: relative; width: 100%; }
 
-    .form-numbers {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .row {
-      display: flex;
-      gap: 10px;
-    }
-
-    .row > * {
-      flex: 1;
-    }
-
-    .input-wrap,
-    .input-shell {
-      position: relative;
-      width: 100%;
-    }
-
-    .smart-field {
-      position: relative;
-      min-height: 58px;
-    }
+    .smart-field { position: relative; min-height: 58px; }
 
     .smart-field input {
       min-height: 58px;
@@ -547,9 +483,7 @@
     .smart-field-right.volume { color: var(--info); }
 
     .smart-field.has-value .smart-field-right,
-    .smart-field.focused .smart-field-right {
-      opacity: 0.22;
-    }
+    .smart-field.focused .smart-field-right { opacity: 0.22; }
 
     .smart-field.static-box {
       min-height: 62px;
@@ -562,9 +496,7 @@
     }
 
     .smart-field.static-box .smart-field-label,
-    .smart-field.static-box .smart-field-right {
-      top: 10px;
-    }
+    .smart-field.static-box .smart-field-right { top: 10px; }
 
     .smart-field.static-box .static-box-main {
       font-size: 13px;
@@ -578,13 +510,8 @@
       color: rgba(255,255,255,0.48);
     }
 
-    .smart-field input::placeholder {
-      color: rgba(255,255,255,0.22);
-    }
-
-    .smart-field.exercise-field input {
-      padding-right: 42px;
-    }
+    .smart-field input::placeholder { color: rgba(255,255,255,0.22); }
+    .smart-field.exercise-field input { padding-right: 42px; }
 
     .input-clear {
       position: absolute;
@@ -608,16 +535,9 @@
       pointer-events: none;
     }
 
-    .input-wrap.has-value .input-clear {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .input-wrap.has-value .input-clear { opacity: 1; pointer-events: auto; }
 
-    .input-clear svg {
-      width: 14px;
-      height: 14px;
-      display: block;
-    }
+    .input-clear svg { width: 14px; height: 14px; display: block; }
 
     .search-dropdown {
       position: absolute;
@@ -635,9 +555,7 @@
       overscroll-behavior: contain;
     }
 
-    .search-dropdown.open {
-      display: block;
-    }
+    .search-dropdown.open { display: block; }
 
     .search-option {
       width: 100%;
@@ -653,9 +571,7 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    .search-option:last-child {
-      border-bottom: 0;
-    }
+    .search-option:last-child { border-bottom: 0; }
 
     .search-main {
       font-size: 15px;
@@ -693,21 +609,9 @@
       line-height: 1;
     }
 
-    .btn-muted {
-      background: rgba(255, 255, 255, 0.06);
-    }
-
-    .btn-accent {
-      color: var(--accent);
-      background: var(--accent-soft);
-      border-color: var(--accent-line);
-    }
-
-    .btn-danger {
-      color: var(--danger);
-      background: var(--danger-soft);
-      border-color: var(--danger-line);
-    }
+    .btn-muted { background: rgba(255, 255, 255, 0.06); }
+    .btn-accent { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-line); }
+    .btn-danger { color: var(--danger); background: var(--danger-soft); border-color: var(--danger-line); }
 
     .icon-square {
       width: 44px;
@@ -734,9 +638,7 @@
       border-bottom: 1px solid var(--line);
     }
 
-    .exercise:last-child {
-      border-bottom: 0;
-    }
+    .exercise:last-child { border-bottom: 0; }
 
     .exercise-head {
       display: flex;
@@ -746,10 +648,7 @@
       align-items: center;
     }
 
-    .exercise-head-left {
-      min-width: 0;
-      flex: 1;
-    }
+    .exercise-head-left { min-width: 0; flex: 1; }
 
     .exercise-name {
       font-size: 16px;
@@ -790,26 +689,11 @@
       text-overflow: ellipsis;
     }
 
-    .compare-text.progress {
-      color: #00f07c;
-      text-shadow: 0 0 16px rgba(49,214,123,0.16);
-    }
-
-    .compare-text.regress {
-      color: var(--danger);
-    }
-
-    .compare-text.equal {
-      color: var(--muted-strong);
-    }
-
-    .compare-text.new {
-      color: var(--accent);
-    }
-
-    .compare-text.volume {
-      color: var(--info);
-    }
+    .compare-text.progress { color: #00f07c; text-shadow: 0 0 16px rgba(49,214,123,0.16); }
+    .compare-text.regress { color: var(--danger); }
+    .compare-text.equal { color: var(--muted-strong); }
+    .compare-text.new { color: var(--accent); }
+    .compare-text.volume { color: var(--info); }
 
     .current-set-card {
       position: relative;
@@ -906,10 +790,7 @@
       border-color: var(--info-line);
     }
 
-    .compact-sets {
-      display: grid;
-      gap: 8px;
-    }
+    .compact-sets { display: grid; gap: 8px; }
 
     .compact-set-row {
       display: grid;
@@ -941,25 +822,11 @@
       align-items: center;
     }
 
-    .compact-status-inline.progress {
-      color: #00f07c;
-    }
-
-    .compact-status-inline.regress {
-      color: var(--danger);
-    }
-
-    .compact-status-inline.equal {
-      color: rgba(255,255,255,0.55);
-    }
-
-    .compact-status-inline.new {
-      color: var(--accent);
-    }
-
-    .compact-status-inline.volume {
-      color: var(--info);
-    }
+    .compact-status-inline.progress { color: #00f07c; }
+    .compact-status-inline.regress { color: var(--danger); }
+    .compact-status-inline.equal { color: rgba(255,255,255,0.55); }
+    .compact-status-inline.new { color: var(--accent); }
+    .compact-status-inline.volume { color: var(--info); }
 
     .compact-set-actions {
       display: flex;
@@ -976,10 +843,7 @@
       border-radius: 14px;
     }
 
-    .history-categories {
-      display: grid;
-      gap: 10px;
-    }
+    .history-categories { display: grid; gap: 10px; }
 
     .history-category {
       width: 100%;
@@ -994,10 +858,7 @@
       border: 1px solid var(--line);
     }
 
-    .history-category.custom {
-      margin-top: 8px;
-      border-color: rgba(255,100,24,0.16);
-    }
+    .history-category.custom { margin-top: 8px; border-color: rgba(255,100,24,0.16); }
 
     .history-category-title {
       font-weight: 820;
@@ -1031,10 +892,7 @@
       font-weight: 700;
     }
 
-    .history-list {
-      display: grid;
-      gap: 10px;
-    }
+    .history-list { display: grid; gap: 10px; }
 
     .history-row {
       display: grid;
@@ -1086,10 +944,7 @@
       padding: 0;
     }
 
-    .progress-controls {
-      display: grid;
-      gap: 10px;
-    }
+    .progress-controls { display: grid; gap: 10px; }
 
     .progress-mode {
       display: grid;
@@ -1130,11 +985,7 @@
       gap: 6px;
     }
 
-    .progress-empty-card-title {
-      font-size: 16px;
-      font-weight: 820;
-      margin-bottom: 2px;
-    }
+    .progress-empty-card-title { font-size: 16px; font-weight: 820; margin-bottom: 2px; }
 
     .sync-pill {
       margin-top: 10px;
@@ -1163,7 +1014,7 @@
 
     .sync-pill.synced .sync-dot { background: var(--success); }
     .sync-pill.syncing .sync-dot { background: #ffb24a; }
-    .sync-pill.failed .sync-dot { background: var(--danger); }
+    .sync-pill.failed  .sync-dot { background: var(--danger); }
 
     .toast {
       position: fixed;
@@ -1188,9 +1039,7 @@
       z-index: 80;
     }
 
-    .modal.open {
-      display: flex;
-    }
+    .modal.open { display: flex; }
 
     .sheet {
       width: 100%;
@@ -1222,10 +1071,7 @@
       gap: 8px;
     }
 
-    .sheet-actions > .btn-card {
-      width: 100%;
-      display: block;
-    }
+    .sheet-actions > .btn-card { width: 100%; display: block; }
 
     .title-row {
       display: flex;
@@ -1256,9 +1102,7 @@
       border-top: 0;
     }
 
-    .edit-exercise-group > input {
-      margin-bottom: 12px;
-    }
+    .edit-exercise-group > input { margin-bottom: 12px; }
 
     .edit-set-card {
       display: grid;
@@ -1312,23 +1156,10 @@
       white-space: nowrap;
     }
 
-    .timer-idle {
-      color: rgba(255, 255, 255, 0.76);
-      font-size: 15px;
-      font-weight: 780;
-    }
+    .timer-idle { color: rgba(255, 255, 255, 0.76); font-size: 15px; font-weight: 780; }
+    .timer-live { color: rgba(255, 255, 255, 0.96); }
 
-    .timer-live {
-      color: rgba(255, 255, 255, 0.96);
-    }
-
-    .timer-icon {
-      width: 14px;
-      height: 14px;
-      display: block;
-      flex: none;
-      color: var(--accent);
-    }
+    .timer-icon { width: 14px; height: 14px; display: block; flex: none; color: var(--accent); }
 
     .timer-readout {
       font-size: 20px;
@@ -1349,13 +1180,8 @@
       flex: none;
     }
 
-    .timer-widget.running .timer-idle {
-      display: none;
-    }
-
-    .timer-widget:not(.running) .timer-live {
-      display: none;
-    }
+    .timer-widget.running .timer-idle { display: none; }
+    .timer-widget:not(.running) .timer-live { display: none; }
 
     @keyframes load {
       0% { transform: translateX(-120%); }
@@ -1363,30 +1189,12 @@
     }
 
     @media (max-width: 420px) {
-      .smart-field-label {
-        font-size: 9px;
-      }
-
-      .current-set-values {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .current-set-bottom {
-        align-items: center;
-      }
-
-      .history-row {
-        grid-template-columns: minmax(0, 1fr) 50px;
-      }
-
-      .history-actions {
-        gap: 8px;
-      }
-
-      .history-action-btn {
-        width: 50px;
-        min-width: 50px;
-      }
+      .smart-field-label { font-size: 9px; }
+      .current-set-values { grid-template-columns: 1fr 1fr; }
+      .current-set-bottom { align-items: center; }
+      .history-row { grid-template-columns: minmax(0, 1fr) 50px; }
+      .history-actions { gap: 8px; }
+      .history-action-btn { width: 50px; min-width: 50px; }
     }
   </style>
 </head>
@@ -1747,13 +1555,8 @@
         return String(value || "").trim().toLowerCase().replace(/ё/g, "е");
       }
 
-      function exerciseKey(value) {
-        return normalizeName(value);
-      }
-
-      function sameName(a, b) {
-        return normalizeName(a) === normalizeName(b);
-      }
+      function exerciseKey(value) { return normalizeName(value); }
+      function sameName(a, b) { return normalizeName(a) === normalizeName(b); }
 
       function normalizeSearchText(value) {
         return String(value || "")
@@ -1782,27 +1585,17 @@
       function parseSetInput(weightValue, repsValue) {
         const weight = normalizeNumber(weightValue);
         const reps = Number(String(repsValue).trim());
-
         if (!Number.isFinite(weight) || weight < 0) return null;
         if (!Number.isInteger(reps) || reps <= 0) return null;
-
         return { weight, reps };
       }
 
       function safeJsonParse(value, fallback = null) {
-        try {
-          return value ? JSON.parse(value) : fallback;
-        } catch {
-          return fallback;
-        }
+        try { return value ? JSON.parse(value) : fallback; } catch { return fallback; }
       }
 
       function safeStorageGet(key) {
-        try {
-          return localStorage.getItem(key);
-        } catch {
-          return null;
-        }
+        try { return localStorage.getItem(key); } catch { return null; }
       }
 
       function safeStorageSet(key, value) {
@@ -2598,12 +2391,13 @@
         return "endurance";
       }
 
+      // УКОРОЧЕННЫЕ СТАТУСЫ. «Иной» заменён на «Другой». Все бейджи — одно слово.
       function describeSetDelta(currentSet, previousSet) {
         if (!previousSet) {
           return {
             status: "new",
             label: "Новый",
-            compareText: "Без прошлого сравнения",
+            compareText: "Без сравнения",
             compactText: "Новый"
           };
         }
@@ -2650,9 +2444,9 @@
           if (clearlyBetterStrength || clearlyBetterVolume || slightlyBetterStrength || slightlyBetterVolume) {
             return {
               status: "volume",
-              label: "Иной стиль",
-              compareText: "Другой режим нагрузки, результат хороший",
-              compactText: "Иной стиль"
+              label: "Другой",
+              compareText: "Другая зона · ок",
+              compactText: "Другой"
             };
           }
 
@@ -2660,27 +2454,27 @@
             return {
               status: "volume",
               label: "Объём",
-              compareText: "Больше рабочей нагрузки, сравнение нейтрально",
+              compareText: "Объём +",
               compactText: "Объём"
             };
           }
 
           return {
             status: "equal",
-            label: "Иной стиль",
-            compareText: "Смена диапазона повторений, без оценки регресса",
-            compactText: "Иной стиль"
+            label: "Другой",
+            compareText: "Другая зона",
+            compactText: "Другой"
           };
         }
 
         if (clearlyBetterStrength || clearlyBetterVolume) {
           const parts = [];
           if (weightDiff > 0) parts.push(`${trimNumber(weightDiff)} кг`);
-          if (repsDiff > 0) parts.push(`${repsDiff} повтор`);
+          if (repsDiff > 0) parts.push(`${repsDiff} повт`);
           return {
             status: "progress",
             label: "Прогресс",
-            compareText: parts.length ? `Плюс ${parts.join(" · +")}` : "Лучше прошлого раза",
+            compareText: parts.length ? `+${parts.join(" · +")}` : "Лучше",
             compactText: parts.length ? `+${parts.join(" +")}` : "Прогресс"
           };
         }
@@ -2689,7 +2483,7 @@
           return {
             status: "progress",
             label: "Лучше",
-            compareText: "Есть улучшение относительно прошлого раза",
+            compareText: "Лучше",
             compactText: "Лучше"
           };
         }
@@ -2699,7 +2493,7 @@
           return {
             status: "equal",
             label: "Ровно",
-            compareText: "Почти без изменений",
+            compareText: "Почти ровно",
             compactText: "Ровно"
           };
         }
@@ -2708,7 +2502,7 @@
           return {
             status: "regress",
             label: "Ниже",
-            compareText: "Нагрузка заметно ниже прошлого раза",
+            compareText: "Хуже",
             compactText: "Ниже"
           };
         }
@@ -2717,18 +2511,18 @@
           return {
             status: "volume",
             label: "Объём",
-            compareText: "Меньше вес, но рабочая нагрузка не хуже",
+            compareText: "Объём",
             compactText: "Объём"
           };
         }
 
         return {
           status: "equal",
-          label: "Нейтрально",
-          compareText: "Изменение без явного регресса",
+          label: "Нейтр.",
+          compareText: "Нейтрально",
           compactText: "Нейтр."
         };
-      }
+        }
 
       function isExerciseCollapsed(exId) {
         return Boolean(state.draftView[exId]);
@@ -3748,14 +3542,16 @@
         });
       }
 
+      // ЖЁСТКИЙ СКРОЛЛ ВВЕРХ СТРАНИЦЫ ПРИ ФОКУСЕ/ТАПЕ (с фолбэками и повтором)
       function scrollAddSetCardToTop(smooth = true) {
-        const rect = el.addSetSection.getBoundingClientRect();
-        const y = window.scrollY + rect.top;
-        window.scrollTo({ top: Math.max(0, y), behavior: smooth ? "smooth" : "auto" });
+        const behavior = smooth ? "smooth" : "auto";
+        try { window.scrollTo({ top: 0, behavior }); } catch (_) { window.scrollTo(0, 0); }
+        try { document.documentElement.scrollTo({ top: 0, behavior }); } catch (_) { document.documentElement.scrollTop = 0; }
       }
 
       function scrollPageToDefaultTop() {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) { window.scrollTo(0, 0); }
+        try { document.documentElement.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) { document.documentElement.scrollTop = 0; }
       }
 
       function bindAddSetInputScroll(input, shell) {
