@@ -30,6 +30,9 @@
       --danger: #ff8a8a;
       --danger-soft: rgba(255, 70, 70, 0.12);
       --danger-line: rgba(255, 90, 90, 0.28);
+      --info: #87b7ff;
+      --info-soft: rgba(135, 183, 255, 0.12);
+      --info-line: rgba(135, 183, 255, 0.28);
       --radius: 18px;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-right: env(safe-area-inset-right, 0px);
@@ -541,6 +544,7 @@
     .smart-field-right.regress { color: var(--danger); }
     .smart-field-right.equal { color: rgba(255,255,255,0.52); }
     .smart-field-right.new { color: var(--accent); }
+    .smart-field-right.volume { color: var(--info); }
 
     .smart-field.has-value .smart-field-right,
     .smart-field.focused .smart-field-right {
@@ -803,6 +807,10 @@
       color: var(--accent);
     }
 
+    .compare-text.volume {
+      color: var(--info);
+    }
+
     .current-set-card {
       position: relative;
       margin-bottom: 12px;
@@ -892,6 +900,12 @@
       border-color: rgba(255, 100, 24, 0.24);
     }
 
+    .current-set-pill.volume {
+      color: var(--info);
+      background: var(--info-soft);
+      border-color: var(--info-line);
+    }
+
     .compact-sets {
       display: grid;
       gap: 8px;
@@ -941,6 +955,10 @@
 
     .compact-status-inline.new {
       color: var(--accent);
+    }
+
+    .compact-status-inline.volume {
+      color: var(--info);
     }
 
     .compact-set-actions {
@@ -1420,7 +1438,7 @@
 
           <section class="section" id="addSetSection">
             <div class="section-title">Добавить подход</div>
-            <div class="card">
+            <div class="card" id="addSetCard">
               <div class="form-stack">
                 <div class="input-wrap smart-field exercise-field" id="exerciseInputWrap">
                   <span class="smart-field-label" id="exerciseLabelLeft">Упражнение</span>
@@ -1533,11 +1551,11 @@
       "use strict";
 
       const CONFIG = {
-        storageKey: "workouts_v18",
-        draftKey: "draft_workout_v18",
-        localDataKey: "trainer_data_v18",
-        cloudDataKey: "trainer_cloud_data_v18",
-        draftViewKey: "draft_view_state_v18",
+        storageKey: "workouts_v19",
+        draftKey: "draft_workout_v19",
+        localDataKey: "trainer_data_v19",
+        cloudDataKey: "trainer_cloud_data_v19",
+        draftViewKey: "draft_view_state_v19",
         splashDelay: 900,
         toastDelay: 2300,
         cloudSaveDebounce: 180,
@@ -1664,6 +1682,7 @@
         trainingHeadBtn: document.getElementById("trainingHeadBtn"),
         trainingHeadTitle: document.getElementById("trainingHeadTitle"),
         addSetSection: document.getElementById("addSetSection"),
+        addSetCard: document.getElementById("addSetCard"),
         exerciseInputWrap: document.getElementById("exerciseInputWrap"),
         exerciseInput: document.getElementById("exerciseInput"),
         exerciseClearBtn: document.getElementById("exerciseClearBtn"),
@@ -2559,6 +2578,7 @@
         updateForm();
         updateMainActions();
         syncMainButtons();
+        scrollAddSetCardToTop(true);
       }
 
       function estimateStrength(weight, reps) {
@@ -2568,6 +2588,14 @@
 
       function round1(value) {
         return Math.round(value * 10) / 10;
+      }
+
+      function getRepZone(reps) {
+        if (reps <= 3) return "max";
+        if (reps <= 6) return "strength";
+        if (reps <= 9) return "hybrid";
+        if (reps <= 15) return "volume";
+        return "endurance";
       }
 
       function describeSetDelta(currentSet, previousSet) {
@@ -2582,7 +2610,6 @@
 
         const currentStrength = estimateStrength(currentSet.weight, currentSet.reps);
         const previousStrength = estimateStrength(previousSet.weight, previousSet.reps);
-
         const currentVolume = currentSet.weight * currentSet.reps;
         const previousVolume = previousSet.weight * previousSet.reps;
 
@@ -2597,10 +2624,12 @@
         const weightDiff = currentSet.weight - previousSet.weight;
         const repsDiff = currentSet.reps - previousSet.reps;
 
-        const nearlyEqualStrength = Math.abs(strengthDeltaPct) < 2.5;
-        const nearlyEqualVolume = Math.abs(volumeDeltaPct) < 4;
+        const currentZone = getRepZone(currentSet.reps);
+        const previousZone = getRepZone(previousSet.reps);
+        const zoneChanged = currentZone !== previousZone;
 
-        if (nearlyEqualStrength && nearlyEqualVolume && weightDiff === 0 && repsDiff === 0) {
+        const sameExactly = weightDiff === 0 && repsDiff === 0;
+        if (sameExactly) {
           return {
             status: "equal",
             label: "Ровно",
@@ -2609,30 +2638,64 @@
           };
         }
 
-        if (strengthDeltaPct >= 2.5 || (nearlyEqualStrength && volumeDeltaPct >= 6)) {
-          let compact = "Прогресс";
-          let compare = "Лучше прошлого раза";
+        const clearlyBetterStrength = strengthDeltaPct >= 4;
+        const clearlyBetterVolume = volumeDeltaPct >= 12;
+        const slightlyBetterStrength = strengthDeltaPct >= 1.5;
+        const slightlyBetterVolume = volumeDeltaPct >= 6;
 
-          if (weightDiff > 0 || repsDiff > 0) {
-            const pieces = [];
-            if (weightDiff !== 0) pieces.push(`${weightDiff > 0 ? "+" : ""}${trimNumber(weightDiff)} кг`);
-            if (repsDiff !== 0) pieces.push(`${repsDiff > 0 ? "+" : ""}${repsDiff} повтор`);
-            compact = pieces.join(" ");
-            compare = pieces.join(" · ");
-          } else {
-            compact = `+${round1(strengthDeltaPct)}%`;
-            compare = `Выше по силе`;
+        const clearlyWorseStrength = strengthDeltaPct <= -8;
+        const clearlyWorseVolume = volumeDeltaPct <= -18;
+
+        if (zoneChanged) {
+          if (clearlyBetterStrength || clearlyBetterVolume || slightlyBetterStrength || slightlyBetterVolume) {
+            return {
+              status: "volume",
+              label: "Иной стиль",
+              compareText: "Другой режим нагрузки, результат хороший",
+              compactText: "Иной стиль"
+            };
+          }
+
+          if (currentVolume > previousVolume || currentSet.reps > previousSet.reps) {
+            return {
+              status: "volume",
+              label: "Объём",
+              compareText: "Больше рабочей нагрузки, сравнение нейтрально",
+              compactText: "Объём"
+            };
           }
 
           return {
-            status: "progress",
-            label: "Прогресс",
-            compareText: compare,
-            compactText: compact
+            status: "equal",
+            label: "Иной стиль",
+            compareText: "Смена диапазона повторений, без оценки регресса",
+            compactText: "Иной стиль"
           };
         }
 
-        if (nearlyEqualStrength && nearlyEqualVolume) {
+        if (clearlyBetterStrength || clearlyBetterVolume) {
+          const parts = [];
+          if (weightDiff > 0) parts.push(`${trimNumber(weightDiff)} кг`);
+          if (repsDiff > 0) parts.push(`${repsDiff} повтор`);
+          return {
+            status: "progress",
+            label: "Прогресс",
+            compareText: parts.length ? `Плюс ${parts.join(" · +")}` : "Лучше прошлого раза",
+            compactText: parts.length ? `+${parts.join(" +")}` : "Прогресс"
+          };
+        }
+
+        if (slightlyBetterStrength || slightlyBetterVolume) {
+          return {
+            status: "progress",
+            label: "Лучше",
+            compareText: "Есть улучшение относительно прошлого раза",
+            compactText: "Лучше"
+          };
+        }
+
+        const almostSame = Math.abs(strengthDeltaPct) < 4 && Math.abs(volumeDeltaPct) < 10;
+        if (almostSame) {
           return {
             status: "equal",
             label: "Ровно",
@@ -2641,22 +2704,29 @@
           };
         }
 
-        let compact = "Регресс";
-        let compare = "Ниже прошлого раза";
+        if (clearlyWorseStrength && clearlyWorseVolume && repsDiff <= 0 && weightDiff <= 0) {
+          return {
+            status: "regress",
+            label: "Ниже",
+            compareText: "Нагрузка заметно ниже прошлого раза",
+            compactText: "Ниже"
+          };
+        }
 
-        if (weightDiff < 0 || repsDiff < 0) {
-          const pieces = [];
-          if (weightDiff !== 0) pieces.push(`${weightDiff > 0 ? "+" : ""}${trimNumber(weightDiff)} кг`);
-          if (repsDiff !== 0) pieces.push(`${repsDiff > 0 ? "+" : ""}${repsDiff} повтор`);
-          compact = pieces.join(" ");
-          compare = pieces.join(" · ");
+        if (currentVolume >= previousVolume || currentSet.reps > previousSet.reps) {
+          return {
+            status: "volume",
+            label: "Объём",
+            compareText: "Меньше вес, но рабочая нагрузка не хуже",
+            compactText: "Объём"
+          };
         }
 
         return {
-          status: "regress",
-          label: "Регресс",
-          compareText: compare,
-          compactText: compact
+          status: "equal",
+          label: "Нейтрально",
+          compareText: "Изменение без явного регресса",
+          compactText: "Нейтр."
         };
       }
 
@@ -2976,6 +3046,7 @@
         persistCritical();
         renderAll();
         syncMainButtons();
+        scrollPageToDefaultTop();
       }
 
       async function requestChangeTrainingType() {
@@ -2998,6 +3069,7 @@
         persistCritical();
         renderAll();
         syncMainButtons();
+        scrollPageToDefaultTop();
       }
 
       async function finishWorkout() {
@@ -3028,6 +3100,9 @@
         persistCritical();
         renderAll();
         syncMainButtons();
+        closeExerciseDropdown();
+        hideKeyboard();
+        scrollPageToDefaultTop();
         toast("Тренировка сохранена");
       }
 
@@ -3673,10 +3748,36 @@
         });
       }
 
-      function scrollAddSetToTop() {
+      function scrollAddSetCardToTop(smooth = true) {
         const rect = el.addSetSection.getBoundingClientRect();
-        const y = window.scrollY + rect.top - 8;
-        window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+        const y = window.scrollY + rect.top;
+        window.scrollTo({ top: Math.max(0, y), behavior: smooth ? "smooth" : "auto" });
+      }
+
+      function scrollPageToDefaultTop() {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function bindAddSetInputScroll(input, shell) {
+        input.addEventListener("focus", () => {
+          if (shell) shell.classList.add("focused");
+          scrollAddSetCardToTop(true);
+          setTimeout(() => scrollAddSetCardToTop(true), 120);
+          setTimeout(() => scrollAddSetCardToTop(true), 260);
+        });
+
+        input.addEventListener("pointerdown", () => {
+          scrollAddSetCardToTop(true);
+        }, { passive: true });
+
+        input.addEventListener("touchstart", () => {
+          scrollAddSetCardToTop(true);
+        }, { passive: true });
+
+        input.addEventListener("blur", () => {
+          if (shell) shell.classList.remove("focused");
+          syncShellStates();
+        });
       }
 
       function bindEvents() {
@@ -3692,6 +3793,7 @@
             haptic();
             renderAll();
             syncMainButtons();
+            scrollPageToDefaultTop();
           });
         });
 
@@ -3703,18 +3805,15 @@
           scheduleExerciseSearchRender();
         });
 
+        bindAddSetInputScroll(el.exerciseInput, el.exerciseInputWrap);
+        bindAddSetInputScroll(el.weightInput, el.weightShell);
+        bindAddSetInputScroll(el.repsInput, el.repsShell);
+
         el.exerciseInput.addEventListener("focus", () => {
-          el.exerciseInputWrap.classList.add("focused");
-          scrollAddSetToTop();
-          setTimeout(scrollAddSetToTop, 120);
-          setTimeout(scrollAddSetToTop, 260);
           renderExerciseSearchResults(true);
         });
 
         el.exerciseInput.addEventListener("blur", () => {
-          el.exerciseInputWrap.classList.remove("focused");
-          syncShellStates();
-
           setTimeout(() => {
             if (document.activeElement && el.exerciseDropdown.contains(document.activeElement)) return;
             closeExerciseDropdown();
@@ -3723,20 +3822,6 @@
 
         el.weightInput.addEventListener("input", updateForm);
         el.repsInput.addEventListener("input", updateForm);
-
-        [
-          { input: el.weightInput, shell: el.weightShell },
-          { input: el.repsInput, shell: el.repsShell }
-        ].forEach(({ input, shell }) => {
-          input.addEventListener("focus", () => {
-            shell.classList.add("focused");
-          });
-
-          input.addEventListener("blur", () => {
-            shell.classList.remove("focused");
-            syncShellStates();
-          });
-        });
 
         el.exerciseClearBtn.addEventListener("click", clearExerciseInput);
         el.prefillSetBtn.addEventListener("click", fillSetPrefillForCurrentExercise);
