@@ -678,14 +678,14 @@
     }
 
     .icon-square {
-      width: 36px;
-      min-width: 36px;
-      height: 36px;
-      min-height: 36px;
+      width: 44px;
+      min-width: 44px;
+      height: 44px;
+      min-height: 44px;
       padding: 0;
-      font-size: 16px;
+      font-size: 14px;
       flex-shrink: 0;
-      border-radius: 10px;
+      border-radius: 14px;
     }
 
     .fallback-finish {
@@ -934,14 +934,16 @@
       font-weight: 760;
     }
 
+    .history-list {
+      display: grid;
+      gap: 10px;
+    }
+
     .history-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 62px 62px;
-      gap: 8px;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
       align-items: stretch;
-      min-height: 92px;
-      margin-bottom: 8px;
-      overflow: visible;
     }
 
     .history-item {
@@ -952,19 +954,38 @@
       flex-direction: column;
       justify-content: center;
       background:
+        radial-gradient(circle at 100% 0%, rgba(255,100,24,0.06), transparent 30%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
         rgba(255, 255, 255, 0.025);
-      padding: 10px 12px;
-      border-radius: var(--radius);
+      padding: 14px 16px;
+      border-radius: 22px;
       border: 1px solid var(--line);
       overflow: hidden;
+      box-shadow: 0 14px 28px rgba(0,0,0,0.14);
     }
 
     .history-title {
       font-weight: 820;
-      font-size: 16px;
-      margin-bottom: 4px;
-      line-height: 1.1;
+      font-size: 20px;
+      margin-bottom: 6px;
+      line-height: 1.08;
+    }
+
+    .history-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .history-action-btn {
+      width: 50px;
+      min-width: 50px;
+      height: 42px;
+      min-height: 42px;
+      border-radius: 14px;
+      font-size: 13px;
+      padding: 0;
     }
 
     .progress-controls {
@@ -1259,6 +1280,19 @@
       .current-set-bottom {
         align-items: center;
       }
+
+      .history-row {
+        grid-template-columns: minmax(0, 1fr) 50px;
+      }
+
+      .history-actions {
+        gap: 8px;
+      }
+
+      .history-action-btn {
+        width: 50px;
+        min-width: 50px;
+      }
     }
   </style>
 </head>
@@ -1357,7 +1391,7 @@
                   <button id="addSetBtn" type="button" class="btn-card btn-accent" disabled>Добавить</button>
                 </div>
 
-                <div class="muted" id="formHint">Выбери упражнение, вес и повторы</div>
+                <div class="muted" id="formHint"></div>
               </div>
             </div>
           </section>
@@ -1423,10 +1457,10 @@
       "use strict";
 
       const CONFIG = {
-        storageKey: "workouts_v15",
-        draftKey: "draft_workout_v15",
-        localDataKey: "trainer_data_v15",
-        cloudDataKey: "trainer_cloud_data_v15",
+        storageKey: "workouts_v16",
+        draftKey: "draft_workout_v16",
+        localDataKey: "trainer_data_v16",
+        cloudDataKey: "trainer_cloud_data_v16",
         splashDelay: 900,
         toastDelay: 2300,
         cloudSaveDebounce: 180,
@@ -2215,17 +2249,12 @@
         updateFieldHints();
         syncShellStates();
 
-        if (!name) {
-          text(el.formHint, "Сначала выбери упражнение");
+        if (!name || !parsed) {
+          text(el.formHint, "");
           return;
         }
 
-        if (!parsed) {
-          text(el.formHint, "Введи вес и количество повторений");
-          return;
-        }
-
-        text(el.formHint, "Готово к добавлению");
+        text(el.formHint, "");
       }
 
       function escapeHtml(value) {
@@ -2517,18 +2546,13 @@
           const headLeft = make("div", "");
           headLeft.appendChild(make("div", "exercise-name", ex.name));
 
-          const template = getTemplateReference(ex.name);
-          if (template && isComparableType(state.draft.trainingType)) {
-            headLeft.appendChild(
-              make("div", "exercise-sub", `Сравнение с ${formatDateTitle(template.workout.performedAt || template.workout.finishedAt || template.workout.createdAt)}`)
-            );
-          }
-
           head.append(
             headLeft,
             make("div", "muted", `${ex.sets.length} подходов · ${Math.round(volume)} кг`)
           );
           box.appendChild(head);
+
+          const template = getTemplateReference(ex.name);
 
           ex.sets.forEach((set, index) => {
             const templateSet = template ? template.exercise.sets[index] : null;
@@ -2901,6 +2925,8 @@
           return;
         }
 
+        const list = make("div", "history-list");
+
         workouts.forEach((workout) => {
           const stats = getStats(workout);
           const row = make("div", "history-row");
@@ -2913,23 +2939,28 @@
             make("div", "muted", `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`)
           );
 
-          const csv = make("button", "btn-card btn-accent icon-square", "CSV");
+          const actions = make("div", "history-actions");
+
+          const csv = make("button", "btn-card btn-accent history-action-btn", "CSV");
           csv.type = "button";
           csv.onclick = (e) => {
             e.stopPropagation();
             exportWorkoutCsv(workout.id);
           };
 
-          const del = make("button", "btn-card btn-danger icon-square", "×");
+          const del = make("button", "btn-card btn-danger history-action-btn", "×");
           del.type = "button";
           del.onclick = (e) => {
             e.stopPropagation();
             confirmDeleteWorkout(workout.id);
           };
 
-          row.append(open, csv, del);
-          el.historyList.appendChild(row);
+          actions.append(csv, del);
+          row.append(open, actions);
+          list.appendChild(row);
         });
+
+        el.historyList.appendChild(list);
       }
 
       function openWorkout(workoutId) {
@@ -3308,7 +3339,7 @@
         el.progressResult.replaceChildren();
 
         if (!el.progressSelect.value) {
-          const box = buildProgressEmpty("Выбери упражнение", "Покажу динамику по силе, объёму или повторениям");
+          const box = buildProgressEmpty("Выбери упражнение", "");
           box.appendChild(buildSyncPill());
           el.progressResult.appendChild(box);
           return;
@@ -3316,7 +3347,7 @@
 
         const entries = progressMap.get(exerciseKey(el.progressSelect.value)) || [];
         if (!entries.length) {
-          const box = buildProgressEmpty("Пока нет данных", "Добавь и сохрани хотя бы одну тренировку");
+          const box = buildProgressEmpty("Пока нет данных", "");
           box.appendChild(buildSyncPill());
           el.progressResult.appendChild(box);
           return;
