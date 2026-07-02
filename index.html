@@ -18,7 +18,6 @@
       --surface: rgba(255, 255, 255, 0.055);
       --field: #171717;
       --line: rgba(255, 255, 255, 0.09);
-      --line-strong: rgba(255, 255, 255, 0.14);
       --text: #fff;
       --muted: rgba(255, 255, 255, 0.58);
       --muted-strong: rgba(255, 255, 255, 0.72);
@@ -28,9 +27,6 @@
       --success: #31d67b;
       --success-soft: rgba(49, 214, 123, 0.12);
       --success-line: rgba(49, 214, 123, 0.26);
-      --warn: #ffb24a;
-      --warn-soft: rgba(255, 178, 74, 0.12);
-      --warn-line: rgba(255, 178, 74, 0.28);
       --danger: #ff8a8a;
       --danger-soft: rgba(255, 70, 70, 0.12);
       --danger-line: rgba(255, 90, 90, 0.28);
@@ -535,11 +531,16 @@
       font-size: 12px;
       line-height: 1;
       font-weight: 800;
-      color: rgba(255,255,255,0.34);
       pointer-events: none;
       text-align: right;
       white-space: nowrap;
+      color: rgba(255,255,255,0.34);
     }
+
+    .smart-field-right.progress { color: #00f07c; }
+    .smart-field-right.regress { color: var(--danger); }
+    .smart-field-right.equal { color: rgba(255,255,255,0.52); }
+    .smart-field-right.new { color: var(--accent); }
 
     .smart-field.has-value .smart-field-right,
     .smart-field.focused .smart-field-right {
@@ -552,6 +553,8 @@
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 14px;
+      display: flex;
+      align-items: center;
     }
 
     .smart-field.static-box .smart-field-label,
@@ -751,7 +754,7 @@
     }
 
     .exercise-toggle {
-      min-height: 36px;
+      min-height: 38px;
       padding: 0 12px;
       border-radius: 999px;
       background: rgba(255,255,255,0.04);
@@ -761,6 +764,17 @@
       font-weight: 760;
       box-shadow: none;
       flex: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .exercise-toggle svg {
+      width: 14px;
+      height: 14px;
+      display: block;
+      flex: none;
+      opacity: 0.86;
     }
 
     .compare-text {
@@ -783,6 +797,10 @@
 
     .compare-text.equal {
       color: var(--muted-strong);
+    }
+
+    .compare-text.new {
+      color: var(--accent);
     }
 
     .current-set-card {
@@ -868,6 +886,12 @@
       border-color: rgba(255,255,255,0.08);
     }
 
+    .current-set-pill.new {
+      color: var(--accent);
+      background: rgba(255, 100, 24, 0.1);
+      border-color: rgba(255, 100, 24, 0.24);
+    }
+
     .compact-sets {
       display: grid;
       gap: 8px;
@@ -877,49 +901,61 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 8px;
+      align-items: stretch;
+    }
+
+    .compact-set-row .smart-field.static-box {
+      min-height: 58px;
+      height: 58px;
       align-items: center;
     }
 
-    .compact-set-box {
-      min-width: 0;
-      padding-right: 12px;
-    }
-
-    .compact-set-value {
-      font-size: 14px;
-      font-weight: 800;
-      color: #fff;
-      line-height: 1.15;
+    .compact-set-row .static-box-main {
       display: flex;
       align-items: center;
+      justify-content: flex-start;
       gap: 8px;
       flex-wrap: wrap;
     }
 
-    .compact-set-delta {
+    .compact-status-inline {
       font-size: 12px;
       font-weight: 800;
       line-height: 1;
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
     }
 
-    .compact-set-delta.progress {
+    .compact-status-inline.progress {
       color: #00f07c;
     }
 
-    .compact-set-delta.regress {
+    .compact-status-inline.regress {
       color: var(--danger);
     }
 
-    .compact-set-delta.equal {
-      color: rgba(255,255,255,0.52);
+    .compact-status-inline.equal {
+      color: rgba(255,255,255,0.55);
+    }
+
+    .compact-status-inline.new {
+      color: var(--accent);
     }
 
     .compact-set-actions {
       display: flex;
-      align-items: center;
+      align-items: stretch;
       gap: 6px;
       flex: none;
+    }
+
+    .compact-set-actions .icon-square {
+      width: 44px;
+      min-width: 44px;
+      height: 58px;
+      min-height: 58px;
+      border-radius: 14px;
     }
 
     .history-categories {
@@ -1009,9 +1045,10 @@
 
     .history-title {
       font-weight: 820;
-      font-size: 20px;
+      font-size: 17px;
       margin-bottom: 6px;
-      line-height: 1.08;
+      line-height: 1.22;
+      word-break: break-word;
     }
 
     .history-actions {
@@ -1107,7 +1144,7 @@
     }
 
     .sync-pill.synced .sync-dot { background: var(--success); }
-    .sync-pill.syncing .sync-dot { background: var(--warn); }
+    .sync-pill.syncing .sync-dot { background: #ffb24a; }
     .sync-pill.failed .sync-dot { background: var(--danger); }
 
     .toast {
@@ -1215,13 +1252,6 @@
       border-radius: 14px;
       background: rgba(255, 255, 255, 0.045);
       overflow: hidden;
-    }
-
-    .confirm-copy {
-      color: rgba(255,255,255,0.72);
-      line-height: 1.45;
-      margin-top: 8px;
-      margin-bottom: 14px;
     }
 
     .global-timer-layer {
@@ -1339,10 +1369,6 @@
         width: 50px;
         min-width: 50px;
       }
-
-      .compact-set-row {
-        grid-template-columns: minmax(0, 1fr) auto;
-      }
     }
   </style>
 </head>
@@ -1392,7 +1418,7 @@
             </button>
           </section>
 
-          <section class="section">
+          <section class="section" id="addSetSection">
             <div class="section-title">Добавить подход</div>
             <div class="card">
               <div class="form-stack">
@@ -1507,11 +1533,11 @@
       "use strict";
 
       const CONFIG = {
-        storageKey: "workouts_v17",
-        draftKey: "draft_workout_v17",
-        localDataKey: "trainer_data_v17",
-        cloudDataKey: "trainer_cloud_data_v17",
-        draftViewKey: "draft_view_state_v17",
+        storageKey: "workouts_v18",
+        draftKey: "draft_workout_v18",
+        localDataKey: "trainer_data_v18",
+        cloudDataKey: "trainer_cloud_data_v18",
+        draftViewKey: "draft_view_state_v18",
         splashDelay: 900,
         toastDelay: 2300,
         cloudSaveDebounce: 180,
@@ -1637,6 +1663,7 @@
         trainingScreen: document.getElementById("trainingScreen"),
         trainingHeadBtn: document.getElementById("trainingHeadBtn"),
         trainingHeadTitle: document.getElementById("trainingHeadTitle"),
+        addSetSection: document.getElementById("addSetSection"),
         exerciseInputWrap: document.getElementById("exerciseInputWrap"),
         exerciseInput: document.getElementById("exerciseInput"),
         exerciseClearBtn: document.getElementById("exerciseClearBtn"),
@@ -2534,50 +2561,102 @@
         syncMainButtons();
       }
 
+      function estimateStrength(weight, reps) {
+        const safeReps = Math.max(1, Number(reps) || 1);
+        return weight * (1 + safeReps / 30);
+      }
+
+      function round1(value) {
+        return Math.round(value * 10) / 10;
+      }
+
       function describeSetDelta(currentSet, previousSet) {
         if (!previousSet) {
           return {
-            status: "equal",
-            label: "Новый подход",
-            compareText: "Новый подход",
-            compactDelta: ""
+            status: "new",
+            label: "Новый",
+            compareText: "Без прошлого сравнения",
+            compactText: "Новый"
           };
         }
+
+        const currentStrength = estimateStrength(currentSet.weight, currentSet.reps);
+        const previousStrength = estimateStrength(previousSet.weight, previousSet.reps);
+
+        const currentVolume = currentSet.weight * currentSet.reps;
+        const previousVolume = previousSet.weight * previousSet.reps;
+
+        const strengthDeltaPct = previousStrength > 0
+          ? ((currentStrength - previousStrength) / previousStrength) * 100
+          : 0;
+
+        const volumeDeltaPct = previousVolume > 0
+          ? ((currentVolume - previousVolume) / previousVolume) * 100
+          : 0;
 
         const weightDiff = currentSet.weight - previousSet.weight;
         const repsDiff = currentSet.reps - previousSet.reps;
 
-        if (weightDiff > 0 || (weightDiff === 0 && repsDiff > 0)) {
-          const pieces = [];
-          if (weightDiff !== 0) pieces.push(`${weightDiff > 0 ? "+" : ""}${trimNumber(weightDiff)} кг`);
-          if (repsDiff !== 0) pieces.push(`${repsDiff > 0 ? "+" : ""}${repsDiff} повтор`);
-          return {
-            status: "progress",
-            label: "Прогресс",
-            compareText: repsDiff > 0 && weightDiff === 0 && repsDiff === 1
-              ? "+1 повтор"
-              : pieces.length ? pieces.join(" · ") : "Лучше прошлого раза",
-            compactDelta: pieces.join(" ")
-          };
-        }
+        const nearlyEqualStrength = Math.abs(strengthDeltaPct) < 2.5;
+        const nearlyEqualVolume = Math.abs(volumeDeltaPct) < 4;
 
-        if (weightDiff === 0 && repsDiff === 0) {
+        if (nearlyEqualStrength && nearlyEqualVolume && weightDiff === 0 && repsDiff === 0) {
           return {
             status: "equal",
             label: "Ровно",
             compareText: "Без изменений",
-            compactDelta: ""
+            compactText: "Ровно"
           };
         }
 
-        const pieces = [];
-        if (weightDiff !== 0) pieces.push(`${weightDiff > 0 ? "+" : ""}${trimNumber(weightDiff)} кг`);
-        if (repsDiff !== 0) pieces.push(`${repsDiff > 0 ? "+" : ""}${repsDiff} повтор`);
+        if (strengthDeltaPct >= 2.5 || (nearlyEqualStrength && volumeDeltaPct >= 6)) {
+          let compact = "Прогресс";
+          let compare = "Лучше прошлого раза";
+
+          if (weightDiff > 0 || repsDiff > 0) {
+            const pieces = [];
+            if (weightDiff !== 0) pieces.push(`${weightDiff > 0 ? "+" : ""}${trimNumber(weightDiff)} кг`);
+            if (repsDiff !== 0) pieces.push(`${repsDiff > 0 ? "+" : ""}${repsDiff} повтор`);
+            compact = pieces.join(" ");
+            compare = pieces.join(" · ");
+          } else {
+            compact = `+${round1(strengthDeltaPct)}%`;
+            compare = `Выше по силе`;
+          }
+
+          return {
+            status: "progress",
+            label: "Прогресс",
+            compareText: compare,
+            compactText: compact
+          };
+        }
+
+        if (nearlyEqualStrength && nearlyEqualVolume) {
+          return {
+            status: "equal",
+            label: "Ровно",
+            compareText: "Почти без изменений",
+            compactText: "Ровно"
+          };
+        }
+
+        let compact = "Регресс";
+        let compare = "Ниже прошлого раза";
+
+        if (weightDiff < 0 || repsDiff < 0) {
+          const pieces = [];
+          if (weightDiff !== 0) pieces.push(`${weightDiff > 0 ? "+" : ""}${trimNumber(weightDiff)} кг`);
+          if (repsDiff !== 0) pieces.push(`${repsDiff > 0 ? "+" : ""}${repsDiff} повтор`);
+          compact = pieces.join(" ");
+          compare = pieces.join(" · ");
+        }
+
         return {
           status: "regress",
           label: "Регресс",
-          compareText: pieces.length ? pieces.join(" · ") : "Ниже прошлого раза",
-          compactDelta: pieces.join(" ")
+          compareText: compare,
+          compactText: compact
         };
       }
 
@@ -2591,10 +2670,10 @@
         renderDraft();
       }
 
-      function createStaticSetBox(label, value, rightValue, variant = "") {
+      function createStaticSetBox(label, value, rightValue, variant = "", rightClass = "") {
         const box = make("div", `smart-field static-box ${variant}`.trim());
         const left = make("span", "smart-field-label", label);
-        const right = make("span", "smart-field-right", rightValue || "");
+        const right = make("span", `smart-field-right ${rightClass}`.trim(), rightValue || "");
         const main = make("div", "static-box-main", value);
         box.append(left, right, main);
         return box;
@@ -2623,8 +2702,16 @@
           const headLeft = make("div", "exercise-head-left");
           headLeft.appendChild(make("div", "exercise-name", ex.name));
 
-          const toggleBtn = make("button", "exercise-toggle", collapsed ? "Развернуть" : "Свернуть");
+          const toggleBtn = make("button", "exercise-toggle");
           toggleBtn.type = "button";
+          toggleBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              ${collapsed
+                ? '<path d="M6 15l6-6 6 6"></path>'
+                : '<path d="M6 9l6 6 6-6"></path>'}
+            </svg>
+            <span>${collapsed ? "Развернуть" : "Свернуть"}</span>
+          `;
           toggleBtn.onclick = () => {
             toggleExerciseCollapsed(ex.id);
             haptic();
@@ -2683,17 +2770,15 @@
               const delta = describeSetDelta(set, templateSet);
 
               const row = make("div", "compact-set-row");
+              const lineText = `${trimNumber(set.weight)} кг x ${set.reps}`;
 
               const valueBox = createStaticSetBox(
                 `${index + 1}-й подход`,
-                `${trimNumber(set.weight)} кг x ${set.reps}`,
-                delta.compactDelta || "",
-                ""
+                lineText,
+                delta.compactText,
+                "",
+                delta.status
               );
-
-              if (delta.compactDelta) {
-                valueBox.querySelector(".smart-field-right").classList.add(delta.status);
-              }
 
               const actions = make("div", "compact-set-actions");
 
@@ -2903,6 +2988,7 @@
 
         state.selectedStartType = "";
         state.draft = createDraft();
+        state.draftView = {};
         el.exerciseInput.value = "";
         el.weightInput.value = "";
         el.repsInput.value = "";
@@ -2957,10 +3043,37 @@
         if (diff === 1) return "Вчера";
 
         return date.toLocaleDateString("ru-RU", {
-          day: "numeric",
-          month: "long",
+          day: "2-digit",
+          month: "2-digit",
           year: "numeric"
         });
+      }
+
+      function getRelativeDayLabel(iso) {
+        const date = new Date(iso);
+        const now = new Date();
+
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const diff = Math.round((today - day) / 86400000);
+
+        if (diff === 0) return "Сегодня";
+        if (diff === 1) return "Вчера";
+        return date.toLocaleDateString("ru-RU", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric"
+        });
+      }
+
+      function getWeekdayLabel(iso) {
+        const date = new Date(iso);
+        return date.toLocaleDateString("ru-RU", { weekday: "long" });
+      }
+
+      function formatHistoryCardTitle(workout) {
+        const iso = workout.performedAt || workout.finishedAt || workout.createdAt;
+        return `${getTypeLabel(workout.trainingType)} • ${getRelativeDayLabel(iso)} • ${new Date(iso).toLocaleDateString("ru-RU")} • ${getWeekdayLabel(iso)}`;
       }
 
       function formatDateWithWeekday(iso) {
@@ -3056,7 +3169,7 @@
           open.type = "button";
           open.onclick = () => openWorkout(workout.id);
           open.append(
-            make("div", "history-title", formatDateTitle(workout.performedAt || workout.finishedAt || workout.createdAt)),
+            make("div", "history-title", formatHistoryCardTitle(workout)),
             make("div", "muted", `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`)
           );
 
@@ -3560,6 +3673,12 @@
         });
       }
 
+      function scrollAddSetToTop() {
+        const rect = el.addSetSection.getBoundingClientRect();
+        const y = window.scrollY + rect.top - 8;
+        window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+      }
+
       function bindEvents() {
         el.tabs.forEach((tab) => {
           tab.addEventListener("click", () => {
@@ -3586,6 +3705,9 @@
 
         el.exerciseInput.addEventListener("focus", () => {
           el.exerciseInputWrap.classList.add("focused");
+          scrollAddSetToTop();
+          setTimeout(scrollAddSetToTop, 120);
+          setTimeout(scrollAddSetToTop, 260);
           renderExerciseSearchResults(true);
         });
 
