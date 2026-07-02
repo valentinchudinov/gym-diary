@@ -476,7 +476,7 @@
 
     .row {
       display: flex;
-      gap: 8px;
+      gap: 10px;
     }
 
     .row > * {
@@ -544,6 +544,31 @@
     .smart-field.has-value .smart-field-right,
     .smart-field.focused .smart-field-right {
       opacity: 0.22;
+    }
+
+    .smart-field.static-box {
+      min-height: 62px;
+      padding: 25px 12px 11px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+    }
+
+    .smart-field.static-box .smart-field-label,
+    .smart-field.static-box .smart-field-right {
+      top: 10px;
+    }
+
+    .smart-field.static-box .static-box-main {
+      font-size: 13px;
+      line-height: 1.15;
+      font-weight: 820;
+      color: #fff;
+      word-break: break-word;
+    }
+
+    .smart-field.static-box.previous .static-box-main {
+      color: rgba(255,255,255,0.48);
     }
 
     .smart-field input::placeholder {
@@ -711,7 +736,12 @@
       justify-content: space-between;
       gap: 10px;
       margin-bottom: 12px;
-      align-items: flex-start;
+      align-items: center;
+    }
+
+    .exercise-head-left {
+      min-width: 0;
+      flex: 1;
     }
 
     .exercise-name {
@@ -720,16 +750,26 @@
       overflow-wrap: anywhere;
     }
 
-    .exercise-sub {
-      margin-top: 4px;
-      color: rgba(255,255,255,0.42);
+    .exercise-toggle {
+      min-height: 36px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.84);
       font-size: 12px;
+      font-weight: 760;
+      box-shadow: none;
+      flex: none;
     }
 
     .compare-text {
       margin-top: 2px;
       font-size: 13px;
       font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .compare-text.progress {
@@ -788,44 +828,6 @@
       margin-bottom: 10px;
     }
 
-    .current-set-box {
-      min-width: 0;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.05);
-      padding: 10px 10px 9px;
-      background: rgba(255,255,255,0.03);
-    }
-
-    .current-set-box.current {
-      background: rgba(255,255,255,0.05);
-    }
-
-    .current-set-box.previous {
-      background: rgba(255,255,255,0.02);
-    }
-
-    .current-set-label {
-      font-size: 11px;
-      line-height: 1;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      color: rgba(255,255,255,0.35);
-      margin-bottom: 7px;
-      white-space: nowrap;
-    }
-
-    .current-set-main {
-      font-size: 13px;
-      line-height: 1.15;
-      font-weight: 820;
-      color: #fff;
-      word-break: break-word;
-    }
-
-    .current-set-box.previous .current-set-main {
-      color: rgba(255,255,255,0.45);
-    }
-
     .current-set-bottom {
       display: flex;
       align-items: flex-end;
@@ -864,6 +866,60 @@
       color: rgba(255,255,255,0.62);
       background: rgba(255,255,255,0.04);
       border-color: rgba(255,255,255,0.08);
+    }
+
+    .compact-sets {
+      display: grid;
+      gap: 8px;
+    }
+
+    .compact-set-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .compact-set-box {
+      min-width: 0;
+      padding-right: 12px;
+    }
+
+    .compact-set-value {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.15;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .compact-set-delta {
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .compact-set-delta.progress {
+      color: #00f07c;
+    }
+
+    .compact-set-delta.regress {
+      color: var(--danger);
+    }
+
+    .compact-set-delta.equal {
+      color: rgba(255,255,255,0.52);
+    }
+
+    .compact-set-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: none;
     }
 
     .history-categories {
@@ -919,19 +975,6 @@
       color: rgba(255,255,255,0.86);
       font-size: 13px;
       font-weight: 700;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      min-height: 34px;
-      padding: 0 12px;
-      border-radius: 999px;
-      background: rgba(255, 100, 24, 0.12);
-      border: 1px solid rgba(255, 100, 24, 0.22);
-      color: var(--accent);
-      font-size: 13px;
-      font-weight: 760;
     }
 
     .history-list {
@@ -1174,6 +1217,13 @@
       overflow: hidden;
     }
 
+    .confirm-copy {
+      color: rgba(255,255,255,0.72);
+      line-height: 1.45;
+      margin-top: 8px;
+      margin-bottom: 14px;
+    }
+
     .global-timer-layer {
       position: absolute;
       top: 0;
@@ -1273,10 +1323,6 @@
         grid-template-columns: 1fr 1fr;
       }
 
-      .current-set-main {
-        font-size: 12px;
-      }
-
       .current-set-bottom {
         align-items: center;
       }
@@ -1292,6 +1338,10 @@
       .history-action-btn {
         width: 50px;
         min-width: 50px;
+      }
+
+      .compact-set-row {
+        grid-template-columns: minmax(0, 1fr) auto;
       }
     }
   </style>
@@ -1457,10 +1507,11 @@
       "use strict";
 
       const CONFIG = {
-        storageKey: "workouts_v16",
-        draftKey: "draft_workout_v16",
-        localDataKey: "trainer_data_v16",
-        cloudDataKey: "trainer_cloud_data_v16",
+        storageKey: "workouts_v17",
+        draftKey: "draft_workout_v17",
+        localDataKey: "trainer_data_v17",
+        cloudDataKey: "trainer_cloud_data_v17",
+        draftViewKey: "draft_view_state_v17",
         splashDelay: 900,
         toastDelay: 2300,
         cloudSaveDebounce: 180,
@@ -1539,6 +1590,7 @@
         workoutsById: new Map(),
         draft: createDraft(),
         selectedStartType: "",
+        draftView: {},
         exerciseCatalog: {
           sorted: [],
           namesByKey: new Map(),
@@ -1776,6 +1828,15 @@
         return value && value.status === "draft" && Array.isArray(value.exercises);
       }
 
+      function loadDraftView() {
+        const raw = safeJsonParse(safeStorageGet(CONFIG.draftViewKey), {});
+        state.draftView = raw && typeof raw === "object" ? raw : {};
+      }
+
+      function saveDraftView() {
+        safeStorageSet(CONFIG.draftViewKey, JSON.stringify(state.draftView));
+      }
+
       function toast(message) {
         text(el.toast, message);
         el.toast.style.display = "block";
@@ -1831,6 +1892,7 @@
         safeStorageSet(CONFIG.localDataKey, JSON.stringify(snapshot));
         safeStorageSet(CONFIG.storageKey, JSON.stringify(state.workouts));
         safeStorageSet(CONFIG.draftKey, JSON.stringify(state.draft));
+        saveDraftView();
       }
 
       function cloudGetItem(key) {
@@ -1985,6 +2047,8 @@
       }
 
       async function loadData() {
+        loadDraftView();
+
         const localSnapshot = safeJsonParse(safeStorageGet(CONFIG.localDataKey), null);
         const localWorkouts = safeJsonParse(safeStorageGet(CONFIG.storageKey), []);
         const localDraft = safeJsonParse(safeStorageGet(CONFIG.draftKey), null);
@@ -2110,11 +2174,7 @@
             );
           }
         } else if (state.tab === "history") {
-          if (state.historyUi.activeType) {
-            text(el.screenMeta, getTypeLabel(state.historyUi.activeType));
-          } else {
-            text(el.screenMeta, "Все типы тренировок");
-          }
+          text(el.screenMeta, state.historyUi.activeType ? "" : "Все типы тренировок");
         } else {
           let syncText = "Локально";
           if (state.cloud.enabled) {
@@ -2248,12 +2308,6 @@
         updateExerciseClear();
         updateFieldHints();
         syncShellStates();
-
-        if (!name || !parsed) {
-          text(el.formHint, "");
-          return;
-        }
-
         text(el.formHint, "");
       }
 
@@ -2485,7 +2539,8 @@
           return {
             status: "equal",
             label: "Новый подход",
-            compareText: "Раньше такого подхода не было"
+            compareText: "Новый подход",
+            compactDelta: ""
           };
         }
 
@@ -2501,7 +2556,8 @@
             label: "Прогресс",
             compareText: repsDiff > 0 && weightDiff === 0 && repsDiff === 1
               ? "+1 повтор"
-              : pieces.length ? pieces.join(" · ") : "Лучше прошлого раза"
+              : pieces.length ? pieces.join(" · ") : "Лучше прошлого раза",
+            compactDelta: pieces.join(" ")
           };
         }
 
@@ -2509,7 +2565,8 @@
           return {
             status: "equal",
             label: "Ровно",
-            compareText: "Без изменений"
+            compareText: "Без изменений",
+            compactDelta: ""
           };
         }
 
@@ -2519,8 +2576,28 @@
         return {
           status: "regress",
           label: "Регресс",
-          compareText: pieces.length ? pieces.join(" · ") : "Ниже прошлого раза"
+          compareText: pieces.length ? pieces.join(" · ") : "Ниже прошлого раза",
+          compactDelta: pieces.join(" ")
         };
+      }
+
+      function isExerciseCollapsed(exId) {
+        return Boolean(state.draftView[exId]);
+      }
+
+      function toggleExerciseCollapsed(exId) {
+        state.draftView[exId] = !state.draftView[exId];
+        saveDraftView();
+        renderDraft();
+      }
+
+      function createStaticSetBox(label, value, rightValue, variant = "") {
+        const box = make("div", `smart-field static-box ${variant}`.trim());
+        const left = make("span", "smart-field-label", label);
+        const right = make("span", "smart-field-right", rightValue || "");
+        const main = make("div", "static-box-main", value);
+        box.append(left, right, main);
+        return box;
       }
 
       function renderDraft() {
@@ -2540,71 +2617,112 @@
 
         state.draft.exercises.forEach((ex) => {
           const box = make("div", "exercise");
-          const volume = ex.sets.reduce((sum, set) => sum + set.weight * set.reps, 0);
+          const collapsed = isExerciseCollapsed(ex.id);
 
           const head = make("div", "exercise-head");
-          const headLeft = make("div", "");
+          const headLeft = make("div", "exercise-head-left");
           headLeft.appendChild(make("div", "exercise-name", ex.name));
 
-          head.append(
-            headLeft,
-            make("div", "muted", `${ex.sets.length} подходов · ${Math.round(volume)} кг`)
-          );
+          const toggleBtn = make("button", "exercise-toggle", collapsed ? "Развернуть" : "Свернуть");
+          toggleBtn.type = "button";
+          toggleBtn.onclick = () => {
+            toggleExerciseCollapsed(ex.id);
+            haptic();
+          };
+
+          head.append(headLeft, toggleBtn);
           box.appendChild(head);
 
           const template = getTemplateReference(ex.name);
 
-          ex.sets.forEach((set, index) => {
-            const templateSet = template ? template.exercise.sets[index] : null;
-            const delta = describeSetDelta(set, templateSet);
+          if (!collapsed) {
+            ex.sets.forEach((set, index) => {
+              const templateSet = template ? template.exercise.sets[index] : null;
+              const delta = describeSetDelta(set, templateSet);
 
-            const card = make("div", "current-set-card");
+              const card = make("div", "current-set-card");
 
-            const top = make("div", "current-set-top");
-            const setIndex = make("div", "current-set-index", `${index + 1}-й подход`);
+              const top = make("div", "current-set-top");
+              const setIndex = make("div", "current-set-index", `${index + 1}-й подход`);
 
-            const actions = make("div", "current-set-actions");
+              const actions = make("div", "current-set-actions");
 
-            const edit = make("button", "btn-card btn-accent icon-square", "✎");
-            edit.type = "button";
-            edit.onclick = () => openEditSetModal(ex.id, set.id);
+              const edit = make("button", "btn-card btn-accent icon-square", "✎");
+              edit.type = "button";
+              edit.onclick = () => openEditSetModal(ex.id, set.id);
 
-            const del = make("button", "btn-card btn-danger icon-square", "×");
-            del.type = "button";
-            del.onclick = () => deleteDraftSet(ex.id, set.id);
+              const del = make("button", "btn-card btn-danger icon-square", "×");
+              del.type = "button";
+              del.onclick = () => confirmDeleteDraftSet(ex.id, set.id, ex.name, index + 1);
 
-            actions.append(edit, del);
-            top.append(setIndex, actions);
+              actions.append(edit, del);
+              top.append(setIndex, actions);
 
-            const values = make("div", "current-set-values");
+              const values = make("div", "current-set-values");
+              const currentValue = `${trimNumber(set.weight)} кг x ${set.reps}`;
+              const previousValue = templateSet ? `${trimNumber(templateSet.weight)} кг x ${templateSet.reps}` : "—";
 
-            const currentBox = make("div", "current-set-box current");
-            currentBox.append(
-              make("div", "current-set-label", "Сейчас"),
-              make("div", "current-set-main", `${trimNumber(set.weight)} кг x ${set.reps}`)
-            );
+              values.append(
+                createStaticSetBox("Сейчас", currentValue, "", "current"),
+                createStaticSetBox("Прошлый раз", previousValue, "", "previous")
+              );
 
-            const previousBox = make("div", "current-set-box previous");
-            previousBox.append(
-              make("div", "current-set-label", "Прошлый раз"),
-              make("div", "current-set-main", templateSet ? `${trimNumber(templateSet.weight)} кг x ${templateSet.reps}` : "—")
-            );
+              const bottom = make("div", "current-set-bottom");
+              const compareText = make("div", `compare-text ${delta.status}`, delta.compareText);
+              const pill = make("div", `current-set-pill ${delta.status}`, delta.label);
 
-            values.append(currentBox, previousBox);
+              bottom.append(compareText, pill);
+              card.append(top, values, bottom);
+              box.appendChild(card);
+            });
+          } else {
+            const compact = make("div", "compact-sets");
 
-            const bottom = make("div", "current-set-bottom");
-            const compareText = make("div", `compare-text ${delta.status}`, delta.compareText);
-            const pill = make("div", `current-set-pill ${delta.status}`, delta.label);
+            ex.sets.forEach((set, index) => {
+              const templateSet = template ? template.exercise.sets[index] : null;
+              const delta = describeSetDelta(set, templateSet);
 
-            bottom.append(compareText, pill);
-            card.append(top, values, bottom);
-            box.appendChild(card);
-          });
+              const row = make("div", "compact-set-row");
+
+              const valueBox = createStaticSetBox(
+                `${index + 1}-й подход`,
+                `${trimNumber(set.weight)} кг x ${set.reps}`,
+                delta.compactDelta || "",
+                ""
+              );
+
+              if (delta.compactDelta) {
+                valueBox.querySelector(".smart-field-right").classList.add(delta.status);
+              }
+
+              const actions = make("div", "compact-set-actions");
+
+              const edit = make("button", "btn-card btn-accent icon-square", "✎");
+              edit.type = "button";
+              edit.onclick = () => openEditSetModal(ex.id, set.id);
+
+              const del = make("button", "btn-card btn-danger icon-square", "×");
+              del.type = "button";
+              del.onclick = () => confirmDeleteDraftSet(ex.id, set.id, ex.name, index + 1);
+
+              actions.append(edit, del);
+              row.append(valueBox, actions);
+              compact.appendChild(row);
+            });
+
+            box.appendChild(compact);
+          }
 
           fragment.appendChild(box);
         });
 
         el.draftList.appendChild(fragment);
+      }
+
+      async function confirmDeleteDraftSet(exId, setId, exerciseName, setIndex) {
+        const answer = await showPopup(`Удалить ${setIndex}-й подход в упражнении «${exerciseName}»?\nЭто действие нельзя отменить.`);
+        if (answer !== "ok") return;
+        deleteDraftSet(exId, setId);
       }
 
       function deleteDraftSet(exId, setId) {
@@ -2614,6 +2732,7 @@
         ex.sets = ex.sets.filter((set) => set.id !== setId);
         if (!ex.sets.length) {
           state.draft.exercises = state.draft.exercises.filter((item) => item.id !== exId);
+          delete state.draftView[exId];
         }
 
         rebuildIndexes();
@@ -2696,6 +2815,7 @@
 
         if (!oldExercise.sets.length) {
           workout.exercises = workout.exercises.filter((ex) => ex.id !== oldExercise.id);
+          delete state.draftView[oldExercise.id];
         }
 
         rebuildIndexes();
@@ -2815,6 +2935,7 @@
         state.workouts.unshift(completedWorkout);
         state.selectedStartType = "";
         state.draft = createDraft();
+        state.draftView = {};
         rebuildIndexes();
 
         haptic("heavy");
@@ -2917,7 +3038,7 @@
           state.historyUi.activeType = "";
           renderAll();
         };
-        breadcrumb.append(back, make("div", "pill", getTypeLabel(type)));
+        breadcrumb.append(back);
         el.historyList.appendChild(breadcrumb);
 
         if (!workouts.length) {
@@ -3072,10 +3193,8 @@
         dateInput.type = "date";
         dateInput.value = formatDateInputValue(workout.performedAt || workout.finishedAt || workout.createdAt);
 
-        const typeInfo = make("div", "pill", getTypeLabel(workout.trainingType));
-
         const form = make("div", "modal-form");
-        form.append(dateInput, typeInfo);
+        form.append(dateInput);
 
         workout.exercises.forEach((ex) => {
           const group = make("div", "edit-exercise-group");
