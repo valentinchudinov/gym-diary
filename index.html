@@ -380,11 +380,7 @@
       transition: all 0.16s ease;
     }
 
-    .premium-type.active .premium-check {
-      color: #fff;
-      border-color: rgba(255,100,24,0.44);
-      background: rgba(255,100,24,0.78);
-    }
+    .premium-type.active .premium-check { color: #fff; border-color: rgba(255,100,24,0.44); background: rgba(255,100,24,0.78); }
 
     .start-cta { display: none; }
 
@@ -725,7 +721,7 @@
       color: rgba(255,255,255,0.56);
       font-weight: 760;
       line-height: 1.1;
-      padding-top: 2px;
+      padding-top: 2px.
     }
 
     .current-set-actions {
@@ -2257,7 +2253,6 @@
         el.exerciseInput.value = name;
         closeExerciseDropdown();
         updateFieldHints();
-        // Убрана автоподстановка — только по кнопке "Подставить"
         updateForm();
         haptic();
       }
@@ -2323,14 +2318,22 @@
         return `${sign}${rounded.toFixed(1)}%`;
       }
 
-      // Логика сравнения с нужными названиями бейджей и процентами
+      // Бейджи/тексты:
+      // Новый — Подходов не было
+      // Отдельно — Сравнивать некорректно
+      // Снижение — Показатели падают
+      // Такой же — Уровень держится
+      // Сила — Вес растет
+      // Объем — Больше повторений
+      // Сила + Объем — Дикая мощь
       function describeSetDelta(currentSet, previousSet) {
+        // Новый: совсем не с чем сравнить (нет прошлого подхода)
         if (!previousSet) {
           return {
-            statusClass: "dash",
-            label: "отдельно",
-            compareText: "Сравнить некорректно",
-            compactText: "отдельно"
+            statusClass: "new",
+            label: "Новый",
+            compareText: "Подходов не было",
+            compactText: "не было"
           };
         }
 
@@ -2339,16 +2342,16 @@
         const weightCurr = Number(currentSet.weight);
         const repsCurr = Number(currentSet.reps);
 
+        // Некорректно сравнивать — используем «Отдельно»
         const minW = Math.min(weightPrev, weightCurr);
         const maxW = Math.max(weightPrev, weightCurr);
         const weightRatio = maxW > 0 ? minW / maxW : 0;
         const repsDiff = Math.abs(repsPrev - repsCurr);
-
         if (!Number.isFinite(weightRatio) || weightRatio < 0.8 || repsDiff > 12) {
           return {
             statusClass: "dash",
-            label: "отдельно",
-            compareText: "Сравнить некорректно",
+            label: "Отдельно",
+            compareText: "Сравнивать некорректно",
             compactText: "отдельно"
           };
         }
@@ -2371,7 +2374,7 @@
           const pct = formatDeltaPercent(delta, true);
           return {
             statusClass: "equal",
-            label: "тот же",
+            label: "Такой же",
             compareText: `Уровень держится (${pct})`,
             compactText: pct
           };
@@ -2381,8 +2384,8 @@
           const pct = formatDeltaPercent(delta);
           return {
             statusClass: "both",
-            label: "Впечатляющий рост",
-            compareText: `Впечатляющий рост (${pct})`,
+            label: "Сила + Объем",
+            compareText: `Дикая мощь (${pct})`,
             compactText: pct
           };
         }
@@ -2391,7 +2394,7 @@
           const pct = formatDeltaPercent(delta);
           return {
             statusClass: "progress",
-            label: "Вес растет",
+            label: "Сила",
             compareText: `Вес растет (${pct})`,
             compactText: pct
           };
@@ -2401,7 +2404,7 @@
           const pct = formatDeltaPercent(delta);
           return {
             statusClass: "volume",
-            label: "Больше повторений",
+            label: "Объем",
             compareText: `Больше повторений (${pct})`,
             compactText: pct
           };
@@ -2410,7 +2413,7 @@
         const pct = formatDeltaPercent(delta, true);
         return {
           statusClass: "equal",
-          label: "тот же",
+          label: "Такой же",
           compareText: `Уровень держится (${pct})`,
           compactText: pct
         };
@@ -2503,11 +2506,16 @@
 
               const values = make("div", "current-set-values");
               const currentValue = `${trimNumber(set.weight)} кг x ${set.reps}`;
-              const previousValue = !templateSet
-                ? "отдельно"
-                : (delta.statusClass === "dash"
-                    ? "отдельно"
-                    : `${trimNumber(templateSet.weight)} кг x ${templateSet.reps}`);
+
+              // Показываем «не было» если нет прошлого подхода, «отдельно» если сравнение некорректно
+              let previousValue = "";
+              if (!templateSet) {
+                previousValue = "не было";
+              } else if (delta.statusClass === "dash") {
+                previousValue = "отдельно";
+              } else {
+                previousValue = `${trimNumber(templateSet.weight)} кг x ${templateSet.reps}`;
+              }
 
               values.append(
                 createStaticSetBox("Сейчас", currentValue, "", "current"),
