@@ -688,7 +688,7 @@
       font-weight: 800;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
+      text-overflow: ellipsis.
     }
 
     .compare-text.progress { color: #00f07c; text-shadow: 0 0 16px rgba(49,214,123,0.16); }
@@ -732,7 +732,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      flex: none;
+      flex: none.
     }
 
     .current-set-values {
@@ -791,7 +791,7 @@
     .current-set-pill.volume {
       color: var(--info);
       background: var(--info-soft);
-      border-color: var(--info-line);
+      border-color: var(--info-line).
     }
 
     .current-set-pill.both {
@@ -1634,7 +1634,6 @@
 
       function getWorkoutTimestamp(workout) {
         const raw = workout.finishedAt || workout.performedAt || workout.createdAt || 0;
-        the_ts = new Date(raw).getTime();
         const ts = new Date(raw).getTime();
         return Number.isFinite(ts) ? ts : 0;
       }
