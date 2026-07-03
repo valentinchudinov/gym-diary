@@ -481,6 +481,8 @@
     .smart-field-right.equal { color: rgba(255,255,255,0.52); }
     .smart-field-right.new { color: var(--accent); }
     .smart-field-right.volume { color: var(--info); }
+    .smart-field-right.both { color: var(--accent); }
+    .smart-field-right.dash { color: rgba(255,255,255,0.55); }
 
     .smart-field.has-value .smart-field-right,
     .smart-field.focused .smart-field-right { opacity: 0.22; }
@@ -694,6 +696,8 @@
     .compare-text.equal { color: var(--muted-strong); }
     .compare-text.new { color: var(--accent); }
     .compare-text.volume { color: var(--info); }
+    .compare-text.both { color: var(--accent); }
+    .compare-text.dash { color: rgba(255,255,255,0.55); }
 
     .current-set-card {
       position: relative;
@@ -788,6 +792,18 @@
       color: var(--info);
       background: var(--info-soft);
       border-color: var(--info-line);
+    }
+
+    .current-set-pill.both {
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-color: var(--accent-line);
+    }
+
+    .current-set-pill.dash {
+      color: rgba(255,255,255,0.62);
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.08);
     }
 
     .compact-sets { display: grid; gap: 8px; }
@@ -1618,6 +1634,7 @@
 
       function getWorkoutTimestamp(workout) {
         const raw = workout.finishedAt || workout.performedAt || workout.createdAt || 0;
+        the_ts = new Date(raw).getTime();
         const ts = new Date(raw).getTime();
         return Number.isFinite(ts) ? ts : 0;
       }
@@ -2371,173 +2388,70 @@
         updateForm();
         updateMainActions();
         syncMainButtons();
-        alignElementToTop(el.addSetCard, true);
+
+        // Новый универсальный скролл (к верху окна)
+        alignFieldBlockToTop({ container: window, block: el.addSetCard }, true);
       }
 
-      function estimateStrength(weight, reps) {
-        const safeReps = Math.max(1, Number(reps) || 1);
-        return weight * (1 + safeReps / 30);
-      }
-
-      function fmtPct(value) {
-        const v = Math.round(Math.abs(value));
-        if (v === 0) return "0%";
-        return (value >= 0 ? "+" : "-") + v + "%";
-      }
-
-      function getRepZone(reps) {
-        if (reps <= 3) return "1–3";
-        if (reps <= 6) return "4–6";
-        if (reps <= 9) return "7–9";
-        if (reps <= 15) return "10–15";
-        return "16+";
-      }
-
-      // Новая согласованная логика статусов
-      // Бейджи (одно слово): Новый, Сила, Объём, Ровно, Ниже, Другой
-      // Короткие подписи:
-      // - Новый: "Нет базы"
-      // - Сила: "1RM +X%"
-      // - Объём: "Объём +Y%"
-      // - Ровно: "Без изменений"
-      // - Ниже: "1RM -X%" или "Объём -Y%"
-      // - Другой: "Некорректно сравнить"
+      // Новая логика сравнения подходов (строго по ТЗ)
       function describeSetDelta(currentSet, previousSet) {
         if (!previousSet) {
           return {
-            statusClass: "new",
-            label: "Новый",
+            statusClass: "dash",
+            label: "—",
             compareText: "Нет базы",
-            compactText: "Новый"
+            compactText: "—"
           };
         }
 
-        const curr1rm = estimateStrength(currentSet.weight, currentSet.reps);
-        const prev1rm = estimateStrength(previousSet.weight, previousSet.reps);
-        const currVol = currentSet.weight * currentSet.reps;
-        const prevVol = previousSet.weight * previousSet.reps;
+        const weightPrev = Number(previousSet.weight);
+        const repsPrev = Number(previousSet.reps);
+        const weightCurr = Number(currentSet.weight);
+        const repsCurr = Number(currentSet.reps);
 
-        const d1rm = prev1rm > 0 ? ((curr1rm - prev1rm) / prev1rm) * 100 : 0;
-        const dVol = prevVol > 0 ? ((currVol - prevVol) / prevVol) * 100 : 0;
+        // Шаг 1. Сравнимость
+        const minW = Math.min(weightPrev, weightCurr);
+        const maxW = Math.max(weightPrev, weightCurr);
+        const weightRatio = maxW > 0 ? minW / maxW : 0;
+        const repsDiff = Math.abs(repsPrev - repsCurr);
 
-        const zoneC = getRepZone(currentSet.reps);
-        const zoneP = getRepZone(previousSet.reps);
-
-        // Одинаковые зоны силы (≤6 повторов): 1RM пороги ±3%
-        const bothStrengthZones = (currentSet.reps <= 6) && (previousSet.reps <= 6);
-        // Одинаковые зоны объёма (≥7 повторов): объём пороги ±10%
-        const bothVolumeZones = (currentSet.reps >= 7) && (previousSet.reps >= 7);
-
-        // Ровно по номеру и весу
-        if (currentSet.weight === previousSet.weight && currentSet.reps === previousSet.reps) {
-          return {
-            statusClass: "equal",
-            label: "Ровно",
-            compareText: "Без изменений",
-            compactText: "Ровно"
-          };
+        if (!Number.isFinite(weightRatio) || weightRatio < 0.8) {
+          return { statusClass: "dash", label: "—", compareText: "Слишком разный вес", compactText: "—" };
+        }
+        if (repsDiff > 12) {
+          return { statusClass: "dash", label: "—", compareText: "Разный режим", compactText: "—" };
         }
 
-        if (bothStrengthZones) {
-          if (d1rm >= 3) {
-            return {
-              statusClass: "progress",
-              label: "Сила",
-              compareText: `1RM ${fmtPct(d1rm)}`,
-              compactText: `1RM ${fmtPct(d1rm)}`
-            };
-          }
-          if (d1rm <= -3) {
-            return {
-              statusClass: "regress",
-              label: "Ниже",
-              compareText: `1RM ${fmtPct(d1rm)}`,
-              compactText: `1RM ${fmtPct(d1rm)}`
-            };
-          }
-          return {
-            statusClass: "equal",
-            label: "Ровно",
-            compareText: "Без изменений",
-            compactText: "Ровно"
-          };
+        // Шаг 2. Индекс нагрузки
+        const loadPrev = weightPrev * (1 + repsPrev / 30);
+        const loadCurr = weightCurr * (1 + repsCurr / 30);
+
+        // Шаг 3. Динамика
+        const delta = loadPrev > 0 ? ((loadCurr - loadPrev) / loadPrev) * 100 : 0;
+
+        // Шаг 4. Приоритет правил
+        if (delta < -2) {
+          return { statusClass: "regress", label: "НИЖЕ", compareText: "Показатели упали", compactText: "НИЖЕ" };
         }
 
-        if (bothVolumeZones) {
-          if (dVol >= 10) {
-            return {
-              statusClass: "volume",
-              label: "Объём",
-              compareText: `Объём ${fmtPct(dVol)}`,
-              compactText: `Объём ${fmtPct(dVol)}`
-            };
-          }
-          if (dVol <= -10) {
-            return {
-              statusClass: "regress",
-              label: "Ниже",
-              compareText: `Объём ${fmtPct(dVol)}`,
-              compactText: `Объём ${fmtPct(dVol)}`
-            };
-          }
-          return {
-            statusClass: "equal",
-            label: "Ровно",
-            compareText: "Без изменений",
-            compactText: "Ровно"
-          };
+        if (delta >= -2 && delta <= 2) {
+          return { statusClass: "equal", label: "ТАК ЖЕ", compareText: "Уровень тот же", compactText: "ТАК ЖЕ" };
         }
 
-        // Разные зоны:
-        // - если |1RM| ≤ 3% и |V| ≤ 15% → Ровно
-        if (Math.abs(d1rm) <= 3 && Math.abs(dVol) <= 15) {
-          return {
-            statusClass: "equal",
-            label: "Ровно",
-            compareText: "Без изменений",
-            compactText: "Ровно"
-          };
+        // delta > 2
+        if (weightCurr > weightPrev && repsCurr <= repsPrev) {
+          return { statusClass: "progress", label: "СИЛА", compareText: "Вес растет", compactText: "СИЛА" };
         }
 
-        // - если 1RM ≥ +5% и Объём > −10% → Сила
-        if (d1rm >= 5 && dVol > -10) {
-          return {
-            statusClass: "progress",
-            label: "Сила",
-            compareText: `1RM ${fmtPct(d1rm)}`,
-            compactText: `1RM ${fmtPct(d1rm)}`
-          };
+        if (repsCurr > repsPrev && weightCurr <= weightPrev) {
+          return { statusClass: "volume", label: "ОБЪЕМ", compareText: "Больше повторений", compactText: "ОБЪЕМ" };
         }
 
-        // - если Объём ≥ +12% и 1RM > −2% → Объём
-        if (dVol >= 12 && d1rm > -2) {
-          return {
-            statusClass: "volume",
-            label: "Объём",
-            compareText: `Объём ${fmtPct(dVol)}`,
-            compactText: `Объём ${fmtPct(dVol)}`
-          };
+        if (weightCurr > weightPrev && repsCurr > repsPrev) {
+          return { statusClass: "both", label: "СИЛА+ОБЪЕМ", compareText: "Вес и повторы растут", compactText: "СИЛА+ОБЪЕМ" };
         }
 
-        // - если 1RM ≤ −5% и Объём ≤ −12% → Ниже
-        if (d1rm <= -5 && dVol <= -12) {
-          // Покажем метрику с большим падением
-          const show1rm = Math.abs(d1rm) >= Math.abs(dVol);
-          return {
-            statusClass: "regress",
-            label: "Ниже",
-            compareText: show1rm ? `1RM ${fmtPct(d1rm)}` : `Объём ${fmtPct(dVol)}`,
-            compactText: show1rm ? `1RM ${fmtPct(d1rm)}` : `Объём ${fmtPct(dVol)}`
-          };
-        }
-
-        // - иначе → Другой
-        return {
-          statusClass: "equal",
-          label: "Другой",
-          compareText: "Некорректно сравнить",
-          compactText: "Другой"
-        };
+        return { statusClass: "equal", label: "ТАК ЖЕ", compareText: "Уровень тот же", compactText: "ТАК ЖЕ" };
       }
 
       function isExerciseCollapsed(exId) {
@@ -3563,29 +3477,84 @@
         try { document.documentElement.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) { document.documentElement.scrollTop = 0; }
       }
 
-      // Мгновенное выравнивание любой карточки .card к верхнему краю
-      let activeScrollTarget = null;
+      // Новый универсальный плавный скролл блока с полем ввода к верхнему краю
+      let activeScrollContext = null;
+
       function getElementTopInPage(node) {
         const rect = node.getBoundingClientRect();
         return (window.scrollY || window.pageYOffset || 0) + rect.top;
       }
-      function alignElementToTop(target, smooth = false) {
-        if (!target) return;
-        const top = Math.max(0, getElementTopInPage(target));
-        const behavior = smooth ? "smooth" : "auto";
-        try { window.scrollTo({ top, behavior }); } catch (_) { window.scrollTo(0, top); }
-        try { document.documentElement.scrollTo({ top, behavior }); } catch (_) { document.documentElement.scrollTop = top; }
-        // Повтор через таймеры (клавиатура/viewport могут измениться)
+
+      function getScrollableContextForField(field) {
+        const sheet = field.closest(".sheet");
+
+        const block =
+          field.closest(".card") ||
+          field.closest(".edit-exercise-group") ||
+          field.closest(".current-set-card") ||
+          field.closest(".exercise") ||
+          field.closest(".sheet") ||
+          field;
+
+        return {
+          container: sheet || window,
+          block
+        };
+      }
+
+      function getTargetTopInContainer(block, container) {
+        if (container === window) {
+          return Math.max(0, getElementTopInPage(block));
+        }
+        const blockRect = block.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        return Math.max(0, container.scrollTop + (blockRect.top - containerRect.top));
+      }
+
+      function getCurrentScrollTop(container) {
+        if (container === window) {
+          return window.scrollY || window.pageYOffset || 0;
+        }
+        return container.scrollTop;
+      }
+
+      function setScrollTop(container, top, behavior) {
+        if (container === window) {
+          try { window.scrollTo({ top, behavior }); } catch { window.scrollTo(0, top); }
+          try { document.documentElement.scrollTo({ top, behavior }); } catch { document.documentElement.scrollTop = top; }
+          return;
+        }
+        try { container.scrollTo({ top, behavior }); } catch { container.scrollTop = top; }
+      }
+
+      function alignFieldBlockToTop(context, preferSmooth = true) {
+        if (!context || !context.block || !context.container) return;
+
+        const targetTop = getTargetTopInContainer(context.block, context.container);
+        const currentTop = getCurrentScrollTop(context.container);
+        const delta = Math.abs(currentTop - targetTop);
+
+        if (delta < 4) return; // уже почти у верхнего края — не дергаем
+
+        const behavior = preferSmooth && delta > 24 ? "smooth" : "auto";
+        setScrollTop(context.container, targetTop, behavior);
+
+        // «Дожим» после подъёма клавиатуры/изменения viewport
         setTimeout(() => {
-          const t = Math.max(0, getElementTopInPage(target));
-          try { window.scrollTo({ top: t, behavior: "auto" }); } catch (_) { window.scrollTo(0, t); }
-          try { document.documentElement.scrollTo({ top: t, behavior: "auto" }); } catch (_) { document.documentElement.scrollTop = t; }
-        }, 60);
+          const retryTop = getTargetTopInContainer(context.block, context.container);
+          const retryCurrent = getCurrentScrollTop(context.container);
+          if (Math.abs(retryCurrent - retryTop) > 8) {
+            setScrollTop(context.container, retryTop, "auto");
+          }
+        }, 120);
+
         setTimeout(() => {
-          const t = Math.max(0, getElementTopInPage(target));
-          try { window.scrollTo({ top: t, behavior: "auto" }); } catch (_) { window.scrollTo(0, t); }
-          try { document.documentElement.scrollTo({ top: t, behavior: "auto" }); } catch (_) { document.documentElement.scrollTop = t; }
-        }, 260);
+          const retryTop = getTargetTopInContainer(context.block, context.container);
+          const retryCurrent = getCurrentScrollTop(context.container);
+          if (Math.abs(retryCurrent - retryTop) > 8) {
+            setScrollTop(context.container, retryTop, "auto");
+          }
+        }, 300);
       }
 
       function bindEvents() {
@@ -3671,31 +3640,30 @@
 
         el.timerToggleBtn.addEventListener("click", toggleTimer);
 
-        // Универсальный скролл карточки вверх при тапе/фокусе на любом input/select/textarea
+        // Глобально: при тапе/фокусе на любом input/select/textarea — плавно выравниваем контейнер вверх
         document.addEventListener("pointerdown", (e) => {
-          const target = e.target && e.target.closest && e.target.closest("input, select, textarea");
-          if (!target) return;
-          const card = target.closest(".card");
-          if (!card) return;
-          activeScrollTarget = card;
-          alignElementToTop(card, false);
+          const field = e.target && e.target.closest && e.target.closest("input, select, textarea");
+          if (!field) return;
+          activeScrollContext = getScrollableContextForField(field);
+          alignFieldBlockToTop(activeScrollContext, true);
         }, { passive: true });
 
         document.addEventListener("focusin", (e) => {
-          const target = e.target && e.target.closest && e.target.closest("input, select, textarea");
-          if (!target) return;
-          const card = target.closest(".card");
-          if (!card) return;
-          activeScrollTarget = card;
-          alignElementToTop(card, false);
+          const field = e.target && e.target.closest && e.target.closest("input, select, textarea");
+          if (!field) return;
+          activeScrollContext = getScrollableContextForField(field);
+          alignFieldBlockToTop(activeScrollContext, true);
         }, true);
 
-        // Повторно выравниваем при изменении viewport (подъём клавиатуры)
         if (window.visualViewport) {
           window.visualViewport.addEventListener("resize", () => {
-            if (!activeScrollTarget) return;
-            const active = document.activeElement && document.activeElement.closest && document.activeElement.closest("input, select, textarea");
-            if (active) alignElementToTop(activeScrollTarget, false);
+            const activeField =
+              document.activeElement &&
+              document.activeElement.closest &&
+              document.activeElement.closest("input, select, textarea");
+            if (!activeField) return;
+            activeScrollContext = getScrollableContextForField(activeField);
+            alignFieldBlockToTop(activeScrollContext, false);
           }, { passive: true });
         }
 
