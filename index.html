@@ -790,8 +790,8 @@
 
     .current-set-pill.volume {
       color: var(--info);
-      background: var(--info-soft);
-      border-color: var(--info-line);
+      background: rgba(135, 183, 255, 0.12);
+      border-color: rgba(135, 183, 255, 0.28);
     }
 
     .current-set-pill.both {
@@ -1701,7 +1701,7 @@
               resolve(!error);
             });
           } catch {
-            resolve(false);
+              resolve(false);
           }
         });
       }
@@ -2323,14 +2323,14 @@
         return `${sign}${rounded.toFixed(1)}%`;
       }
 
-      // Логика сравнения с новыми текстами/бейджами и процентами
+      // Логика сравнения с нужными названиями бейджей и процентами
       function describeSetDelta(currentSet, previousSet) {
         if (!previousSet) {
           return {
             statusClass: "dash",
-            label: "Отдельно",
+            label: "отдельно",
             compareText: "Сравнить некорректно",
-            compactText: "Отдельно"
+            compactText: "отдельно"
           };
         }
 
@@ -2347,9 +2347,9 @@
         if (!Number.isFinite(weightRatio) || weightRatio < 0.8 || repsDiff > 12) {
           return {
             statusClass: "dash",
-            label: "Отдельно",
+            label: "отдельно",
             compareText: "Сравнить некорректно",
-            compactText: "Отдельно"
+            compactText: "отдельно"
           };
         }
 
@@ -2371,13 +2371,12 @@
           const pct = formatDeltaPercent(delta, true);
           return {
             statusClass: "equal",
-            label: "Тот же",
+            label: "тот же",
             compareText: `Уровень держится (${pct})`,
             compactText: pct
           };
         }
 
-        // delta > 2
         if (weightCurr > weightPrev && repsCurr > repsPrev) {
           const pct = formatDeltaPercent(delta);
           return {
@@ -2411,7 +2410,7 @@
         const pct = formatDeltaPercent(delta, true);
         return {
           statusClass: "equal",
-          label: "Тот же",
+          label: "тот же",
           compareText: `Уровень держится (${pct})`,
           compactText: pct
         };
@@ -2505,9 +2504,9 @@
               const values = make("div", "current-set-values");
               const currentValue = `${trimNumber(set.weight)} кг x ${set.reps}`;
               const previousValue = !templateSet
-                ? "Отдельно"
+                ? "отдельно"
                 : (delta.statusClass === "dash"
-                    ? "Отдельно"
+                    ? "отдельно"
                     : `${trimNumber(templateSet.weight)} кг x ${templateSet.reps}`);
 
               values.append(
@@ -2641,33 +2640,24 @@
         el.modalBody.append(title, form);
       }
 
-      // Правка: сохраняем позицию подхода при редактировании в том же упражнении
+      // Сохраняем позицию в том же упражнении
       function moveOrUpdateSet(workout, exId, setId, newName, weight, reps) {
         const oldExercise = workout.exercises.find((ex) => ex.id === exId);
         if (!oldExercise) return;
-
         const index = oldExercise.sets.findIndex((set) => set.id === setId);
         if (index < 0) return;
 
         const sameExercise = sameName(oldExercise.name, newName);
 
         if (sameExercise) {
-          // Обновляем значения на месте, не меняя порядок
           oldExercise.sets[index].weight = weight;
           oldExercise.sets[index].reps = reps;
-          // Имя упражнения не меняем
         } else {
-          // Перенос в другое упражнение — вырезаем и добавляем в конец целевого
           const updated = { ...oldExercise.sets[index], weight, reps };
           oldExercise.sets.splice(index, 1);
-
           let target = workout.exercises.find((ex) => sameName(ex.name, newName));
-          if (!target) {
-            target = { id: id(), name: newName, sets: [] };
-            workout.exercises.push(target);
-          }
+          if (!target) { target = { id: id(), name: newName, sets: [] }; workout.exercises.push(target); }
           target.sets.push(updated);
-
           if (!oldExercise.sets.length) {
             workout.exercises = workout.exercises.filter((ex) => ex.id !== oldExercise.id);
             delete state.draftView[oldExercise.id];
@@ -2693,32 +2683,20 @@
       function syncMainButtons() {
         const mainButton = tg && tg.MainButton ? tg.MainButton : null;
         if (!mainButton) return;
-
         mainButton.offClick(startTraining);
         mainButton.offClick(finishWorkout);
-
         const hasStarted = isTrainingStarted();
         const hasSelectedType = Boolean(state.selectedStartType);
         const hasSets = getStats(state.draft).sets > 0;
-
-        if (state.tab !== "today") {
-          mainButton.hide();
-          return;
-        }
-
+        if (state.tab !== "today") { mainButton.hide(); return; }
         if (!hasStarted) {
-          if (!hasSelectedType) {
-            mainButton.hide();
-            return;
-          }
-
+          if (!hasSelectedType) { mainButton.hide(); return; }
           mainButton.setText("Начать тренировку");
           mainButton.setParams({ color: "#ff6418", text_color: "#ffffff", is_active: true, is_visible: true });
           mainButton.onClick(startTraining);
           mainButton.show();
           return;
         }
-
         if (hasSets) {
           mainButton.setText("Завершить тренировку");
           mainButton.setParams({ color: "#ff6418", text_color: "#ffffff", is_active: true, is_visible: true });
@@ -2726,22 +2704,18 @@
           mainButton.show();
           return;
         }
-
         mainButton.hide();
       }
 
       function startTraining() {
         if (!state.selectedStartType) return;
-
         state.draft = createDraft();
         state.draft.trainingType = state.selectedStartType;
         state.draft.createdAt = new Date().toISOString();
         state.draft.performedAt = new Date().toISOString();
-
         el.exerciseInput.value = "";
         el.weightInput.value = "";
         el.repsInput.value = "";
-
         haptic();
         rebuildIndexes();
         persistCritical();
@@ -2752,12 +2726,10 @@
 
       async function requestChangeTrainingType() {
         const hasSets = getStats(state.draft).sets > 0;
-
         if (hasSets) {
           const answer = await showPopup("Сменить тип тренировки?\nТекущая тренировка будет сброшена без сохранения. Продолжить?");
           if (answer !== "ok") return;
         }
-
         state.selectedStartType = "";
         state.draft = createDraft();
         state.draftView = {};
@@ -2765,7 +2737,6 @@
         el.weightInput.value = "";
         el.repsInput.value = "";
         closeExerciseDropdown();
-
         rebuildIndexes();
         persistCritical();
         renderAll();
@@ -2774,29 +2745,21 @@
       }
 
       async function finishWorkout() {
-        if (!state.draft.trainingType) {
-          toast("Сначала начни тренировку");
-          return;
-        }
-
+        if (!state.draft.trainingType) { toast("Сначала начни тренировку"); return; }
         if (!getStats(state.draft).sets) return;
-
         const answer = await showPopup(`Завершить тренировку "${getTypeLabel(state.draft.trainingType)}"?`);
         if (answer !== "ok") return;
-
         const completedWorkout = sanitizeWorkout({
           ...state.draft,
           status: "completed",
           finishedAt: new Date().toISOString(),
           performedAt: state.draft.performedAt || new Date().toISOString()
         });
-
         state.workouts.unshift(completedWorkout);
         state.selectedStartType = "";
         state.draft = createDraft();
         state.draftView = {};
         rebuildIndexes();
-
         haptic("heavy");
         persistCritical();
         renderAll();
@@ -2810,42 +2773,26 @@
       function formatDateTitle(iso) {
         const date = new Date(iso);
         const now = new Date();
-
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         const diff = Math.round((today - day) / 86400000);
-
         if (diff === 0) return "Сегодня";
         if (diff === 1) return "Вчера";
-
-        return date.toLocaleDateString("ru-RU", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric"
-        });
+        return date.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" });
       }
 
       function getRelativeDayLabel(iso) {
         const date = new Date(iso);
         const now = new Date();
-
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         const diff = Math.round((today - day) / 86400000);
-
         if (diff === 0) return "Сегодня";
         if (diff === 1) return "Вчера";
-        return date.toLocaleDateString("ru-RU", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric"
-        });
+        return date.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" });
       }
 
-      function getWeekdayLabel(iso) {
-        const date = new Date(iso);
-        return date.toLocaleDateString("ru-RU", { weekday: "long" });
-      }
+      function getWeekdayLabel(iso) { const date = new Date(iso); return date.toLocaleDateString("ru-RU", { weekday: "long" }); }
 
       function formatHistoryCardTitle(workout) {
         const iso = workout.performedAt || workout.finishedAt || workout.createdAt;
@@ -2855,64 +2802,34 @@
       function formatDateWithWeekday(iso) {
         const date = new Date(iso);
         const now = new Date();
-
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         const diff = Math.round((today - day) / 86400000);
-
         const weekday = date.toLocaleDateString("ru-RU", { weekday: "long" });
         if (diff === 0) return `сегодня, ${weekday}`;
-
         return `${weekday}, ${date.toLocaleDateString("ru-RU")}`;
       }
 
-      function formatDateInputValue(iso) {
-        const d = new Date(iso);
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, "0");
-        const dd = String(d.getDate()).padStart(2, "0");
-        return `${yyyy}-${mm}-${dd}`;
-      }
+      function formatDateInputValue(iso) { const d = new Date(iso); const yyyy = d.getFullYear(); const mm = String(d.getMonth() + 1).padStart(2, "0"); const dd = String(d.getDate()).padStart(2, "0"); return `${yyyy}-${mm}-${dd}`; }
 
-      function getWorkoutsByType(type) {
-        return state.workouts
-          .filter((workout) => workout.trainingType === type)
-          .sort((a, b) => getWorkoutTimestamp(b) - getWorkoutTimestamp(a));
-      }
-
-      function getLastWorkoutByType(type) {
-        return getWorkoutsByType(type)[0] || null;
-      }
+      function getWorkoutsByType(type) { return state.workouts.filter((w) => w.trainingType === type).sort((a, b) => getWorkoutTimestamp(b) - getWorkoutTimestamp(a)); }
+      function getLastWorkoutByType(type) { return getWorkoutsByType(type)[0] || null; }
 
       function renderHistory() {
         el.historyList.replaceChildren();
-
         if (!state.historyUi.activeType) {
           const wrap = make("div", "history-categories");
-
           HISTORY_TYPE_ORDER.forEach((type) => {
             const lastWorkout = getLastWorkoutByType(type);
             const btn = make("button", `history-category${type === "custom" ? " custom" : ""}`);
             btn.type = "button";
-            btn.onclick = () => {
-              state.historyUi.activeType = type;
-              renderAll();
-            };
-
+            btn.onclick = () => { state.historyUi.activeType = type; renderAll(); };
             btn.append(
               make("div", "history-category-title", getTypeLabel(type)),
-              make(
-                "div",
-                "history-category-sub",
-                lastWorkout
-                  ? formatDateWithWeekday(lastWorkout.performedAt || lastWorkout.finishedAt || lastWorkout.createdAt)
-                  : "Пока нет тренировок"
-              )
+              make("div", "history-category-sub", lastWorkout ? formatDateWithWeekday(lastWorkout.performedAt || lastWorkout.finishedAt || lastWorkout.createdAt) : "Пока нет тренировок")
             );
-
             wrap.appendChild(btn);
           });
-
           el.historyList.appendChild(wrap);
           return;
         }
@@ -2923,24 +2840,16 @@
         const breadcrumb = make("div", "history-breadcrumb");
         const back = make("button", "link-btn", "← Назад");
         back.type = "button";
-        back.onclick = () => {
-          state.historyUi.activeType = "";
-          renderAll();
-        };
+        back.onclick = () => { state.historyUi.activeType = ""; renderAll(); };
         breadcrumb.append(back);
         el.historyList.appendChild(breadcrumb);
 
-        if (!workouts.length) {
-          el.historyList.appendChild(make("div", "empty", "Пока нет тренировок"));
-          return;
-        }
+        if (!workouts.length) { el.historyList.appendChild(make("div", "empty", "Пока нет тренировок")); return; }
 
         const list = make("div", "history-list");
-
         workouts.forEach((workout) => {
           const stats = getStats(workout);
           const row = make("div", "history-row");
-
           const open = make("button", "history-item");
           open.type = "button";
           open.onclick = () => openWorkout(workout.id);
@@ -2948,47 +2857,29 @@
             make("div", "history-title", formatHistoryCardTitle(workout)),
             make("div", "muted", `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`)
           );
-
           const actions = make("div", "history-actions");
-
           const csv = make("button", "btn-card btn-accent history-action-btn", "CSV");
           csv.type = "button";
-          csv.onclick = (e) => {
-            e.stopPropagation();
-            exportWorkoutCsv(workout.id);
-          };
-
+          csv.onclick = (e) => { e.stopPropagation(); exportWorkoutCsv(workout.id); };
           const del = make("button", "btn-card btn-danger history-action-btn", "×");
           del.type = "button";
-          del.onclick = (e) => {
-            e.stopPropagation();
-            confirmDeleteWorkout(workout.id);
-          };
-
+          del.onclick = (e) => { e.stopPropagation(); confirmDeleteWorkout(workout.id); };
           actions.append(csv, del);
           row.append(open, actions);
           list.appendChild(row);
         });
-
         el.historyList.appendChild(list);
       }
 
       function openWorkout(workoutId) {
         const workout = state.workoutsById.get(workoutId);
         if (!workout) return;
-
         openSheet();
         el.modalBody.replaceChildren();
-
         const stats = getStats(workout);
-
         el.modalBody.append(
           make("div", "title", getTypeLabel(workout.trainingType)),
-          make(
-            "div",
-            "meta",
-            `${formatDateWithWeekday(workout.performedAt || workout.finishedAt || workout.createdAt)} · ${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
-          )
+          make("div", "meta", `${formatDateWithWeekday(workout.performedAt || workout.finishedAt || workout.createdAt)} · ${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`)
         );
         workout.exercises.forEach((ex) => {
           const box = make("div", "exercise");
@@ -3225,10 +3116,7 @@
         });
 
         el.progressSelect.replaceChildren(fragment);
-        el.progressSelect.value =
-          currentValue && [...progressMap.values()].some((items) => items[0].name === currentValue)
-            ? currentValue
-            : "";
+        el.progressSelect.value = currentValue && [...progressMap.values()].some((items) => items[0].name === currentValue) ? currentValue : "";
 
         el.progressMetricBtns.forEach((btn) => { btn.classList.toggle("active", btn.dataset.metric === state.progressMetric); });
 
@@ -3254,14 +3142,8 @@
         el.progressResult.appendChild(box);
       }
 
-      function openSheet() {
-        el.modal.classList.add("open");
-      }
-
-      function closeModal() {
-        el.modal.classList.remove("open");
-        hideKeyboard();
-      }
+      function openSheet() { el.modal.classList.add("open"); }
+      function closeModal() { el.modal.classList.remove("open"); hideKeyboard(); }
 
       function formatStopwatch(ms) {
         const centiseconds = Math.floor(ms / 10) % 100;
@@ -3270,76 +3152,34 @@
         const minutes = Math.floor(totalSeconds / 60);
         return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(centiseconds).padStart(2, "0")}`;
       }
-
-      function renderTimer(ms = 0) {
-        text(el.timerReadout, formatStopwatch(ms));
-        el.timerToggleBtn.classList.toggle("running", state.timer.running);
-      }
-
-      function timerLoop(now) {
-        if (!state.timer.running) return;
-        if (!state.timer.lastPaintAt || now - state.timer.lastPaintAt >= 50) {
-          state.timer.lastPaintAt = now;
-          renderTimer(now - state.timer.startedAt);
-        }
-        state.timer.raf = requestAnimationFrame(timerLoop);
-      }
-
+      function renderTimer(ms = 0) { text(el.timerReadout, formatStopwatch(ms)); el.timerToggleBtn.classList.toggle("running", state.timer.running); }
+      function timerLoop(now) { if (!state.timer.running) return; if (!state.timer.lastPaintAt || now - state.timer.lastPaintAt >= 50) { state.timer.lastPaintAt = now; renderTimer(now - state.timer.startedAt); } state.timer.raf = requestAnimationFrame(timerLoop); }
       function toggleTimer() {
         if (state.timer.running) {
-          cancelAnimationFrame(state.timer.raf);
-          state.timer.running = false;
-          state.timer.startedAt = 0;
-          state.timer.raf = 0;
-          state.timer.lastPaintAt = 0;
-          renderTimer(0);
-          return;
+          cancelAnimationFrame(state.timer.raf); state.timer.running = false; state.timer.startedAt = 0; state.timer.raf = 0; state.timer.lastPaintAt = 0; renderTimer(0); return;
         }
-        state.timer.running = true;
-        state.timer.startedAt = performance.now();
-        state.timer.lastPaintAt = 0;
-        renderTimer(0);
-        state.timer.raf = requestAnimationFrame(timerLoop);
+        state.timer.running = true; state.timer.startedAt = performance.now(); state.timer.lastPaintAt = 0; renderTimer(0); state.timer.raf = requestAnimationFrame(timerLoop);
       }
 
       function syncTimerViewportPosition() {
         const vv = window.visualViewport;
         const scrollX = window.scrollX || window.pageXOffset || 0;
         const scrollY = window.scrollY || window.pageYOffset || 0;
-
         const left = scrollX + (vv ? vv.offsetLeft : 0);
         const top = scrollY + (vv ? vv.offsetTop : 0);
         const width = vv ? vv.width : document.documentElement.clientWidth;
         const height = vv ? vv.height : window.innerHeight;
-
         el.timerLayer.style.width = `${Math.round(width)}px`;
         el.timerLayer.style.height = `${Math.round(height)}px`;
         el.timerLayer.style.transform = `translate3d(${Math.round(left)}px, ${Math.round(top)}px, 0)`;
       }
-
-      function scheduleTimerViewportSync() {
-        if (timerViewportRaf) return;
-        timerViewportRaf = requestAnimationFrame(() => {
-          timerViewportRaf = 0;
-          syncTimerViewportPosition();
-        });
-      }
-
-      function scrollPageToDefaultTop() {
-        try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) { window.scrollTo(0, 0); }
-        try { document.documentElement.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) { document.documentElement.scrollTop = 0; }
-      }
+      function scheduleTimerViewportSync() { if (timerViewportRaf) return; timerViewportRaf = requestAnimationFrame(() => { timerViewportRaf = 0; syncTimerViewportPosition(); }); }
+      function scrollPageToDefaultTop() { try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) { window.scrollTo(0, 0); } try { document.documentElement.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) { document.documentElement.scrollTop = 0; } }
 
       let activeScrollContext = null;
-
-      function getElementTopInPage(node) {
-        const rect = node.getBoundingClientRect();
-        return (window.scrollY || window.pageYOffset || 0) + rect.top;
-      }
-
+      function getElementTopInPage(node) { const rect = node.getBoundingClientRect(); return (window.scrollY || window.pageYOffset || 0) + rect.top; }
       function getScrollableContextForField(field) {
         const sheet = field.closest(".sheet");
-
         const block =
           field.closest(".card") ||
           field.closest(".edit-exercise-group") ||
@@ -3347,29 +3187,15 @@
           field.closest(".exercise") ||
           field.closest(".sheet") ||
           field;
-
-        return {
-          container: sheet || window,
-          block
-        };
+        return { container: sheet || window, block };
       }
-
       function getTargetTopInContainer(block, container) {
-        if (container === window) {
-          return Math.max(0, getElementTopInPage(block));
-        }
+        if (container === window) return Math.max(0, getElementTopInPage(block));
         const blockRect = block.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
         return Math.max(0, container.scrollTop + (blockRect.top - containerRect.top));
       }
-
-      function getCurrentScrollTop(container) {
-        if (container === window) {
-          return window.scrollY || window.pageYOffset || 0;
-        }
-        return container.scrollTop;
-      }
-
+      function getCurrentScrollTop(container) { return container === window ? (window.scrollY || window.pageYOffset || 0) : container.scrollTop; }
       function setScrollTop(container, top, behavior) {
         if (container === window) {
           try { window.scrollTo({ top, behavior }); } catch { window.scrollTo(0, top); }
@@ -3378,33 +3204,23 @@
         }
         try { container.scrollTo({ top, behavior }); } catch { container.scrollTop = top; }
       }
-
       function alignFieldBlockToTop(context, preferSmooth = true) {
         if (!context || !context.block || !context.container) return;
-
         const targetTop = getTargetTopInContainer(context.block, context.container);
         const currentTop = getCurrentScrollTop(context.container);
         const delta = Math.abs(currentTop - targetTop);
-
         if (delta < 4) return;
-
         const behavior = preferSmooth && delta > 24 ? "smooth" : "auto";
         setScrollTop(context.container, targetTop, behavior);
-
         setTimeout(() => {
           const retryTop = getTargetTopInContainer(context.block, context.container);
           const retryCurrent = getCurrentScrollTop(context.container);
-          if (Math.abs(retryCurrent - retryTop) > 8) {
-            setScrollTop(context.container, retryTop, "auto");
-          }
+          if (Math.abs(retryCurrent - retryTop) > 8) setScrollTop(context.container, retryTop, "auto");
         }, 120);
-
         setTimeout(() => {
           const retryTop = getTargetTopInContainer(context.block, context.container);
           const retryCurrent = getCurrentScrollTop(context.container);
-          if (Math.abs(retryCurrent - retryTop) > 8) {
-            setScrollTop(context.container, retryTop, "auto");
-          }
+          if (Math.abs(retryCurrent - retryTop) > 8) setScrollTop(context.container, retryTop, "auto");
         }, 300);
       }
 
@@ -3413,10 +3229,8 @@
           tab.addEventListener("click", () => {
             const nextTab = tab.dataset.tab;
             if (state.tab === nextTab) return;
-
             if (state.tab === "history" && nextTab !== "history") resetHistorySelection();
             if (nextTab === "history") resetHistorySelection();
-
             state.tab = nextTab;
             haptic();
             renderAll();
@@ -3428,21 +3242,9 @@
         el.startTrainingBtn.addEventListener("click", startTraining);
         el.trainingHeadBtn.addEventListener("click", requestChangeTrainingType);
 
-        el.exerciseInput.addEventListener("input", () => {
-          updateForm();
-          scheduleExerciseSearchRender();
-        });
-
-        el.exerciseInput.addEventListener("focus", () => {
-          renderExerciseSearchResults(true);
-        });
-
-        el.exerciseInput.addEventListener("blur", () => {
-          setTimeout(() => {
-            if (document.activeElement && el.exerciseDropdown.contains(document.activeElement)) return;
-            closeExerciseDropdown();
-          }, 120);
-        });
+        el.exerciseInput.addEventListener("input", () => { updateForm(); scheduleExerciseSearchRender(); });
+        el.exerciseInput.addEventListener("focus", () => { renderExerciseSearchResults(true); });
+        el.exerciseInput.addEventListener("blur", () => { setTimeout(() => { if (document.activeElement && el.exerciseDropdown.contains(document.activeElement)) return; closeExerciseDropdown(); }, 120); });
 
         el.weightInput.addEventListener("input", updateForm);
         el.repsInput.addEventListener("input", updateForm);
@@ -3454,40 +3256,18 @@
 
         el.exerciseInput.addEventListener("keydown", (e) => {
           if (e.key === "Enter") {
-            if (state.search.results.length) {
-              e.preventDefault();
-              selectExerciseSuggestion(state.search.results[0]);
-              return;
-            }
-            if (!el.addSetBtn.disabled) {
-              e.preventDefault();
-              addSet();
-            }
+            if (state.search.results.length) { e.preventDefault(); selectExerciseSuggestion(state.search.results[0]); return; }
+            if (!el.addSetBtn.disabled) { e.preventDefault(); addSet(); }
           }
         });
-
-        el.repsInput.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" && !el.addSetBtn.disabled) {
-            e.preventDefault();
-            addSet();
-          }
-        });
+        el.repsInput.addEventListener("keydown", (e) => { if (e.key === "Enter" && !el.addSetBtn.disabled) { e.preventDefault(); addSet(); } });
 
         el.progressSelect.addEventListener("change", renderProgress);
-        el.progressMetricBtns.forEach((btn) => {
-          btn.addEventListener("click", () => {
-            state.progressMetric = btn.dataset.metric;
-            renderProgress();
-          });
-        });
+        el.progressMetricBtns.forEach((btn) => { btn.addEventListener("click", () => { state.progressMetric = btn.dataset.metric; renderProgress(); }); });
 
-        el.modal.addEventListener("click", (e) => {
-          if (e.target === el.modal) closeModal();
-        });
+        el.modal.addEventListener("click", (e) => { if (e.target === el.modal) closeModal(); });
 
-        document.addEventListener("click", (event) => {
-          if (!el.exerciseInputWrap.contains(event.target)) closeExerciseDropdown();
-        });
+        document.addEventListener("click", (event) => { if (!el.exerciseInputWrap.contains(event.target)) closeExerciseDropdown(); });
 
         el.timerToggleBtn.addEventListener("click", toggleTimer);
 
@@ -3520,35 +3300,21 @@
         window.addEventListener("scroll", scheduleTimerViewportSync, { passive: true });
         window.addEventListener("resize", scheduleTimerViewportSync, { passive: true });
 
-        window.addEventListener("focus", () => {
-          scheduleCloudResumeSync();
-        });
+        window.addEventListener("focus", () => { scheduleCloudResumeSync(); });
 
         document.addEventListener("visibilitychange", () => {
-          if (document.visibilityState === "hidden") {
-            persistNowLocal();
-            persistNowCloud();
-          } else {
-            scheduleCloudResumeSync();
-          }
+          if (document.visibilityState === "hidden") { persistNowLocal(); persistNowCloud(); }
+          else { scheduleCloudResumeSync(); }
         });
 
-        window.addEventListener("pagehide", () => {
-          persistNowLocal();
-          persistNowCloud();
-        });
-
-        window.addEventListener("beforeunload", () => {
-          persistNowLocal();
-          persistNowCloud();
-        });
+        window.addEventListener("pagehide", () => { persistNowLocal(); persistNowCloud(); });
+        window.addEventListener("beforeunload", () => { persistNowLocal(); persistNowCloud(); });
       }
 
       function initTelegram() {
         if (!tg) return;
         tg.ready();
         tg.expand();
-
         if (tg.MainButton) {
           tg.MainButton.offClick(startTraining);
           tg.MainButton.offClick(finishWorkout);
@@ -3556,13 +3322,7 @@
         }
       }
 
-      async function init() {
-        initTelegram();
-        bindEvents();
-        renderTimer(0);
-        scheduleTimerViewportSync();
-        await loadData();
-      }
+      async function init() { initTelegram(); bindEvents(); renderTimer(0); scheduleTimerViewportSync(); await loadData(); }
 
       init();
     })();
