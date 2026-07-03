@@ -2371,7 +2371,7 @@
         updateForm();
         updateMainActions();
         syncMainButtons();
-        scrollAddSetCardToTop(true);
+        alignElementToTop(el.addSetCard, true);
       }
 
       function estimateStrength(weight, reps) {
@@ -2379,150 +2379,166 @@
         return weight * (1 + safeReps / 30);
       }
 
-      function round1(value) {
-        return Math.round(value * 10) / 10;
+      function fmtPct(value) {
+        const v = Math.round(Math.abs(value));
+        if (v === 0) return "0%";
+        return (value >= 0 ? "+" : "-") + v + "%";
       }
 
       function getRepZone(reps) {
-        if (reps <= 3) return "max";
-        if (reps <= 6) return "strength";
-        if (reps <= 9) return "hybrid";
-        if (reps <= 15) return "volume";
-        return "endurance";
+        if (reps <= 3) return "1–3";
+        if (reps <= 6) return "4–6";
+        if (reps <= 9) return "7–9";
+        if (reps <= 15) return "10–15";
+        return "16+";
       }
 
-      // УКОРОЧЕННЫЕ СТАТУСЫ. «Иной» заменён на «Другой». Все бейджи — одно слово.
+      // Новая согласованная логика статусов
+      // Бейджи (одно слово): Новый, Сила, Объём, Ровно, Ниже, Другой
+      // Короткие подписи:
+      // - Новый: "Нет базы"
+      // - Сила: "1RM +X%"
+      // - Объём: "Объём +Y%"
+      // - Ровно: "Без изменений"
+      // - Ниже: "1RM -X%" или "Объём -Y%"
+      // - Другой: "Некорректно сравнить"
       function describeSetDelta(currentSet, previousSet) {
         if (!previousSet) {
           return {
-            status: "new",
+            statusClass: "new",
             label: "Новый",
-            compareText: "Без сравнения",
+            compareText: "Нет базы",
             compactText: "Новый"
           };
         }
 
-        const currentStrength = estimateStrength(currentSet.weight, currentSet.reps);
-        const previousStrength = estimateStrength(previousSet.weight, previousSet.reps);
-        const currentVolume = currentSet.weight * currentSet.reps;
-        const previousVolume = previousSet.weight * previousSet.reps;
+        const curr1rm = estimateStrength(currentSet.weight, currentSet.reps);
+        const prev1rm = estimateStrength(previousSet.weight, previousSet.reps);
+        const currVol = currentSet.weight * currentSet.reps;
+        const prevVol = previousSet.weight * previousSet.reps;
 
-        const strengthDeltaPct = previousStrength > 0
-          ? ((currentStrength - previousStrength) / previousStrength) * 100
-          : 0;
+        const d1rm = prev1rm > 0 ? ((curr1rm - prev1rm) / prev1rm) * 100 : 0;
+        const dVol = prevVol > 0 ? ((currVol - prevVol) / prevVol) * 100 : 0;
 
-        const volumeDeltaPct = previousVolume > 0
-          ? ((currentVolume - previousVolume) / previousVolume) * 100
-          : 0;
+        const zoneC = getRepZone(currentSet.reps);
+        const zoneP = getRepZone(previousSet.reps);
 
-        const weightDiff = currentSet.weight - previousSet.weight;
-        const repsDiff = currentSet.reps - previousSet.reps;
+        // Одинаковые зоны силы (≤6 повторов): 1RM пороги ±3%
+        const bothStrengthZones = (currentSet.reps <= 6) && (previousSet.reps <= 6);
+        // Одинаковые зоны объёма (≥7 повторов): объём пороги ±10%
+        const bothVolumeZones = (currentSet.reps >= 7) && (previousSet.reps >= 7);
 
-        const currentZone = getRepZone(currentSet.reps);
-        const previousZone = getRepZone(previousSet.reps);
-        const zoneChanged = currentZone !== previousZone;
-
-        const sameExactly = weightDiff === 0 && repsDiff === 0;
-        if (sameExactly) {
+        // Ровно по номеру и весу
+        if (currentSet.weight === previousSet.weight && currentSet.reps === previousSet.reps) {
           return {
-            status: "equal",
+            statusClass: "equal",
             label: "Ровно",
             compareText: "Без изменений",
             compactText: "Ровно"
           };
         }
 
-        const clearlyBetterStrength = strengthDeltaPct >= 4;
-        const clearlyBetterVolume = volumeDeltaPct >= 12;
-        const slightlyBetterStrength = strengthDeltaPct >= 1.5;
-        const slightlyBetterVolume = volumeDeltaPct >= 6;
-
-        const clearlyWorseStrength = strengthDeltaPct <= -8;
-        const clearlyWorseVolume = volumeDeltaPct <= -18;
-
-        if (zoneChanged) {
-          if (clearlyBetterStrength || clearlyBetterVolume || slightlyBetterStrength || slightlyBetterVolume) {
+        if (bothStrengthZones) {
+          if (d1rm >= 3) {
             return {
-              status: "volume",
-              label: "Другой",
-              compareText: "Другая зона · ок",
-              compactText: "Другой"
+              statusClass: "progress",
+              label: "Сила",
+              compareText: `1RM ${fmtPct(d1rm)}`,
+              compactText: `1RM ${fmtPct(d1rm)}`
             };
           }
-
-          if (currentVolume > previousVolume || currentSet.reps > previousSet.reps) {
+          if (d1rm <= -3) {
             return {
-              status: "volume",
-              label: "Объём",
-              compareText: "Объём +",
-              compactText: "Объём"
+              statusClass: "regress",
+              label: "Ниже",
+              compareText: `1RM ${fmtPct(d1rm)}`,
+              compactText: `1RM ${fmtPct(d1rm)}`
             };
           }
-
           return {
-            status: "equal",
-            label: "Другой",
-            compareText: "Другая зона",
-            compactText: "Другой"
-          };
-        }
-
-        if (clearlyBetterStrength || clearlyBetterVolume) {
-          const parts = [];
-          if (weightDiff > 0) parts.push(`${trimNumber(weightDiff)} кг`);
-          if (repsDiff > 0) parts.push(`${repsDiff} повт`);
-          return {
-            status: "progress",
-            label: "Прогресс",
-            compareText: parts.length ? `+${parts.join(" · +")}` : "Лучше",
-            compactText: parts.length ? `+${parts.join(" +")}` : "Прогресс"
-          };
-        }
-
-        if (slightlyBetterStrength || slightlyBetterVolume) {
-          return {
-            status: "progress",
-            label: "Лучше",
-            compareText: "Лучше",
-            compactText: "Лучше"
-          };
-        }
-
-        const almostSame = Math.abs(strengthDeltaPct) < 4 && Math.abs(volumeDeltaPct) < 10;
-        if (almostSame) {
-          return {
-            status: "equal",
+            statusClass: "equal",
             label: "Ровно",
-            compareText: "Почти ровно",
+            compareText: "Без изменений",
             compactText: "Ровно"
           };
         }
 
-        if (clearlyWorseStrength && clearlyWorseVolume && repsDiff <= 0 && weightDiff <= 0) {
+        if (bothVolumeZones) {
+          if (dVol >= 10) {
+            return {
+              statusClass: "volume",
+              label: "Объём",
+              compareText: `Объём ${fmtPct(dVol)}`,
+              compactText: `Объём ${fmtPct(dVol)}`
+            };
+          }
+          if (dVol <= -10) {
+            return {
+              statusClass: "regress",
+              label: "Ниже",
+              compareText: `Объём ${fmtPct(dVol)}`,
+              compactText: `Объём ${fmtPct(dVol)}`
+            };
+          }
           return {
-            status: "regress",
-            label: "Ниже",
-            compareText: "Хуже",
-            compactText: "Ниже"
+            statusClass: "equal",
+            label: "Ровно",
+            compareText: "Без изменений",
+            compactText: "Ровно"
           };
         }
 
-        if (currentVolume >= previousVolume || currentSet.reps > previousSet.reps) {
+        // Разные зоны:
+        // - если |1RM| ≤ 3% и |V| ≤ 15% → Ровно
+        if (Math.abs(d1rm) <= 3 && Math.abs(dVol) <= 15) {
           return {
-            status: "volume",
+            statusClass: "equal",
+            label: "Ровно",
+            compareText: "Без изменений",
+            compactText: "Ровно"
+          };
+        }
+
+        // - если 1RM ≥ +5% и Объём > −10% → Сила
+        if (d1rm >= 5 && dVol > -10) {
+          return {
+            statusClass: "progress",
+            label: "Сила",
+            compareText: `1RM ${fmtPct(d1rm)}`,
+            compactText: `1RM ${fmtPct(d1rm)}`
+          };
+        }
+
+        // - если Объём ≥ +12% и 1RM > −2% → Объём
+        if (dVol >= 12 && d1rm > -2) {
+          return {
+            statusClass: "volume",
             label: "Объём",
-            compareText: "Объём",
-            compactText: "Объём"
+            compareText: `Объём ${fmtPct(dVol)}`,
+            compactText: `Объём ${fmtPct(dVol)}`
           };
         }
 
-        return {
-          status: "equal",
-          label: "Нейтр.",
-          compareText: "Нейтрально",
-          compactText: "Нейтр."
-        };
+        // - если 1RM ≤ −5% и Объём ≤ −12% → Ниже
+        if (d1rm <= -5 && dVol <= -12) {
+          // Покажем метрику с большим падением
+          const show1rm = Math.abs(d1rm) >= Math.abs(dVol);
+          return {
+            statusClass: "regress",
+            label: "Ниже",
+            compareText: show1rm ? `1RM ${fmtPct(d1rm)}` : `Объём ${fmtPct(dVol)}`,
+            compactText: show1rm ? `1RM ${fmtPct(d1rm)}` : `Объём ${fmtPct(dVol)}`
+          };
         }
+
+        // - иначе → Другой
+        return {
+          statusClass: "equal",
+          label: "Другой",
+          compareText: "Некорректно сравнить",
+          compactText: "Другой"
+        };
+      }
 
       function isExerciseCollapsed(exId) {
         return Boolean(state.draftView[exId]);
@@ -2619,8 +2635,8 @@
               );
 
               const bottom = make("div", "current-set-bottom");
-              const compareText = make("div", `compare-text ${delta.status}`, delta.compareText);
-              const pill = make("div", `current-set-pill ${delta.status}`, delta.label);
+              const compareText = make("div", `compare-text ${delta.statusClass}`, delta.compareText);
+              const pill = make("div", `current-set-pill ${delta.statusClass}`, delta.label);
 
               bottom.append(compareText, pill);
               card.append(top, values, bottom);
@@ -2641,7 +2657,7 @@
                 lineText,
                 delta.compactText,
                 "",
-                delta.status
+                delta.statusClass
               );
 
               const actions = make("div", "compact-set-actions");
@@ -3542,38 +3558,34 @@
         });
       }
 
-      // ЖЁСТКИЙ СКРОЛЛ ВВЕРХ СТРАНИЦЫ ПРИ ФОКУСЕ/ТАПЕ (с фолбэками и повтором)
-      function scrollAddSetCardToTop(smooth = true) {
-        const behavior = smooth ? "smooth" : "auto";
-        try { window.scrollTo({ top: 0, behavior }); } catch (_) { window.scrollTo(0, 0); }
-        try { document.documentElement.scrollTo({ top: 0, behavior }); } catch (_) { document.documentElement.scrollTop = 0; }
-      }
-
       function scrollPageToDefaultTop() {
         try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) { window.scrollTo(0, 0); }
         try { document.documentElement.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) { document.documentElement.scrollTop = 0; }
       }
 
-      function bindAddSetInputScroll(input, shell) {
-        input.addEventListener("focus", () => {
-          if (shell) shell.classList.add("focused");
-          scrollAddSetCardToTop(true);
-          setTimeout(() => scrollAddSetCardToTop(true), 120);
-          setTimeout(() => scrollAddSetCardToTop(true), 260);
-        });
-
-        input.addEventListener("pointerdown", () => {
-          scrollAddSetCardToTop(true);
-        }, { passive: true });
-
-        input.addEventListener("touchstart", () => {
-          scrollAddSetCardToTop(true);
-        }, { passive: true });
-
-        input.addEventListener("blur", () => {
-          if (shell) shell.classList.remove("focused");
-          syncShellStates();
-        });
+      // Мгновенное выравнивание любой карточки .card к верхнему краю
+      let activeScrollTarget = null;
+      function getElementTopInPage(node) {
+        const rect = node.getBoundingClientRect();
+        return (window.scrollY || window.pageYOffset || 0) + rect.top;
+      }
+      function alignElementToTop(target, smooth = false) {
+        if (!target) return;
+        const top = Math.max(0, getElementTopInPage(target));
+        const behavior = smooth ? "smooth" : "auto";
+        try { window.scrollTo({ top, behavior }); } catch (_) { window.scrollTo(0, top); }
+        try { document.documentElement.scrollTo({ top, behavior }); } catch (_) { document.documentElement.scrollTop = top; }
+        // Повтор через таймеры (клавиатура/viewport могут измениться)
+        setTimeout(() => {
+          const t = Math.max(0, getElementTopInPage(target));
+          try { window.scrollTo({ top: t, behavior: "auto" }); } catch (_) { window.scrollTo(0, t); }
+          try { document.documentElement.scrollTo({ top: t, behavior: "auto" }); } catch (_) { document.documentElement.scrollTop = t; }
+        }, 60);
+        setTimeout(() => {
+          const t = Math.max(0, getElementTopInPage(target));
+          try { window.scrollTo({ top: t, behavior: "auto" }); } catch (_) { window.scrollTo(0, t); }
+          try { document.documentElement.scrollTo({ top: t, behavior: "auto" }); } catch (_) { document.documentElement.scrollTop = t; }
+        }, 260);
       }
 
       function bindEvents() {
@@ -3600,10 +3612,6 @@
           updateForm();
           scheduleExerciseSearchRender();
         });
-
-        bindAddSetInputScroll(el.exerciseInput, el.exerciseInputWrap);
-        bindAddSetInputScroll(el.weightInput, el.weightShell);
-        bindAddSetInputScroll(el.repsInput, el.repsShell);
 
         el.exerciseInput.addEventListener("focus", () => {
           renderExerciseSearchResults(true);
@@ -3663,13 +3671,36 @@
 
         el.timerToggleBtn.addEventListener("click", toggleTimer);
 
+        // Универсальный скролл карточки вверх при тапе/фокусе на любом input/select/textarea
+        document.addEventListener("pointerdown", (e) => {
+          const target = e.target && e.target.closest && e.target.closest("input, select, textarea");
+          if (!target) return;
+          const card = target.closest(".card");
+          if (!card) return;
+          activeScrollTarget = card;
+          alignElementToTop(card, false);
+        }, { passive: true });
+
+        document.addEventListener("focusin", (e) => {
+          const target = e.target && e.target.closest && e.target.closest("input, select, textarea");
+          if (!target) return;
+          const card = target.closest(".card");
+          if (!card) return;
+          activeScrollTarget = card;
+          alignElementToTop(card, false);
+        }, true);
+
+        // Повторно выравниваем при изменении viewport (подъём клавиатуры)
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener("resize", () => {
+            if (!activeScrollTarget) return;
+            const active = document.activeElement && document.activeElement.closest && document.activeElement.closest("input, select, textarea");
+            if (active) alignElementToTop(activeScrollTarget, false);
+          }, { passive: true });
+        }
+
         window.addEventListener("scroll", scheduleTimerViewportSync, { passive: true });
         window.addEventListener("resize", scheduleTimerViewportSync, { passive: true });
-
-        if (window.visualViewport) {
-          window.visualViewport.addEventListener("scroll", scheduleTimerViewportSync, { passive: true });
-          window.visualViewport.addEventListener("resize", scheduleTimerViewportSync, { passive: true });
-        }
 
         window.addEventListener("focus", () => {
           scheduleCloudResumeSync();
