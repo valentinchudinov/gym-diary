@@ -2328,9 +2328,9 @@
         if (!previousSet) {
           return {
             statusClass: "dash",
-            label: "отдельно",
+            label: "Отдельно",
             compareText: "Сравнить некорректно",
-            compactText: "отдельно"
+            compactText: "Отдельно"
           };
         }
 
@@ -2347,9 +2347,9 @@
         if (!Number.isFinite(weightRatio) || weightRatio < 0.8 || repsDiff > 12) {
           return {
             statusClass: "dash",
-            label: "отдельно",
+            label: "Отдельно",
             compareText: "Сравнить некорректно",
-            compactText: "отдельно"
+            compactText: "Отдельно"
           };
         }
 
@@ -2371,7 +2371,7 @@
           const pct = formatDeltaPercent(delta, true);
           return {
             statusClass: "equal",
-            label: "Уровень держится",
+            label: "Тот же",
             compareText: `Уровень держится (${pct})`,
             compactText: pct
           };
@@ -2411,7 +2411,7 @@
         const pct = formatDeltaPercent(delta, true);
         return {
           statusClass: "equal",
-          label: "Уровень держится",
+          label: "Тот же",
           compareText: `Уровень держится (${pct})`,
           compactText: pct
         };
@@ -2505,9 +2505,9 @@
               const values = make("div", "current-set-values");
               const currentValue = `${trimNumber(set.weight)} кг x ${set.reps}`;
               const previousValue = !templateSet
-                ? "отдельно"
+                ? "Отдельно"
                 : (delta.statusClass === "dash"
-                    ? "отдельно"
+                    ? "Отдельно"
                     : `${trimNumber(templateSet.weight)} кг x ${templateSet.reps}`);
 
               values.append(
