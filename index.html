@@ -688,7 +688,7 @@
       font-weight: 800;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis.
+      text-overflow: ellipsis;
     }
 
     .compare-text.progress { color: #00f07c; text-shadow: 0 0 16px rgba(49,214,123,0.16); }
@@ -732,7 +732,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      flex: none.
+      flex: none;
     }
 
     .current-set-values {
@@ -791,7 +791,7 @@
     .current-set-pill.volume {
       color: var(--info);
       background: var(--info-soft);
-      border-color: var(--info-line).
+      border-color: var(--info-line);
     }
 
     .current-set-pill.both {
@@ -979,7 +979,6 @@
       border: 1px solid transparent;
       color: rgba(255, 255, 255, 0.68);
       font-weight: 760;
-      box-shadow: none;
     }
 
     .progress-mode-btn.active {
@@ -1025,12 +1024,11 @@
       height: 8px;
       border-radius: 50%;
       background: rgba(255,255,255,0.45);
-      flex: none;
     }
 
     .sync-pill.synced .sync-dot { background: var(--success); }
     .sync-pill.syncing .sync-dot { background: #ffb24a; }
-    .sync-pill.failed  .sync-dot { background: var(--danger); }
+    .sync-pill.failed .sync-dot { background: var(--danger); }
 
     .toast {
       position: fixed;
@@ -1097,105 +1095,30 @@
       margin-bottom: 22px;
     }
 
-    .modal-set-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      align-items: center;
-      min-height: 40px;
-      padding: 8px 0;
-    }
+    .modal-set-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; min-height: 40px; padding: 8px 0; }
 
-    .edit-exercise-group {
-      margin-top: 18px;
-      padding-top: 14px;
-      border-top: 1px solid var(--line);
-    }
-
-    .edit-exercise-group:first-child {
-      margin-top: 0;
-      padding-top: 0;
-      border-top: 0;
-    }
-
+    .edit-exercise-group { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .edit-exercise-group:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
     .edit-exercise-group > input { margin-bottom: 12px; }
 
     .edit-set-card {
-      display: grid;
-      grid-template-columns: 1fr 58px;
-      gap: 8px;
-      align-items: stretch;
-      padding: 10px;
-      margin-bottom: 8px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.045);
-      overflow: hidden;
+      display: grid; grid-template-columns: 1fr 58px; gap: 8px; align-items: stretch; padding: 10px; margin-bottom: 8px; border-radius: 14px; background: rgba(255, 255, 255, 0.045); overflow: hidden;
     }
 
-    .global-timer-layer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 60;
-      transform: translate3d(0, 0, 0);
-      will-change: transform, width, height;
-    }
-
-    .global-timer {
-      position: absolute;
-      top: calc(12px + var(--safe-top));
-      right: calc(12px + var(--safe-right));
-      pointer-events: none;
-    }
+    .global-timer-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 60; transform: translate3d(0, 0, 0); }
+    .global-timer { position: absolute; top: calc(12px + var(--safe-top)); right: calc(12px + var(--safe-right)); pointer-events: none; }
 
     .timer-widget {
-      min-height: 0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 14px;
-      border-radius: 17px;
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      background: rgba(10, 10, 10, 0.28);
-      color: rgba(255, 255, 255, 0.92);
-      pointer-events: auto;
-      touch-action: manipulation;
+      min-height: 0; display: inline-flex; align-items: center; justify-content: center; padding: 10px 14px;
+      border-radius: 17px; border: 1px solid rgba(255, 255, 255, 0.09); background: rgba(10, 10, 10, 0.28);
+      color: rgba(255, 255, 255, 0.92); pointer-events: auto; touch-action: manipulation;
     }
-
-    .timer-idle, .timer-live {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      white-space: nowrap;
-    }
-
+    .timer-idle, .timer-live { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
     .timer-idle { color: rgba(255, 255, 255, 0.76); font-size: 15px; font-weight: 780; }
     .timer-live { color: rgba(255, 255, 255, 0.96); }
-
     .timer-icon { width: 14px; height: 14px; display: block; flex: none; color: var(--accent); }
-
-    .timer-readout {
-      font-size: 20px;
-      line-height: 1;
-      font-weight: 820;
-      letter-spacing: 0.05em;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .timer-mark {
-      width: 16px;
-      height: 16px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent);
-      opacity: 0.88;
-      flex: none;
-    }
-
+    .timer-readout { font-size: 20px; line-height: 1; font-weight: 820; letter-spacing: 0.05em; font-variant-numeric: tabular-nums; }
+    .timer-mark { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; color: var(--accent); opacity: 0.88; flex: none; }
     .timer-widget.running .timer-idle { display: none; }
     .timer-widget:not(.running) .timer-live { display: none; }
 
@@ -2334,7 +2257,7 @@
         el.exerciseInput.value = name;
         closeExerciseDropdown();
         updateFieldHints();
-        fillSetPrefillForCurrentExercise();
+        // Убрана автоподстановка — только по кнопке "Подставить"
         updateForm();
         haptic();
       }
@@ -2388,18 +2311,26 @@
         updateMainActions();
         syncMainButtons();
 
-        // Новый универсальный скролл (к верху окна)
         alignFieldBlockToTop({ container: window, block: el.addSetCard }, true);
       }
 
-      // Новая логика сравнения подходов (строго по ТЗ)
+      // Формат процента с знаком, 1 десятичный, 0% для мелких/равных
+      function formatDeltaPercent(delta, forceZero = false) {
+        if (forceZero) return "0%";
+        const rounded = Math.round(delta * 10) / 10;
+        if (Math.abs(rounded) < 0.05) return "0%";
+        const sign = rounded > 0 ? "+" : "";
+        return `${sign}${rounded.toFixed(1)}%`;
+      }
+
+      // Логика сравнения с новыми текстами/бейджами и процентами
       function describeSetDelta(currentSet, previousSet) {
         if (!previousSet) {
           return {
             statusClass: "dash",
-            label: "—",
-            compareText: "Нет базы",
-            compactText: "—"
+            label: "отдельно",
+            compareText: "Сравнить некорректно",
+            compactText: "отдельно"
           };
         }
 
@@ -2408,49 +2339,82 @@
         const weightCurr = Number(currentSet.weight);
         const repsCurr = Number(currentSet.reps);
 
-        // Шаг 1. Сравнимость
         const minW = Math.min(weightPrev, weightCurr);
         const maxW = Math.max(weightPrev, weightCurr);
         const weightRatio = maxW > 0 ? minW / maxW : 0;
         const repsDiff = Math.abs(repsPrev - repsCurr);
 
-        if (!Number.isFinite(weightRatio) || weightRatio < 0.8) {
-          return { statusClass: "dash", label: "—", compareText: "Слишком разный вес", compactText: "—" };
-        }
-        if (repsDiff > 12) {
-          return { statusClass: "dash", label: "—", compareText: "Разный режим", compactText: "—" };
+        if (!Number.isFinite(weightRatio) || weightRatio < 0.8 || repsDiff > 12) {
+          return {
+            statusClass: "dash",
+            label: "отдельно",
+            compareText: "Сравнить некорректно",
+            compactText: "отдельно"
+          };
         }
 
-        // Шаг 2. Индекс нагрузки
         const loadPrev = weightPrev * (1 + repsPrev / 30);
         const loadCurr = weightCurr * (1 + repsCurr / 30);
-
-        // Шаг 3. Динамика
         const delta = loadPrev > 0 ? ((loadCurr - loadPrev) / loadPrev) * 100 : 0;
 
-        // Шаг 4. Приоритет правил
         if (delta < -2) {
-          return { statusClass: "regress", label: "НИЖЕ", compareText: "Показатели упали", compactText: "НИЖЕ" };
+          const pct = formatDeltaPercent(delta);
+          return {
+            statusClass: "regress",
+            label: "Снижение",
+            compareText: `Показатели падают (${pct})`,
+            compactText: pct
+          };
         }
 
         if (delta >= -2 && delta <= 2) {
-          return { statusClass: "equal", label: "ТАК ЖЕ", compareText: "Уровень тот же", compactText: "ТАК ЖЕ" };
+          const pct = formatDeltaPercent(delta, true);
+          return {
+            statusClass: "equal",
+            label: "Уровень держится",
+            compareText: `Уровень держится (${pct})`,
+            compactText: pct
+          };
         }
 
         // delta > 2
+        if (weightCurr > weightPrev && repsCurr > repsPrev) {
+          const pct = formatDeltaPercent(delta);
+          return {
+            statusClass: "both",
+            label: "Впечатляющий рост",
+            compareText: `Впечатляющий рост (${pct})`,
+            compactText: pct
+          };
+        }
+
         if (weightCurr > weightPrev && repsCurr <= repsPrev) {
-          return { statusClass: "progress", label: "СИЛА", compareText: "Вес растет", compactText: "СИЛА" };
+          const pct = formatDeltaPercent(delta);
+          return {
+            statusClass: "progress",
+            label: "Вес растет",
+            compareText: `Вес растет (${pct})`,
+            compactText: pct
+          };
         }
 
         if (repsCurr > repsPrev && weightCurr <= weightPrev) {
-          return { statusClass: "volume", label: "ОБЪЕМ", compareText: "Больше повторений", compactText: "ОБЪЕМ" };
+          const pct = formatDeltaPercent(delta);
+          return {
+            statusClass: "volume",
+            label: "Больше повторений",
+            compareText: `Больше повторений (${pct})`,
+            compactText: pct
+          };
         }
 
-        if (weightCurr > weightPrev && repsCurr > repsPrev) {
-          return { statusClass: "both", label: "СИЛА+ОБЪЕМ", compareText: "Вес и повторы растут", compactText: "СИЛА+ОБЪЕМ" };
-        }
-
-        return { statusClass: "equal", label: "ТАК ЖЕ", compareText: "Уровень тот же", compactText: "ТАК ЖЕ" };
+        const pct = formatDeltaPercent(delta, true);
+        return {
+          statusClass: "equal",
+          label: "Уровень держится",
+          compareText: `Уровень держится (${pct})`,
+          compactText: pct
+        };
       }
 
       function isExerciseCollapsed(exId) {
@@ -2540,7 +2504,11 @@
 
               const values = make("div", "current-set-values");
               const currentValue = `${trimNumber(set.weight)} кг x ${set.reps}`;
-              const previousValue = templateSet ? `${trimNumber(templateSet.weight)} кг x ${templateSet.reps}` : "—";
+              const previousValue = !templateSet
+                ? "отдельно"
+                : (delta.statusClass === "dash"
+                    ? "отдельно"
+                    : `${trimNumber(templateSet.weight)} кг x ${templateSet.reps}`);
 
               values.append(
                 createStaticSetBox("Сейчас", currentValue, "", "current"),
@@ -2673,6 +2641,7 @@
         el.modalBody.append(title, form);
       }
 
+      // Правка: сохраняем позицию подхода при редактировании в том же упражнении
       function moveOrUpdateSet(workout, exId, setId, newName, weight, reps) {
         const oldExercise = workout.exercises.find((ex) => ex.id === exId);
         if (!oldExercise) return;
@@ -2680,20 +2649,29 @@
         const index = oldExercise.sets.findIndex((set) => set.id === setId);
         if (index < 0) return;
 
-        const updated = { ...oldExercise.sets[index], weight, reps };
-        oldExercise.sets.splice(index, 1);
+        const sameExercise = sameName(oldExercise.name, newName);
 
-        let target = workout.exercises.find((ex) => sameName(ex.name, newName));
-        if (!target) {
-          target = { id: id(), name: newName, sets: [] };
-          workout.exercises.push(target);
-        }
+        if (sameExercise) {
+          // Обновляем значения на месте, не меняя порядок
+          oldExercise.sets[index].weight = weight;
+          oldExercise.sets[index].reps = reps;
+          // Имя упражнения не меняем
+        } else {
+          // Перенос в другое упражнение — вырезаем и добавляем в конец целевого
+          const updated = { ...oldExercise.sets[index], weight, reps };
+          oldExercise.sets.splice(index, 1);
 
-        target.sets.push(updated);
+          let target = workout.exercises.find((ex) => sameName(ex.name, newName));
+          if (!target) {
+            target = { id: id(), name: newName, sets: [] };
+            workout.exercises.push(target);
+          }
+          target.sets.push(updated);
 
-        if (!oldExercise.sets.length) {
-          workout.exercises = workout.exercises.filter((ex) => ex.id !== oldExercise.id);
-          delete state.draftView[oldExercise.id];
+          if (!oldExercise.sets.length) {
+            workout.exercises = workout.exercises.filter((ex) => ex.id !== oldExercise.id);
+            delete state.draftView[oldExercise.id];
+          }
         }
 
         rebuildIndexes();
@@ -3012,11 +2990,9 @@
             `${formatDateWithWeekday(workout.performedAt || workout.finishedAt || workout.createdAt)} · ${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`
           )
         );
-
         workout.exercises.forEach((ex) => {
           const box = make("div", "exercise");
           box.appendChild(make("div", "exercise-name", ex.name));
-
           ex.sets.forEach((set, index) => {
             const row = make("div", "modal-set-row");
             row.append(
@@ -3025,10 +3001,8 @@
             );
             box.appendChild(row);
           });
-
           el.modalBody.appendChild(box);
         });
-
         const actions = make("div", "sheet-actions");
         const edit = make("button", "btn-card btn-accent", "Редактировать");
         edit.type = "button";
@@ -3040,33 +3014,17 @@
       function createEditSetCard(weightValue = "", repsValue = "") {
         const card = make("div", "edit-set-card");
         const nums = make("div", "form-numbers");
-
-        const weight = make("input", "");
-        weight.value = weightValue;
-        weight.inputMode = "decimal";
-        weight.placeholder = "Вес";
-        weight.dataset.kind = "weight";
-
-        const reps = make("input", "");
-        reps.value = repsValue;
-        reps.inputMode = "numeric";
-        reps.placeholder = "Повторения";
-        reps.dataset.kind = "reps";
-
+        const weight = make("input", ""); weight.value = weightValue; weight.inputMode = "decimal"; weight.placeholder = "Вес"; weight.dataset.kind = "weight";
+        const reps = make("input", ""); reps.value = repsValue; reps.inputMode = "numeric"; reps.placeholder = "Повторения"; reps.dataset.kind = "reps";
         nums.append(weight, reps);
-
         const del = make("button", "btn-card btn-danger icon-square", "×");
         del.type = "button";
         del.onclick = () => {
           const group = card.closest(".edit-exercise-group");
           const cards = [...group.querySelectorAll(".edit-set-card")];
-          if (cards.length <= 1) {
-            group.remove();
-          } else {
-            card.remove();
-          }
+          if (cards.length <= 1) group.remove();
+          else card.remove();
         };
-
         card.append(nums, del);
         return card;
       }
@@ -3074,12 +3032,10 @@
       function createExerciseGroup(nameValue = "") {
         const group = make("div", "edit-exercise-group");
         group.dataset.exId = id();
-
         const name = make("input", "");
         name.value = nameValue;
         name.placeholder = "Упражнение";
         name.dataset.exName = "1";
-
         group.appendChild(name);
         group.appendChild(createEditSetCard("", ""));
         return group;
@@ -3088,7 +3044,6 @@
       function openEditWorkout(workoutId) {
         const workout = state.workoutsById.get(workoutId);
         if (!workout) return;
-
         openSheet();
         el.modalBody.replaceChildren();
 
@@ -3096,7 +3051,6 @@
         const title = make("div", "title", "Редактировать тренировку");
         const addBtn = make("button", "btn-card btn-accent icon-square", "+");
         addBtn.type = "button";
-
         header.append(title, addBtn);
         el.modalBody.appendChild(header);
 
@@ -3110,33 +3064,24 @@
         workout.exercises.forEach((ex) => {
           const group = make("div", "edit-exercise-group");
           group.dataset.exId = ex.id;
-
           const name = make("input", "");
           name.value = ex.name;
           name.dataset.exName = "1";
           group.appendChild(name);
-
           ex.sets.forEach((set) => {
             const card = createEditSetCard(String(set.weight), String(set.reps));
             card.dataset.setId = set.id;
             group.appendChild(card);
           });
-
           form.appendChild(group);
         });
 
-        addBtn.onclick = () => {
-          form.appendChild(createExerciseGroup(""));
-        };
+        addBtn.onclick = () => { form.appendChild(createExerciseGroup("")); };
 
         const actions = make("div", "sheet-actions");
-
         const addExerciseBtn = make("button", "btn-card btn-muted", "Добавить упражнение");
         addExerciseBtn.type = "button";
-        addExerciseBtn.onclick = () => {
-          form.appendChild(createExerciseGroup(""));
-        };
-
+        addExerciseBtn.onclick = () => { form.appendChild(createExerciseGroup("")); };
         const save = make("button", "btn-card btn-accent", "Сохранить");
         save.type = "button";
         save.onclick = () => saveWorkoutEdit(workoutId, form, dateInput);
@@ -3148,70 +3093,32 @@
       function saveWorkoutEdit(workoutId, form, dateInput) {
         const oldWorkout = state.workoutsById.get(workoutId);
         if (!oldWorkout) return;
-
         const nextExercises = [];
         const groups = [...form.querySelectorAll(".edit-exercise-group")];
-
         for (const group of groups) {
           const nameInput = group.querySelector('input[data-ex-name="1"]');
           const name = nameInput ? nameInput.value.trim() : "";
-
-          if (!name) {
-            toast("Проверь название упражнения");
-            return;
-          }
-
+          if (!name) { toast("Проверь название упражнения"); return; }
           const cards = [...group.querySelectorAll(".edit-set-card")];
           if (!cards.length) continue;
-
           const sets = [];
-
           for (const card of cards) {
             const weightEl = card.querySelector('[data-kind="weight"]');
             const repsEl = card.querySelector('[data-kind="reps"]');
             const parsed = parseSetInput(weightEl.value, repsEl.value);
-
-            if (!parsed) {
-              toast("Проверь вес и повторы");
-              return;
-            }
-
-            sets.push({
-              id: card.dataset.setId || id(),
-              weight: parsed.weight,
-              reps: parsed.reps
-            });
+            if (!parsed) { toast("Проверь вес и повторы"); return; }
+            sets.push({ id: card.dataset.setId || id(), weight: parsed.weight, reps: parsed.reps });
           }
-
-          nextExercises.push({
-            id: group.dataset.exId || id(),
-            name,
-            sets
-          });
+          nextExercises.push({ id: group.dataset.exId || id(), name, sets });
         }
-
-        if (!nextExercises.length) {
-          toast("Нельзя сохранить пустую тренировку");
-          return;
-        }
-
-        const selectedDate = dateInput.value
-          ? new Date(`${dateInput.value}T12:00:00`).toISOString()
-          : oldWorkout.performedAt || oldWorkout.finishedAt || oldWorkout.createdAt;
-
-        const newWorkout = sanitizeWorkout({
-          ...oldWorkout,
-          performedAt: selectedDate,
-          exercises: nextExercises
-        });
-
+        if (!nextExercises.length) { toast("Нельзя сохранить пустую тренировку"); return; }
+        const selectedDate = dateInput.value ? new Date(`${dateInput.value}T12:00:00`).toISOString() : oldWorkout.performedAt || oldWorkout.finishedAt || oldWorkout.createdAt;
+        const newWorkout = sanitizeWorkout({ ...oldWorkout, performedAt: selectedDate, exercises: nextExercises });
         const workoutIndex = state.workouts.findIndex((item) => item.id === workoutId);
         if (workoutIndex < 0) return;
-
         state.workouts[workoutIndex] = newWorkout;
         state.workouts.sort((a, b) => getWorkoutTimestamp(b) - getWorkoutTimestamp(a));
         rebuildIndexes();
-
         persistCritical();
         renderAll();
         closeModal();
@@ -3221,9 +3128,7 @@
       function exportWorkoutCsv(workoutId) {
         const workout = state.workoutsById.get(workoutId);
         if (!workout) return;
-
         const rows = [["Дата", "Тип", "Упражнение", "Подход", "Вес", "Повторы", "Объём"]];
-
         workout.exercises.forEach((ex) => {
           ex.sets.forEach((set, index) => {
             rows.push([
@@ -3237,23 +3142,16 @@
             ]);
           });
         });
-
-        const csv = rows
-          .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(";"))
-          .join("\n");
-
+        const csv = rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(";")).join("\n");
         const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
         const url = URL.createObjectURL(blob);
-
         const a = document.createElement("a");
         a.href = url;
         a.download = `${new Date(workout.performedAt || workout.finishedAt || workout.createdAt).toISOString().slice(0, 10)}_${getTypeLabel(workout.trainingType).replace(/\s+/g, "-")}.csv`;
-
         document.body.appendChild(a);
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
-
         toast("CSV-файл создан");
       }
 
@@ -3274,37 +3172,16 @@
 
       function getAllProgressEntriesByExercise() {
         const map = new Map();
-
         state.workouts.forEach((workout) => {
           workout.exercises.forEach((ex) => {
             const key = exerciseKey(ex.name);
             if (!map.has(key)) map.set(key, []);
-
-            let bestWeight = 0;
-            let volume = 0;
-            let reps = 0;
-
-            ex.sets.forEach((set) => {
-              if (set.weight > bestWeight) bestWeight = set.weight;
-              volume += set.weight * set.reps;
-              reps += set.reps;
-            });
-
-            map.get(key).push({
-              key,
-              name: ex.name,
-              date: workout.performedAt || workout.finishedAt || workout.createdAt,
-              weight: bestWeight,
-              volume,
-              reps
-            });
+            let bestWeight = 0; let volume = 0; let reps = 0;
+            ex.sets.forEach((set) => { if (set.weight > bestWeight) bestWeight = set.weight; volume += set.weight * set.reps; reps += set.reps; });
+            map.get(key).push({ key, name: ex.name, date: workout.performedAt || workout.finishedAt || workout.createdAt, weight: bestWeight, volume, reps });
           });
         });
-
-        for (const arr of map.values()) {
-          arr.sort((a, b) => new Date(a.date) - new Date(b.date));
-        }
-
+        for (const arr of map.values()) arr.sort((a, b) => new Date(a.date) - new Date(b.date));
         return map;
       }
 
@@ -3316,10 +3193,7 @@
 
       function buildProgressEmpty(title, subtitle) {
         const box = make("div", "progress-empty-card");
-        box.append(
-          make("div", "progress-empty-card-title", title),
-          make("div", "muted", subtitle)
-        );
+        box.append(make("div", "progress-empty-card-title", title), make("div", "muted", subtitle));
         return box;
       }
 
@@ -3346,15 +3220,9 @@
         empty.textContent = "Выбери упражнение";
         fragment.appendChild(empty);
 
-        [...progressMap.values()]
-          .map((items) => items[0].name)
-          .sort((a, b) => a.localeCompare(b, "ru"))
-          .forEach((name) => {
-            const option = document.createElement("option");
-            option.value = name;
-            option.textContent = name;
-            fragment.appendChild(option);
-          });
+        [...progressMap.values()].map((items) => items[0].name).sort((a, b) => a.localeCompare(b, "ru")).forEach((name) => {
+          const option = document.createElement("option"); option.value = name; option.textContent = name; fragment.appendChild(option);
+        });
 
         el.progressSelect.replaceChildren(fragment);
         el.progressSelect.value =
@@ -3362,26 +3230,13 @@
             ? currentValue
             : "";
 
-        el.progressMetricBtns.forEach((btn) => {
-          btn.classList.toggle("active", btn.dataset.metric === state.progressMetric);
-        });
+        el.progressMetricBtns.forEach((btn) => { btn.classList.toggle("active", btn.dataset.metric === state.progressMetric); });
 
         el.progressResult.replaceChildren();
-
-        if (!el.progressSelect.value) {
-          const box = buildProgressEmpty("Выбери упражнение", "");
-          box.appendChild(buildSyncPill());
-          el.progressResult.appendChild(box);
-          return;
-        }
+        if (!el.progressSelect.value) { const box = buildProgressEmpty("Выбери упражнение", ""); box.appendChild(buildSyncPill()); el.progressResult.appendChild(box); return; }
 
         const entries = progressMap.get(exerciseKey(el.progressSelect.value)) || [];
-        if (!entries.length) {
-          const box = buildProgressEmpty("Пока нет данных", "");
-          box.appendChild(buildSyncPill());
-          el.progressResult.appendChild(box);
-          return;
-        }
+        if (!entries.length) { const box = buildProgressEmpty("Пока нет данных", ""); box.appendChild(buildSyncPill()); el.progressResult.appendChild(box); return; }
 
         const metric = state.progressMetric;
         const first = entries[0];
@@ -3440,7 +3295,6 @@
           renderTimer(0);
           return;
         }
-
         state.timer.running = true;
         state.timer.startedAt = performance.now();
         state.timer.lastPaintAt = 0;
@@ -3476,7 +3330,6 @@
         try { document.documentElement.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) { document.documentElement.scrollTop = 0; }
       }
 
-      // Новый универсальный плавный скролл блока с полем ввода к верхнему краю
       let activeScrollContext = null;
 
       function getElementTopInPage(node) {
@@ -3533,12 +3386,11 @@
         const currentTop = getCurrentScrollTop(context.container);
         const delta = Math.abs(currentTop - targetTop);
 
-        if (delta < 4) return; // уже почти у верхнего края — не дергаем
+        if (delta < 4) return;
 
         const behavior = preferSmooth && delta > 24 ? "smooth" : "auto";
         setScrollTop(context.container, targetTop, behavior);
 
-        // «Дожим» после подъёма клавиатуры/изменения viewport
         setTimeout(() => {
           const retryTop = getTargetTopInContainer(context.block, context.container);
           const retryCurrent = getCurrentScrollTop(context.container);
@@ -3639,7 +3491,6 @@
 
         el.timerToggleBtn.addEventListener("click", toggleTimer);
 
-        // Глобально: при тапе/фокусе на любом input/select/textarea — плавно выравниваем контейнер вверх
         document.addEventListener("pointerdown", (e) => {
           const field = e.target && e.target.closest && e.target.closest("input, select, textarea");
           if (!field) return;
