@@ -346,9 +346,16 @@
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.08);
       color: var(--accent);
+      overflow: hidden;
     }
 
-    .premium-icon svg { width: 26px; height: 26px; display: block; }
+    .premium-icon-img {
+      width: 28px;
+      height: 28px;
+      display: block;
+      object-fit: contain;
+    }
+
     .premium-copy { min-width: 0; flex: 1; display: block; }
 
     .premium-title {
@@ -380,7 +387,11 @@
       transition: all 0.16s ease;
     }
 
-    .premium-type.active .premium-check { color: #fff; border-color: rgba(255,100,24,0.44); background: rgba(255,100,24,0.78); }
+    .premium-type.active .premium-check {
+      color: #fff;
+      border-color: rgba(255,100,24,0.44);
+      background: rgba(255,100,24,0.78);
+    }
 
     .start-cta { display: none; }
 
@@ -721,7 +732,7 @@
       color: rgba(255,255,255,0.56);
       font-weight: 760;
       line-height: 1.1;
-      padding-top: 2px.
+      padding-top: 2px;
     }
 
     .current-set-actions {
@@ -1312,57 +1323,22 @@
         chest: {
           label: "Грудь",
           sub: "Жимы, разводки, акцент на силу и форму",
-          icon: `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M3 10h2"></path>
-              <path d="M19 10h2"></path>
-              <path d="M5 8v4"></path>
-              <path d="M19 8v4"></path>
-              <rect x="7" y="9" width="10" height="2" rx="1"></rect>
-              <path d="M9 7v6"></path>
-              <path d="M15 7v6"></path>
-            </svg>
-          `
+          iconUrl: "icons/chest.svg"
         },
         back: {
           label: "Спина",
           sub: "Тяги, ширина, толщина и контроль спины",
-          icon: `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="5.5" r="2"></circle>
-              <path d="M9.5 10c.6 1.2 1.4 1.8 2.5 1.8S13.9 11.2 14.5 10"></path>
-              <path d="M8.5 9.5c-.8 2.6-1 4.6-1 7.5"></path>
-              <path d="M15.5 9.5c.8 2.6 1 4.6 1 7.5"></path>
-              <path d="M10 12.5l-1.5 6"></path>
-              <path d="M14 12.5l1.5 6"></path>
-              <path d="M9 9c1 .9 2 1.3 3 1.3S14 9.9 15 9"></path>
-            </svg>
-          `
+          iconUrl: "icons/back.svg"
         },
         legs: {
           label: "Ноги",
           sub: "Присед, разгибания, бёдра и объём нижней части",
-          icon: `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M10 4h4"></path>
-              <path d="M10.5 4v5l-2.2 3.2"></path>
-              <path d="M13.5 4v5l2.2 3.2"></path>
-              <path d="M8.3 12.2L9.4 20"></path>
-              <path d="M15.7 12.2L14.6 20"></path>
-              <path d="M8.8 20H6.7"></path>
-              <path d="M17.3 20h-2.1"></path>
-            </svg>
-          `
+          iconUrl: "icons/legs.svg"
         },
         custom: {
           label: "Своя тренировка",
           sub: "Свободный формат без сравнительных шаблонов",
-          icon: `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 5v14"></path>
-              <path d="M5 12h14"></path>
-            </svg>
-          `
+          iconUrl: "icons/custom.svg"
         }
       };
 
@@ -1484,6 +1460,12 @@
         if (cls) node.className = cls;
         if (content !== undefined) text(node, content);
         return node;
+      }
+
+      function iconHtmlForType(item) {
+        const src = item.iconUrl || "";
+        if (!src) return "";
+        return `<img class="premium-icon-img" src="${src}" alt="${item.label || ""}" loading="lazy" decoding="async" onerror="this.style.display='none'">`;
       }
 
       function normalizeName(value) {
@@ -1697,7 +1679,7 @@
               resolve(!error);
             });
           } catch {
-              resolve(false);
+            resolve(false);
           }
         });
       }
@@ -1979,7 +1961,7 @@
           btn.type = "button";
           btn.dataset.type = type;
           btn.innerHTML = `
-            <span class="premium-icon">${item.icon}</span>
+            <span class="premium-icon">${iconHtmlForType(item)}</span>
             <span class="premium-copy">
               <span class="premium-title">${item.label}</span>
               <span class="premium-sub">${item.sub}</span>
@@ -2309,7 +2291,6 @@
         alignFieldBlockToTop({ container: window, block: el.addSetCard }, true);
       }
 
-      // Формат процента с знаком, 1 десятичный, 0% для мелких/равных
       function formatDeltaPercent(delta, forceZero = false) {
         if (forceZero) return "0%";
         const rounded = Math.round(delta * 10) / 10;
@@ -2318,16 +2299,7 @@
         return `${sign}${rounded.toFixed(1)}%`;
       }
 
-      // Бейджи/тексты:
-      // Новый — Подходов не было
-      // Отдельно — Сравнивать некорректно
-      // Снижение — Показатели падают
-      // Такой же — Уровень держится
-      // Сила — Вес растет
-      // Объем — Больше повторений
-      // Сила + Объем — Дикая мощь
       function describeSetDelta(currentSet, previousSet) {
-        // Новый: совсем не с чем сравнить (нет прошлого подхода)
         if (!previousSet) {
           return {
             statusClass: "new",
@@ -2342,11 +2314,11 @@
         const weightCurr = Number(currentSet.weight);
         const repsCurr = Number(currentSet.reps);
 
-        // Некорректно сравнивать — используем «Отдельно»
         const minW = Math.min(weightPrev, weightCurr);
         const maxW = Math.max(weightPrev, weightCurr);
         const weightRatio = maxW > 0 ? minW / maxW : 0;
         const repsDiff = Math.abs(repsPrev - repsCurr);
+
         if (!Number.isFinite(weightRatio) || weightRatio < 0.8 || repsDiff > 12) {
           return {
             statusClass: "dash",
@@ -2506,16 +2478,10 @@
 
               const values = make("div", "current-set-values");
               const currentValue = `${trimNumber(set.weight)} кг x ${set.reps}`;
-
-              // Показываем «не было» если нет прошлого подхода, «отдельно» если сравнение некорректно
               let previousValue = "";
-              if (!templateSet) {
-                previousValue = "не было";
-              } else if (delta.statusClass === "dash") {
-                previousValue = "отдельно";
-              } else {
-                previousValue = `${trimNumber(templateSet.weight)} кг x ${templateSet.reps}`;
-              }
+              if (!templateSet) previousValue = "не было";
+              else if (delta.statusClass === "dash") previousValue = "отдельно";
+              else previousValue = `${trimNumber(templateSet.weight)} кг x ${templateSet.reps}`;
 
               values.append(
                 createStaticSetBox("Сейчас", currentValue, "", "current"),
@@ -2648,7 +2614,6 @@
         el.modalBody.append(title, form);
       }
 
-      // Сохраняем позицию в том же упражнении
       function moveOrUpdateSet(workout, exId, setId, newName, weight, reps) {
         const oldExercise = workout.exercises.find((ex) => ex.id === exId);
         if (!oldExercise) return;
