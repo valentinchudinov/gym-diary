@@ -1490,22 +1490,19 @@
     (() => {
       "use strict";
 
-      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFYI5xgsejwuTEntriAZJeE3eL0vFTYLuO9XufJYqTWHmioNs5X85zcT95tKTxroGK/exec";
+      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwePJczppj63ajPw2oknVit-NE4F5NszUliVF-ZhVV4djZV-J5BMYKHm50g7_ecx_bN/exec";
+      const EXPORT_SECRET = "KOCHKI1604";
 
       const CONFIG = {
-        storageKey: "workouts_v22",
-        draftKey: "draft_workout_v22",
-        localDataKey: "trainer_data_v22",
-        cloudDataKey: "trainer_cloud_data_v22",
-        draftViewKey: "draft_view_state_v22",
-        phraseMemoryKey: "training_phrase_memory_v22",
+        storageKey: "workouts_v50",
+        draftKey: "draft_workout_v50",
+        localDataKey: "trainer_data_v50",
+        draftViewKey: "draft_view_state_v50",
+        phraseMemoryKey: "training_phrase_memory_v50",
         splashDelay: 900,
         toastDelay: 2300,
-        cloudSaveDebounce: 180,
         searchDebounce: 70,
-        searchMaxResults: 20,
-        cloudPollInterval: 7000,
-        cloudResumeDebounce: 600
+        searchMaxResults: 20
       };
 
       const TRAINING_TYPES = {
@@ -1594,20 +1591,6 @@
           raf: 0,
           lastPaintAt: 0
         },
-        cloud: {
-          enabled: Boolean(
-            tg &&
-            tg.initData &&
-            tg.CloudStorage &&
-            typeof tg.CloudStorage.getItem === "function" &&
-            typeof tg.CloudStorage.setItem === "function"
-          ),
-          syncInFlight: false,
-          saveInFlight: false,
-          pendingSave: false,
-          status: "idle",
-          lastError: ""
-        },
         export: {
           inFlightIds: new Set()
         }
@@ -1631,7 +1614,6 @@
         trainingHeadBtn: document.getElementById("trainingHeadBtn"),
         trainingHeadIcon: document.getElementById("trainingHeadIcon"),
         trainingHeadTitle: document.getElementById("trainingHeadTitle"),
-        addSetSection: document.getElementById("addSetSection"),
         addSetCard: document.getElementById("addSetCard"),
         exerciseInputWrap: document.getElementById("exerciseInputWrap"),
         exerciseInput: document.getElementById("exerciseInput"),
@@ -1662,9 +1644,6 @@
         timerReadout: document.getElementById("timerReadout")
       };
 
-      let cloudSaveTimer = 0;
-      let cloudPollTimer = 0;
-      let cloudResumeTimer = 0;
       let timerViewportRaf = 0;
 
       function id() {
@@ -1917,12 +1896,6 @@
         };
       }
 
-      function markSyncStatus(status, errorText = "") {
-        state.cloud.status = status;
-        state.cloud.lastError = errorText || "";
-        updateMeta();
-      }
-
       function persistNowLocal() {
         const snapshot = buildSnapshot();
         safeStorageSet(CONFIG.localDataKey, JSON.stringify(snapshot));
@@ -1931,98 +1904,8 @@
         saveDraftView();
       }
 
-      function cloudGetItem(key) {
-        return new Promise((resolve) => {
-          if (!state.cloud.enabled || !tg || !tg.CloudStorage) {
-            resolve(null);
-            return;
-          }
-          try {
-            tg.CloudStorage.getItem(key, (error, value) => {
-              if (error) {
-                markSyncStatus("failed", typeof error === "string" ? error : "CloudStorage getItem error");
-                resolve(null);
-                return;
-              }
-              resolve(value || null);
-            });
-          } catch (err) {
-            markSyncStatus("failed", err && err.message ? err.message : "CloudStorage getItem exception");
-            resolve(null);
-          }
-        });
-      }
-
-      function cloudSetItem(key, value) {
-        return new Promise((resolve) => {
-          if (!state.cloud.enabled || !tg || !tg.CloudStorage) {
-            resolve(false);
-            return;
-          }
-          try {
-            tg.CloudStorage.setItem(key, value, (error) => {
-              if (error) {
-                markSyncStatus("failed", typeof error === "string" ? error : "CloudStorage setItem error");
-                resolve(false);
-                return;
-              }
-              resolve(true);
-            });
-          } catch (err) {
-            markSyncStatus("failed", err && err.message ? err.message : "CloudStorage setItem exception");
-            resolve(false);
-          }
-        });
-      }
-
-      async function persistNowCloud() {
-        if (!state.cloud.enabled) return false;
-        if (state.cloud.saveInFlight) {
-          state.cloud.pendingSave = true;
-          return false;
-        }
-
-        state.cloud.saveInFlight = true;
-        markSyncStatus("syncing");
-
-        const snapshot = buildSnapshot();
-        const ok = await cloudSetItem(CONFIG.cloudDataKey, JSON.stringify(snapshot));
-
-        state.cloud.saveInFlight = false;
-
-        if (ok) {
-          markSyncStatus("synced");
-        } else {
-          markSyncStatus("failed", state.cloud.lastError || "Не удалось сохранить в облако");
-          toast("CloudStorage: не удалось сохранить в облако");
-        }
-
-        if (state.cloud.pendingSave) {
-          state.cloud.pendingSave = false;
-          persistNowCloud();
-        }
-
-        return ok;
-      }
-
-      function scheduleCloudPersist(immediate = false) {
-        clearTimeout(cloudSaveTimer);
-        if (!state.cloud.enabled) return;
-
-        if (immediate) {
-          persistNowCloud();
-          return;
-        }
-
-        markSyncStatus("syncing");
-        cloudSaveTimer = setTimeout(() => {
-          persistNowCloud();
-        }, CONFIG.cloudSaveDebounce);
-      }
-
       function persistCritical() {
         persistNowLocal();
-        scheduleCloudPersist(true);
       }
 
       function rebuildIndexes() {
@@ -2072,31 +1955,6 @@
         rebuildIndexes();
       }
 
-      async function syncFromCloud(force = false) {
-        if (!state.cloud.enabled || state.cloud.syncInFlight) return false;
-
-        state.cloud.syncInFlight = true;
-        const raw = await cloudGetItem(CONFIG.cloudDataKey);
-        const snapshot = safeJsonParse(raw, null);
-        state.cloud.syncInFlight = false;
-
-        if (!snapshot || !Array.isArray(snapshot.workouts) || !snapshot.draft) return false;
-
-        const cloudUpdatedAt = Number(snapshot.updatedAt) || 0;
-        const localSnapshot = safeJsonParse(safeStorageGet(CONFIG.localDataKey), buildSnapshot());
-        const localUpdatedAt = Number(localSnapshot.updatedAt) || 0;
-
-        if (force || cloudUpdatedAt > localUpdatedAt) {
-          applySnapshot(snapshot);
-          persistNowLocal();
-          renderAll();
-          markSyncStatus("synced");
-          return true;
-        }
-
-        return false;
-      }
-
       async function loadData() {
         loadDraftView();
         loadPhraseMemory();
@@ -2116,64 +1974,15 @@
           };
         }
 
-        if (state.cloud.enabled) {
-          markSyncStatus("syncing");
-          const cloudRaw = await cloudGetItem(CONFIG.cloudDataKey);
-          const cloudSnapshot = safeJsonParse(cloudRaw, null);
-
-          const localUpdatedAt = Number(finalSnapshot.updatedAt) || 0;
-          const cloudUpdatedAt = Number(cloudSnapshot && cloudSnapshot.updatedAt) || 0;
-
-          if (cloudSnapshot && Array.isArray(cloudSnapshot.workouts) && cloudSnapshot.draft) {
-            if (cloudUpdatedAt >= localUpdatedAt) {
-              finalSnapshot = cloudSnapshot;
-            } else {
-              await persistNowCloud();
-            }
-            markSyncStatus("synced");
-          } else {
-            await persistNowCloud();
-          }
-        }
-
         applySnapshot(finalSnapshot);
         initRandomSubs();
         persistNowLocal();
         renderAll();
         syncMainButtons();
 
-        if (tg && !getTelegramInitData()) {
-          toast("Открой приложение именно внутри Telegram");
-        }
-
-        startCloudPolling();
-
         setTimeout(() => {
           el.splash.classList.add("hide");
         }, CONFIG.splashDelay);
-      }
-
-      function startCloudPolling() {
-        stopCloudPolling();
-        if (!state.cloud.enabled) return;
-
-        cloudPollTimer = setInterval(() => {
-          if (document.visibilityState !== "visible") return;
-          syncFromCloud(false);
-        }, CONFIG.cloudPollInterval);
-      }
-
-      function stopCloudPolling() {
-        clearInterval(cloudPollTimer);
-        cloudPollTimer = 0;
-      }
-
-      function scheduleCloudResumeSync() {
-        clearTimeout(cloudResumeTimer);
-        if (!state.cloud.enabled) return;
-        cloudResumeTimer = setTimeout(() => {
-          syncFromCloud(false);
-        }, CONFIG.cloudResumeDebounce);
       }
 
       function isTrainingStarted() {
@@ -2234,16 +2043,7 @@
         } else if (state.tab === "history") {
           text(el.screenMeta, state.historyUi.activeType ? "" : "Все типы тренировок");
         } else {
-          let syncText = "Локально";
-          if (state.cloud.enabled) {
-            if (state.cloud.status === "syncing") syncText = "Синхронизация...";
-            else if (state.cloud.status === "synced") syncText = "Облако синхронизировано";
-            else if (state.cloud.status === "failed") syncText = `Ошибка синхронизации${state.cloud.lastError ? `: ${state.cloud.lastError}` : ""}`;
-            else syncText = "Облако подключено";
-          } else if (tg) {
-            syncText = "CloudStorage недоступен";
-          }
-          text(el.screenMeta, syncText);
+          text(el.screenMeta, "Локальное сохранение");
         }
       }
 
@@ -3027,41 +2827,6 @@
         return tg.initDataUnsafe.user || null;
       }
 
-      function getTelegramUserId() {
-        const user = getTelegramUser();
-        if (user && user.id != null) {
-          return String(user.id);
-        }
-        return "";
-      }
-
-      function getTelegramInitData() {
-        return tg && typeof tg.initData === "string" ? tg.initData : "";
-      }
-
-      function ensureTelegramAuthOrThrow() {
-        if (!tg) {
-          throw new Error("Открой приложение внутри Telegram");
-        }
-
-        const initData = getTelegramInitData();
-        const userId = getTelegramUserId();
-
-        if (!initData) {
-          throw new Error("Нет Telegram initData. Открой приложение из Telegram.");
-        }
-
-        if (!userId) {
-          throw new Error("Не удалось получить Telegram user id.");
-        }
-
-        return {
-          initData,
-          userId,
-          user: getTelegramUser()
-        };
-      }
-
       function formatDateDDMMYYYY(iso) {
         const d = new Date(iso);
         const dd = String(d.getDate()).padStart(2, "0");
@@ -3081,12 +2846,15 @@
       }
 
       function buildExportPayload(workout) {
-        const auth = ensureTelegramAuthOrThrow();
+        const user = getTelegramUser();
         const performedAt = workout.performedAt || workout.finishedAt || workout.createdAt || new Date().toISOString();
 
         return {
-          initData: auth.initData,
-          userId: auth.userId,
+          secret: EXPORT_SECRET,
+          userId: user && user.id != null ? String(user.id) : "",
+          username: user && user.username ? String(user.username) : "",
+          firstName: user && user.first_name ? String(user.first_name) : "",
+          lastName: user && user.last_name ? String(user.last_name) : "",
           training: {
             id: String(workout.id),
             date: formatDateDDMMYYYY(performedAt),
@@ -3108,20 +2876,24 @@
       }
 
       async function sendWorkoutToGoogleSheets(workout) {
-        if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEBAPP_URL_HERE")) {
+        if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("PASTE_YOUR_NEW_EXEC_URL")) {
           throw new Error("Не указан URL Google Apps Script");
         }
 
         const payload = buildExportPayload(workout);
+
+        const body = new URLSearchParams({
+          payload: JSON.stringify(payload)
+        }).toString();
 
         let response;
         try {
           response = await fetch(GOOGLE_SCRIPT_URL, {
             method: "POST",
             headers: {
-              "Content-Type": "application/json"
+              "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
             },
-            body: JSON.stringify(payload)
+            body
           });
         } catch (networkError) {
           throw new Error("Сеть / CORS / недоступен Web App");
@@ -3134,13 +2906,12 @@
         let data = null;
         try {
           data = await response.json();
-        } catch (parseError) {
+        } catch {
           throw new Error("Apps Script вернул не JSON");
         }
 
         if (!data || data.ok !== true) {
-          const details = data && data.details ? ` | ${JSON.stringify(data.details)}` : "";
-          throw new Error(data && data.error ? `${data.error}${details}` : "Ошибка выгрузки");
+          throw new Error(data && data.error ? data.error : "Ошибка выгрузки");
         }
 
         return data;
@@ -3184,7 +2955,7 @@
 
           if (!silentSuccess) {
             if (responseData && responseData.duplicate === true) {
-              toast("Тренировка уже была в таблице и помечена как выгруженная");
+              toast("Тренировка уже есть в таблице");
             } else {
               toast("Тренировка выгружена в таблицу");
             }
@@ -3237,12 +3008,7 @@
 
         const exportOk = await exportWorkoutById(completedWorkout.id, { silentSuccess: true });
         if (exportOk) {
-          const exportedWorkout = state.workoutsById.get(completedWorkout.id);
-          if (exportedWorkout && exportedWorkout.isExported) {
-            toast("Тренировка сохранена и выгружена");
-          } else {
-            toast("Тренировка сохранена");
-          }
+          toast("Тренировка сохранена и выгружена");
         } else {
           toast("Тренировка сохранена, но выгрузка не удалась");
         }
@@ -3698,15 +3464,8 @@
       }
 
       function buildSyncPill() {
-        const map = {
-          idle: { text: "Локальные данные", cls: "" },
-          syncing: { text: "Синхронизация...", cls: "syncing" },
-          synced: { text: "Облако синхронизировано", cls: "synced" },
-          failed: { text: `Ошибка синхронизации${state.cloud.lastError ? `: ${state.cloud.lastError}` : ""}`, cls: "failed" }
-        };
-        const data = map[state.cloud.status] || map.idle;
-        const pill = make("div", `sync-pill ${data.cls}`);
-        pill.innerHTML = `<span class="sync-dot"></span><span>${data.text}</span>`;
+        const pill = make("div", "sync-pill");
+        pill.innerHTML = `<span class="sync-dot"></span><span>Локальное сохранение</span>`;
         return pill;
       }
 
@@ -4006,25 +3765,19 @@
 
         window.addEventListener("scroll", scheduleTimerViewportSync, { passive: true });
         window.addEventListener("resize", scheduleTimerViewportSync, { passive: true });
-        window.addEventListener("focus", () => { scheduleCloudResumeSync(); });
 
         document.addEventListener("visibilitychange", () => {
           if (document.visibilityState === "hidden") {
             persistNowLocal();
-            persistNowCloud();
-          } else {
-            scheduleCloudResumeSync();
           }
         });
 
         window.addEventListener("pagehide", () => {
           persistNowLocal();
-          persistNowCloud();
         });
 
         window.addEventListener("beforeunload", () => {
           persistNowLocal();
-          persistNowCloud();
         });
       }
 
