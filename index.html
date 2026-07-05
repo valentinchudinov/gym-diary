@@ -1490,7 +1490,7 @@
     (() => {
       "use strict";
 
-      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwv20NiTUTeSp2RZjkbBxukVhcZY-0HvrHxdowJwFMM1K1Lwi7FUhK8vbq0ySueBPmC/exec";
+      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFYI5xgsejwuTEntriAZJeE3eL0vFTYLuO9XufJYqTWHmioNs5X85zcT95tKTxroGK/exec";
 
       const CONFIG = {
         storageKey: "workouts_v22",
@@ -3088,19 +3088,19 @@
           initData: auth.initData,
           userId: auth.userId,
           training: {
-            id: workout.id,
+            id: String(workout.id),
             date: formatDateDDMMYYYY(performedAt),
             dateTime: formatDateTimeDDMMYYYYHHMM(performedAt),
             type: getTypeLabel(workout.trainingType),
-            typeKey: workout.trainingType,
+            typeKey: String(workout.trainingType || ""),
             columnLabel: TRAINING_TYPES[workout.trainingType]?.exportColumnLabel || getTypeLabel(workout.trainingType),
             exercisesDetailed: workout.exercises.map((ex) => ({
-              name: ex.name,
+              name: String(ex.name || ""),
               sets: ex.sets.map((set, index) => ({
                 index: index + 1,
                 text: `${index + 1}й подход: ${trimNumber(set.weight)}кг x ${set.reps}`,
-                weight: set.weight,
-                reps: set.reps
+                weight: Number(set.weight),
+                reps: Number(set.reps)
               }))
             }))
           }
@@ -3119,7 +3119,7 @@
           response = await fetch(GOOGLE_SCRIPT_URL, {
             method: "POST",
             headers: {
-              "Content-Type": "text/plain;charset=utf-8"
+              "Content-Type": "application/json"
             },
             body: JSON.stringify(payload)
           });
