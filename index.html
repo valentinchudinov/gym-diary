@@ -1490,7 +1490,7 @@
     (() => {
       "use strict";
 
-      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZ8k0gmpkG6HbcgTLoKnxNY-EDHqy8VDB_AweZfcTJFNq1tbZVEZ2tnb2vO5nDDPBp/exec";
+      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw4Q9z5qoGpou9aY90q9DkFCYKEVQExlYd6htfzAL0bisOISztSYTVBXiPDlQOj_0NK/exec";
 
       const CONFIG = {
         storageKey: "workouts_v22",
@@ -3139,7 +3139,8 @@
         }
 
         if (!data || data.ok !== true) {
-          throw new Error(data && data.error ? data.error : "Ошибка выгрузки");
+          const details = data && data.details ? ` | ${JSON.stringify(data.details)}` : "";
+          throw new Error(data && data.error ? `${data.error}${details}` : "Ошибка выгрузки");
         }
 
         return data;
