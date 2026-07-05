@@ -1490,7 +1490,7 @@
     (() => {
       "use strict";
 
-      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDec9rLkS_Dg4RZxFm5nWpIa60D4xLBeo9rNcDATJvj7BmAu5HG62Io30YXF2pZyk3/exec";
+      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz02F1wwMZgwDKhf8oZTUX7hsh32nXsjT_-OiOO5kMqapMh9LcF0AxzYkF-t9SVCbQN/exec";
 
       const CONFIG = {
         storageKey: "workouts_v22",
@@ -3027,6 +3027,10 @@
         return "";
       }
 
+      function getTelegramInitData() {
+        return tg && typeof tg.initData === "string" ? tg.initData : "";
+      }
+
       function formatDateDDMMYYYY(iso) {
         const d = new Date(iso);
         const dd = String(d.getDate()).padStart(2, "0");
@@ -3049,6 +3053,7 @@
         const performedAt = workout.performedAt || workout.finishedAt || workout.createdAt || new Date().toISOString();
 
         return {
+          initData: getTelegramInitData(),
           userId: getTelegramUserId() || "unknown_user",
           training: {
             id: workout.id,
@@ -3076,6 +3081,10 @@
         }
 
         const payload = buildExportPayload(workout);
+
+        if (!payload.initData) {
+          throw new Error("Нет Telegram initData. Открой приложение из Telegram.");
+        }
 
         let response;
         try {
