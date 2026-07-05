@@ -25,10 +25,14 @@
       --accent-soft: rgba(255, 100, 24, 0.1);
       --accent-line: rgba(255, 100, 24, 0.24);
       --success: #31d67b;
+      --success-soft: rgba(49, 214, 123, 0.12);
+      --success-line: rgba(49, 214, 123, 0.26);
       --danger: #ff8a8a;
       --danger-soft: rgba(255, 70, 70, 0.12);
       --danger-line: rgba(255, 90, 90, 0.28);
       --info: #87b7ff;
+      --info-soft: rgba(135, 183, 255, 0.12);
+      --info-line: rgba(135, 183, 255, 0.28);
       --radius: 18px;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-right: env(safe-area-inset-right, 0px);
@@ -335,24 +339,66 @@
         rgba(255,255,255,0.035);
     }
 
-    .premium-icon {
-      width: 52px;
-      height: 52px;
-      min-width: 52px;
+    .premium-icon,
+    .training-head-icon,
+    .history-category-icon,
+    .history-item-icon,
+    .workout-modal-icon {
       border-radius: 16px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.08);
-      color: var(--accent);
       overflow: hidden;
       flex: none;
     }
 
-    .premium-icon-img {
+    .premium-icon {
+      width: 52px;
+      height: 52px;
+      min-width: 52px;
+    }
+
+    .training-head-icon,
+    .workout-modal-icon {
+      width: 52px;
+      height: 52px;
+      min-width: 52px;
+    }
+
+    .history-category-icon {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+    }
+
+    .history-item-icon {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      border-radius: 14px;
+    }
+
+    .premium-icon-img,
+    .training-head-icon img,
+    .workout-modal-icon img {
       width: 40px;
       height: 40px;
+      display: block;
+      object-fit: contain;
+    }
+
+    .history-category-icon img {
+      width: 36px;
+      height: 36px;
+      display: block;
+      object-fit: contain;
+    }
+
+    .history-item-icon img {
+      width: 32px;
+      height: 32px;
       display: block;
       object-fit: contain;
     }
@@ -428,27 +474,6 @@
       flex: 1;
     }
 
-    .training-head-icon {
-      width: 52px;
-      height: 52px;
-      min-width: 52px;
-      border-radius: 16px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      overflow: hidden;
-      flex: none;
-    }
-
-    .training-head-icon img {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-      display: block;
-    }
-
     .training-head-title { font-size: 22px; font-weight: 840; line-height: 1.08; }
     .training-head-sub { margin-top: 4px; color: var(--muted); font-size: 12px; }
 
@@ -464,68 +489,6 @@
       color: rgba(255,255,255,0.52);
       background: rgba(255,255,255,0.03);
       flex: none;
-    }
-
-    .history-category-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .history-category-icon {
-      width: 48px;
-      height: 48px;
-      min-width: 48px;
-      border-radius: 15px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      overflow: hidden;
-      flex: none;
-    }
-
-    .history-category-icon img {
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
-      display: block;
-    }
-
-    .history-item-top {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 8px;
-      min-width: 0;
-    }
-
-    .history-item-icon {
-      width: 44px;
-      height: 44px;
-      min-width: 44px;
-      border-radius: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      overflow: hidden;
-      flex: none;
-    }
-
-    .history-item-icon img {
-      width: 32px;
-      height: 32px;
-      object-fit: contain;
-      display: block;
-    }
-
-    .history-title-wrap {
-      min-width: 0;
-      flex: 1;
     }
 
     .form-stack, .modal-form { display: grid; gap: 10px; }
@@ -645,7 +608,6 @@
     }
 
     .input-wrap.has-value .input-clear { opacity: 1; pointer-events: auto; }
-
     .input-clear svg { width: 14px; height: 14px; display: block; }
 
     .search-dropdown {
@@ -721,6 +683,8 @@
     .btn-muted { background: rgba(255, 255, 255, 0.06); }
     .btn-accent { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-line); }
     .btn-danger { color: var(--danger); background: var(--danger-soft); border-color: var(--danger-line); }
+    .btn-success { color: var(--success); background: var(--success-soft); border-color: var(--success-line); }
+    .btn-info { color: var(--info); background: var(--info-soft); border-color: var(--info-line); }
 
     .icon-square {
       width: 44px;
@@ -960,6 +924,13 @@
 
     .history-category.custom { margin-top: 8px; border-color: rgba(255,100,24,0.16); }
 
+    .history-category-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
     .history-category-title {
       font-weight: 820;
       font-size: 16px;
@@ -1019,12 +990,59 @@
       box-shadow: 0 14px 28px rgba(0,0,0,0.14);
     }
 
+    .history-item-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      min-width: 0;
+    }
+
+    .history-title-wrap {
+      min-width: 0;
+      flex: 1;
+    }
+
     .history-title {
       font-weight: 820;
       font-size: 17px;
       margin-bottom: 2px;
       line-height: 1.22;
       word-break: break-word;
+    }
+
+    .history-status {
+      margin-top: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 28px;
+      padding: 0 10px;
+      width: fit-content;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.75);
+    }
+
+    .history-status.exported {
+      color: var(--success);
+      background: var(--success-soft);
+      border-color: var(--success-line);
+    }
+
+    .history-status.pending {
+      color: #ffb24a;
+      background: rgba(255, 178, 74, 0.12);
+      border-color: rgba(255, 178, 74, 0.28);
+    }
+
+    .history-status.failed {
+      color: var(--danger);
+      background: var(--danger-soft);
+      border-color: var(--danger-line);
     }
 
     .history-actions {
@@ -1035,8 +1053,8 @@
     }
 
     .history-action-btn {
-      width: 50px;
-      min-width: 50px;
+      width: 52px;
+      min-width: 52px;
       height: 42px;
       min-height: 42px;
       border-radius: 14px;
@@ -1196,27 +1214,6 @@
       min-width: 0;
     }
 
-    .workout-modal-icon {
-      width: 52px;
-      height: 52px;
-      min-width: 52px;
-      border-radius: 16px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      overflow: hidden;
-      flex: none;
-    }
-
-    .workout-modal-icon img {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-      display: block;
-    }
-
     .workout-modal-title-wrap {
       min-width: 0;
       flex: 1;
@@ -1324,9 +1321,9 @@
       .smart-field-label { font-size: 9px; }
       .current-set-values { grid-template-columns: 1fr 1fr; }
       .current-set-bottom { align-items: center; }
-      .history-row { grid-template-columns: minmax(0, 1fr) 50px; }
+      .history-row { grid-template-columns: minmax(0, 1fr) 52px; }
       .history-actions { gap: 8px; }
-      .history-action-btn { width: 50px; min-width: 50px; }
+      .history-action-btn { width: 52px; min-width: 52px; }
     }
   </style>
 </head>
@@ -1493,13 +1490,15 @@
     (() => {
       "use strict";
 
+      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDec9rLkS_Dg4RZxFm5nWpIa60D4xLBeo9rNcDATJvj7BmAu5HG62Io30YXF2pZyk3/exec";
+
       const CONFIG = {
-        storageKey: "workouts_v20",
-        draftKey: "draft_workout_v20",
-        localDataKey: "trainer_data_v20",
-        cloudDataKey: "trainer_cloud_data_v20",
-        draftViewKey: "draft_view_state_v20",
-        phraseMemoryKey: "training_phrase_memory_v20",
+        storageKey: "workouts_v23",
+        draftKey: "draft_workout_v23",
+        localDataKey: "trainer_data_v23",
+        cloudDataKey: "trainer_cloud_data_v23",
+        draftViewKey: "draft_view_state_v23",
+        phraseMemoryKey: "training_phrase_memory_v23",
         splashDelay: 900,
         toastDelay: 2300,
         cloudSaveDebounce: 180,
@@ -1512,6 +1511,7 @@
       const TRAINING_TYPES = {
         chest: {
           label: "Грудь",
+          exportColumnLabel: "Грудь",
           iconUrl: "icons/chest.svg",
           subVariants: [
             "Жим лёжа — горизонтальная ошибка, ставшая традицией",
@@ -1522,6 +1522,7 @@
         },
         back: {
           label: "Спина",
+          exportColumnLabel: "Спина",
           iconUrl: "icons/back.svg",
           subVariants: [
             "Тут либо тянешь корпус, либо тянешь время",
@@ -1533,6 +1534,7 @@
         },
         legs: {
           label: "Ноги",
+          exportColumnLabel: "Ноги",
           iconUrl: "icons/legs.svg",
           subVariants: [
             "Под штангой все философы резко становятся практиками",
@@ -1543,6 +1545,7 @@
         },
         custom: {
           label: "Свободная тренировка",
+          exportColumnLabel: "Свободная тренировка",
           shortLabel: "Свободная",
           iconUrl: "icons/custom.svg",
           subVariants: [
@@ -1597,6 +1600,9 @@
           saveInFlight: false,
           pendingSave: false,
           status: "idle"
+        },
+        export: {
+          inFlightIds: new Set()
         }
       };
 
@@ -1665,7 +1671,10 @@
           trainingType: "",
           createdAt: new Date().toISOString(),
           performedAt: new Date().toISOString(),
-          exercises: []
+          exercises: [],
+          isExported: false,
+          exportError: "",
+          exportedAt: ""
         };
       }
 
@@ -1817,6 +1826,9 @@
           createdAt: workout.createdAt || new Date().toISOString(),
           finishedAt: workout.finishedAt,
           performedAt: workout.performedAt || workout.finishedAt || workout.createdAt || new Date().toISOString(),
+          isExported: Boolean(workout.isExported),
+          exportError: String(workout.exportError || ""),
+          exportedAt: String(workout.exportedAt || ""),
           exercises: (workout.exercises || [])
             .filter((ex) => ex && ex.name && Array.isArray(ex.sets))
             .map((ex) => ({
@@ -2919,8 +2931,8 @@
       function syncMainButtons() {
         const mainButton = tg && tg.MainButton ? tg.MainButton : null;
         if (!mainButton) return;
-        mainButton.offClick(startTraining);
-        mainButton.offClick(finishWorkout);
+        mainButton.offClick(startTrainingFlow);
+        mainButton.offClick(finishWorkoutFlow);
         const hasStarted = isTrainingStarted();
         const hasSelectedType = Boolean(state.selectedStartType);
         const hasSets = getStats(state.draft).sets > 0;
@@ -2929,21 +2941,21 @@
           if (!hasSelectedType) { mainButton.hide(); return; }
           mainButton.setText("Начать тренировку");
           mainButton.setParams({ color: "#ff6418", text_color: "#ffffff", is_active: true, is_visible: true });
-          mainButton.onClick(startTraining);
+          mainButton.onClick(startTrainingFlow);
           mainButton.show();
           return;
         }
         if (hasSets) {
           mainButton.setText("Завершить тренировку");
           mainButton.setParams({ color: "#ff6418", text_color: "#ffffff", is_active: true, is_visible: true });
-          mainButton.onClick(finishWorkout);
+          mainButton.onClick(finishWorkoutFlow);
           mainButton.show();
           return;
         }
         mainButton.hide();
       }
 
-      function startTraining() {
+      function startTrainingFlow() {
         if (!state.selectedStartType) return;
         state.draft = createDraft();
         state.draft.trainingType = state.selectedStartType;
@@ -2980,17 +2992,162 @@
         scrollPageToDefaultTop();
       }
 
-      async function finishWorkout() {
-        if (!state.draft.trainingType) { toast("Сначала начни тренировку"); return; }
+      function getTelegramUserId() {
+        const fromInit = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id
+          ? String(tg.initDataUnsafe.user.id)
+          : "";
+        if (fromInit) return fromInit;
+        const fallback = safeStorageGet("tg_fallback_user_id");
+        if (fallback) return fallback;
+        return "";
+      }
+
+      function formatDateDDMMYYYY(iso) {
+        const d = new Date(iso);
+        const dd = String(d.getDate()).padStart(2, "0");
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const yyyy = d.getFullYear();
+        return `${dd}.${mm}.${yyyy}`;
+      }
+
+      function formatDateTimeDDMMYYYYHHMM(iso) {
+        const d = new Date(iso);
+        const dd = String(d.getDate()).padStart(2, "0");
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const yyyy = d.getFullYear();
+        const hh = String(d.getHours()).padStart(2, "0");
+        const min = String(d.getMinutes()).padStart(2, "0");
+        return `${dd}.${mm}.${yyyy} ${hh}:${min}`;
+      }
+
+      function buildExportPayload(workout) {
+        const performedAt = workout.performedAt || workout.finishedAt || workout.createdAt || new Date().toISOString();
+
+        return {
+          userId: getTelegramUserId() || "unknown_user",
+          training: {
+            id: workout.id,
+            date: formatDateDDMMYYYY(performedAt),
+            dateTime: formatDateTimeDDMMYYYYHHMM(performedAt),
+            type: getTypeLabel(workout.trainingType),
+            typeKey: workout.trainingType,
+            columnLabel: TRAINING_TYPES[workout.trainingType]?.exportColumnLabel || getTypeLabel(workout.trainingType),
+            exercisesDetailed: workout.exercises.map((ex) => ({
+              name: ex.name,
+              sets: ex.sets.map((set, index) => ({
+                index: index + 1,
+                text: `${index + 1}й подход: ${trimNumber(set.weight)}кг x ${set.reps}`,
+                weight: set.weight,
+                reps: set.reps
+              }))
+            }))
+          }
+        };
+      }
+
+      async function sendWorkoutToGoogleSheets(workout) {
+        if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEBAPP_URL_HERE")) {
+          throw new Error("Не указан URL Google Apps Script");
+        }
+
+        const payload = buildExportPayload(workout);
+
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json().catch(() => ({}));
+        if (!data || data.ok !== true) {
+          throw new Error(data && data.error ? data.error : "Ошибка выгрузки");
+        }
+
+        return data;
+      }
+
+      function setWorkoutExportState(workoutId, exported, errorText = "") {
+        const workout = state.workouts.find((item) => item.id === workoutId);
+        if (!workout) return;
+        workout.isExported = Boolean(exported);
+        workout.exportError = errorText || "";
+        workout.exportedAt = exported ? new Date().toISOString() : "";
+        rebuildIndexes();
+        persistCritical();
+        renderAll();
+      }
+
+      async function exportWorkoutById(workoutId, { silentSuccess = false } = {}) {
+        const workout = state.workoutsById.get(workoutId);
+        if (!workout) {
+          toast("Тренировка не найдена");
+          return false;
+        }
+
+        if (workout.isExported) {
+          toast("Тренировка уже выгружена");
+          return true;
+        }
+
+        if (state.export.inFlightIds.has(workoutId)) {
+          toast("Выгрузка уже выполняется");
+          return false;
+        }
+
+        try {
+          state.export.inFlightIds.add(workoutId);
+          renderAll();
+
+          const responseData = await sendWorkoutToGoogleSheets(workout);
+
+          setWorkoutExportState(workoutId, true, "");
+
+          if (!silentSuccess) {
+            if (responseData && responseData.duplicate === true) {
+              toast("Тренировка уже была в таблице и помечена как выгруженная");
+            } else {
+              toast("Тренировка выгружена в таблицу");
+            }
+          }
+
+          return true;
+        } catch (error) {
+          const message = error && error.message ? error.message : "Не удалось выгрузить тренировку";
+          setWorkoutExportState(workoutId, false, message);
+          toast(`Ошибка выгрузки: ${message}`);
+          return false;
+        } finally {
+          state.export.inFlightIds.delete(workoutId);
+          renderAll();
+        }
+      }
+
+      async function finishWorkoutFlow() {
+        if (!state.draft.trainingType) {
+          toast("Сначала начни тренировку");
+          return;
+        }
         if (!getStats(state.draft).sets) return;
+
         const answer = await showPopup(`Завершить тренировку "${getTypeLabel(state.draft.trainingType)}"?`);
         if (answer !== "ok") return;
+
         const completedWorkout = sanitizeWorkout({
           ...state.draft,
           status: "completed",
           finishedAt: new Date().toISOString(),
-          performedAt: state.draft.performedAt || new Date().toISOString()
+          performedAt: state.draft.performedAt || new Date().toISOString(),
+          isExported: false,
+          exportError: "",
+          exportedAt: ""
         });
+
         state.workouts.unshift(completedWorkout);
         state.selectedStartType = "";
         state.draft = createDraft();
@@ -3003,7 +3160,31 @@
         closeExerciseDropdown();
         hideKeyboard();
         scrollPageToDefaultTop();
-        toast("Тренировка сохранена");
+
+        const exportOk = await exportWorkoutById(completedWorkout.id, { silentSuccess: true });
+        if (exportOk) {
+          const exportedWorkout = state.workoutsById.get(completedWorkout.id);
+          if (exportedWorkout && exportedWorkout.isExported) {
+            toast("Тренировка сохранена и выгружена");
+          } else {
+            toast("Тренировка сохранена");
+          }
+        } else {
+          toast("Тренировка сохранена, но выгрузка не удалась");
+        }
+      }
+
+      function getExportStatusData(workout) {
+        if (state.export.inFlightIds.has(workout.id)) {
+          return { cls: "pending", text: "Выгружается..." };
+        }
+        if (workout.isExported) {
+          return { cls: "exported", text: "Выгружена" };
+        }
+        if (workout.exportError) {
+          return { cls: "failed", text: "Не выгружена" };
+        }
+        return { cls: "", text: "Не выгружена" };
       }
 
       function formatDateTitle(iso) {
@@ -3116,6 +3297,7 @@
         const list = make("div", "history-list");
         workouts.forEach((workout) => {
           const stats = getStats(workout);
+          const exportStatus = getExportStatusData(workout);
           const row = make("div", "history-row");
 
           const open = make("button", "history-item");
@@ -3132,21 +3314,34 @@
           );
           top.append(icon, titleWrap);
 
+          const statusNode = make("div", `history-status ${exportStatus.cls}`, exportStatus.text);
+
           open.append(
             top,
-            make("div", "muted", `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`)
+            make("div", "muted", `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`),
+            statusNode
           );
 
           const actions = make("div", "history-actions");
-          const csv = make("button", "btn-card btn-accent history-action-btn", "CSV");
-          csv.type = "button";
-          csv.onclick = (e) => { e.stopPropagation(); exportWorkoutCsv(workout.id); };
+
+          const exportBtn = make(
+            "button",
+            `btn-card history-action-btn ${workout.isExported ? "btn-success" : "btn-info"}`,
+            workout.isExported ? "✓" : "↑"
+          );
+          exportBtn.type = "button";
+          exportBtn.disabled = workout.isExported || state.export.inFlightIds.has(workout.id);
+          exportBtn.title = workout.isExported ? "Уже выгружено" : "Выгрузить в таблицу";
+          exportBtn.onclick = async (e) => {
+            e.stopPropagation();
+            await exportWorkoutById(workout.id);
+          };
 
           const del = make("button", "btn-card btn-danger history-action-btn", "×");
           del.type = "button";
           del.onclick = (e) => { e.stopPropagation(); confirmDeleteWorkout(workout.id); };
 
-          actions.append(csv, del);
+          actions.append(exportBtn, del);
           row.append(open, actions);
           list.appendChild(row);
         });
@@ -3172,10 +3367,12 @@
         head.append(icon, titleWrap);
 
         const stats = getStats(workout);
+        const exportStatus = getExportStatusData(workout);
 
         el.modalBody.append(
           head,
-          make("div", "meta", `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`)
+          make("div", "meta", `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`),
+          make("div", `history-status ${exportStatus.cls}`, exportStatus.text)
         );
 
         workout.exercises.forEach((ex) => {
@@ -3193,10 +3390,23 @@
         });
 
         const actions = make("div", "sheet-actions");
+
+        if (!workout.isExported) {
+          const exportBtn = make("button", "btn-card btn-info", state.export.inFlightIds.has(workout.id) ? "Выгружается..." : "Выгрузить в таблицу");
+          exportBtn.type = "button";
+          exportBtn.disabled = state.export.inFlightIds.has(workout.id);
+          exportBtn.onclick = async () => {
+            const ok = await exportWorkoutById(workout.id);
+            if (ok) openWorkout(workout.id);
+          };
+          actions.append(exportBtn);
+        }
+
         const edit = make("button", "btn-card btn-accent", "Редактировать");
         edit.type = "button";
         edit.onclick = () => openEditWorkout(workout.id);
         actions.append(edit);
+
         el.modalBody.appendChild(actions);
       }
 
@@ -3337,7 +3547,15 @@
           ? new Date(`${dateInput.value}T12:00:00`).toISOString()
           : oldWorkout.performedAt || oldWorkout.finishedAt || oldWorkout.createdAt;
 
-        const newWorkout = sanitizeWorkout({ ...oldWorkout, performedAt: selectedDate, exercises: nextExercises });
+        const newWorkout = sanitizeWorkout({
+          ...oldWorkout,
+          performedAt: selectedDate,
+          exercises: nextExercises,
+          isExported: false,
+          exportError: "",
+          exportedAt: ""
+        });
+
         const workoutIndex = state.workouts.findIndex((item) => item.id === workoutId);
         if (workoutIndex < 0) return;
 
@@ -3348,38 +3566,6 @@
         renderAll();
         closeModal();
         toast("Тренировка обновлена");
-      }
-
-      function exportWorkoutCsv(workoutId) {
-        const workout = state.workoutsById.get(workoutId);
-        if (!workout) return;
-
-        const rows = [["Дата", "Тип", "Упражнение", "Подход", "Вес", "Повторы", "Объём"]];
-        workout.exercises.forEach((ex) => {
-          ex.sets.forEach((set, index) => {
-            rows.push([
-              formatDateTitle(workout.performedAt || workout.finishedAt || workout.createdAt),
-              getTypeLabel(workout.trainingType),
-              ex.name,
-              String(index + 1),
-              String(set.weight),
-              String(set.reps),
-              String(Math.round(set.weight * set.reps))
-            ]);
-          });
-        });
-
-        const csv = rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(";")).join("\n");
-        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${new Date(workout.performedAt || workout.finishedAt || workout.createdAt).toISOString().slice(0, 10)}_${getTypeLabel(workout.trainingType).replace(/\s+/g, "-")}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-        toast("CSV-файл создан");
       }
 
       async function confirmDeleteWorkout(workoutId) {
@@ -3654,7 +3840,7 @@
           });
         });
 
-        el.startTrainingBtn.addEventListener("click", startTraining);
+        el.startTrainingBtn.addEventListener("click", startTrainingFlow);
         el.trainingHeadBtn.addEventListener("click", requestChangeTrainingType);
 
         el.exerciseInput.addEventListener("input", () => {
@@ -3677,7 +3863,7 @@
         el.exerciseClearBtn.addEventListener("click", clearExerciseInput);
         el.prefillSetBtn.addEventListener("click", fillSetPrefillForCurrentExercise);
         el.addSetBtn.addEventListener("click", addSet);
-        el.fallbackFinishBtn.addEventListener("click", finishWorkout);
+        el.fallbackFinishBtn.addEventListener("click", finishWorkoutFlow);
 
         el.exerciseInput.addEventListener("keydown", (e) => {
           if (e.key === "Enter") {
@@ -3773,8 +3959,8 @@
         tg.ready();
         tg.expand();
         if (tg.MainButton) {
-          tg.MainButton.offClick(startTraining);
-          tg.MainButton.offClick(finishWorkout);
+          tg.MainButton.offClick(startTrainingFlow);
+          tg.MainButton.offClick(finishWorkoutFlow);
           tg.MainButton.hide();
         }
       }
