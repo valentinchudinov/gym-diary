@@ -1490,7 +1490,7 @@
     (() => {
       "use strict";
 
-      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzq_JRMhs3YsaTSAku2Y9pzpXg1GASLyumN0fxH9xjO5f-rLyrKuf04wqS6bFMop1G/exec";
+      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbykWIq2Vys9jNjDho38KREVnmRB5sUtUskqwKxJdoRkC7ovFUk7pY_6bUdwwOHdzDSP/exec";
 
       const CONFIG = {
         storageKey: "workouts_v22",
@@ -2141,6 +2141,11 @@
         persistNowLocal();
         renderAll();
         syncMainButtons();
+
+        if (tg && !getTelegramInitData()) {
+          toast("Открой приложение именно внутри Telegram");
+        }
+
         startCloudPolling();
 
         setTimeout(() => {
@@ -3017,18 +3022,44 @@
         scrollPageToDefaultTop();
       }
 
+      function getTelegramUser() {
+        if (!tg || !tg.initDataUnsafe || !tg.initDataUnsafe.user) return null;
+        return tg.initDataUnsafe.user || null;
+      }
+
       function getTelegramUserId() {
-        const fromInit = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id
-          ? String(tg.initDataUnsafe.user.id)
-          : "";
-        if (fromInit) return fromInit;
-        const fallback = safeStorageGet("tg_fallback_user_id");
-        if (fallback) return fallback;
+        const user = getTelegramUser();
+        if (user && user.id != null) {
+          return String(user.id);
+        }
         return "";
       }
 
       function getTelegramInitData() {
         return tg && typeof tg.initData === "string" ? tg.initData : "";
+      }
+
+      function ensureTelegramAuthOrThrow() {
+        if (!tg) {
+          throw new Error("Открой приложение внутри Telegram");
+        }
+
+        const initData = getTelegramInitData();
+        const userId = getTelegramUserId();
+
+        if (!initData) {
+          throw new Error("Нет Telegram initData. Открой приложение из Telegram.");
+        }
+
+        if (!userId) {
+          throw new Error("Не удалось получить Telegram user id.");
+        }
+
+        return {
+          initData,
+          userId,
+          user: getTelegramUser()
+        };
       }
 
       function formatDateDDMMYYYY(iso) {
@@ -3050,11 +3081,12 @@
       }
 
       function buildExportPayload(workout) {
+        const auth = ensureTelegramAuthOrThrow();
         const performedAt = workout.performedAt || workout.finishedAt || workout.createdAt || new Date().toISOString();
 
         return {
-          initData: getTelegramInitData(),
-          userId: getTelegramUserId() || "unknown_user",
+          initData: auth.initData,
+          userId: auth.userId,
           training: {
             id: workout.id,
             date: formatDateDDMMYYYY(performedAt),
@@ -3082,10 +3114,6 @@
 
         const payload = buildExportPayload(workout);
 
-        if (!payload.initData) {
-          throw new Error("Нет Telegram initData. Открой приложение из Telegram.");
-        }
-
         let response;
         try {
           response = await fetch(GOOGLE_SCRIPT_URL, {
@@ -3103,7 +3131,7 @@
           throw new Error(`HTTP ${response.status}`);
         }
 
-        let data = {};
+        let data = null;
         try {
           data = await response.json();
         } catch (parseError) {
