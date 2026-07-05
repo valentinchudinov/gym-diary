@@ -350,8 +350,8 @@
     }
 
     .premium-icon-img {
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       display: block;
       object-fit: contain;
     }
@@ -1322,22 +1322,46 @@
       const TRAINING_TYPES = {
         chest: {
           label: "Грудь",
-          sub: "Жимы, разводки, акцент на силу и форму",
+          subVariants: [
+            "Жму штангу под крышей, голуби судят",
+            "Жим пошёл, чердак одобрил скрипом",
+            "Лёг жать, встал пыльным полубогом",
+            "Жму так, будто плачу за аренду",
+            "Грудь качнул, крышу тоже"
+          ],
           iconUrl: "icons/chest.svg"
         },
         back: {
           label: "Спина",
-          sub: "Тяги, ширина, толщина и контроль спины",
+          subVariants: [
+            "Спина шире, чем проход между коробками",
+            "Это не тренировка, это бытовой эпос",
+            "Не качок, а чердачный феномен",
+            "Подтянулся, будто обещал пацанам",
+            "Турник трещит, славянин крепчает"
+          ],
           iconUrl: "icons/back.svg"
         },
         legs: {
           label: "Ноги",
-          sub: "Присед, разгибания, бёдра и объём нижней части",
+          subVariants: [
+            "Сел кабачком, встал тираннозавром",
+            "Ягодицы включили режим диктатуры",
+            "Присел низко, увидел прошлое",
+            "Присел так что, банка в жопе хлопнула",
+            "На дне приседа меня ждал укроп"
+          ],
           iconUrl: "icons/legs.svg"
         },
         custom: {
           label: "Своя тренировка",
-          sub: "Свободный формат без сравнительных шаблонов",
+          subVariants: [
+            "Не программа, а славянская импровизация",
+            "Сегодня качаю всё, что попадётся под руку",
+            "Выгляжу так, будто знаю, что делаю",
+            "Делаю вид, что так и было задумано",
+            "Зал не нужен, когда есть чердак и внутренняя нестабильность"
+          ],
           iconUrl: "icons/custom.svg"
         }
       };
@@ -1354,6 +1378,7 @@
         draft: createDraft(),
         selectedStartType: "",
         draftView: {},
+        randomSubs: {},
         exerciseCatalog: {
           sorted: [],
           namesByKey: new Map(),
@@ -1460,6 +1485,23 @@
         if (cls) node.className = cls;
         if (content !== undefined) text(node, content);
         return node;
+      }
+
+      function pickRandom(arr) {
+        if (!Array.isArray(arr) || !arr.length) return "";
+        return arr[Math.floor(Math.random() * arr.length)];
+      }
+
+      function initRandomSubs() {
+        const subs = {};
+        Object.keys(TRAINING_TYPES).forEach((type) => {
+          subs[type] = pickRandom(TRAINING_TYPES[type].subVariants || []);
+        });
+        state.randomSubs = subs;
+      }
+
+      function getTypeSub(type) {
+        return state.randomSubs[type] || "";
       }
 
       function iconHtmlForType(item) {
@@ -1964,7 +2006,7 @@
             <span class="premium-icon">${iconHtmlForType(item)}</span>
             <span class="premium-copy">
               <span class="premium-title">${item.label}</span>
-              <span class="premium-sub">${item.sub}</span>
+              <span class="premium-sub">${getTypeSub(type)}</span>
             </span>
             <span class="premium-check">✓</span>
           `;
@@ -2703,6 +2745,7 @@
           const answer = await showPopup("Сменить тип тренировки?\nТекущая тренировка будет сброшена без сохранения. Продолжить?");
           if (answer !== "ok") return;
         }
+        initRandomSubs();
         state.selectedStartType = "";
         state.draft = createDraft();
         state.draftView = {};
@@ -2729,6 +2772,7 @@
           performedAt: state.draft.performedAt || new Date().toISOString()
         });
         state.workouts.unshift(completedWorkout);
+        initRandomSubs();
         state.selectedStartType = "";
         state.draft = createDraft();
         state.draftView = {};
@@ -3295,7 +3339,14 @@
         }
       }
 
-      async function init() { initTelegram(); bindEvents(); renderTimer(0); scheduleTimerViewportSync(); await loadData(); }
+      async function init() {
+        initRandomSubs();
+        initTelegram();
+        bindEvents();
+        renderTimer(0);
+        scheduleTimerViewportSync();
+        await loadData();
+      }
 
       init();
     })();
