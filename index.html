@@ -1493,12 +1493,12 @@
       const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDec9rLkS_Dg4RZxFm5nWpIa60D4xLBeo9rNcDATJvj7BmAu5HG62Io30YXF2pZyk3/exec";
 
       const CONFIG = {
-        storageKey: "workouts_v23",
-        draftKey: "draft_workout_v23",
-        localDataKey: "trainer_data_v23",
-        cloudDataKey: "trainer_cloud_data_v23",
-        draftViewKey: "draft_view_state_v23",
-        phraseMemoryKey: "training_phrase_memory_v23",
+        storageKey: "workouts_v22",
+        draftKey: "draft_workout_v22",
+        localDataKey: "trainer_data_v22",
+        cloudDataKey: "trainer_cloud_data_v22",
+        draftViewKey: "draft_view_state_v22",
+        phraseMemoryKey: "training_phrase_memory_v22",
         splashDelay: 900,
         toastDelay: 2300,
         cloudSaveDebounce: 180,
@@ -1595,11 +1595,18 @@
           lastPaintAt: 0
         },
         cloud: {
-          enabled: Boolean(tg && tg.CloudStorage),
+          enabled: Boolean(
+            tg &&
+            tg.initData &&
+            tg.CloudStorage &&
+            typeof tg.CloudStorage.getItem === "function" &&
+            typeof tg.CloudStorage.setItem === "function"
+          ),
           syncInFlight: false,
           saveInFlight: false,
           pendingSave: false,
-          status: "idle"
+          status: "idle",
+          lastError: ""
         },
         export: {
           inFlightIds: new Set()
@@ -1910,8 +1917,9 @@
         };
       }
 
-      function markSyncStatus(status) {
+      function markSyncStatus(status, errorText = "") {
         state.cloud.status = status;
+        state.cloud.lastError = errorText || "";
         updateMeta();
       }
 
@@ -1931,10 +1939,15 @@
           }
           try {
             tg.CloudStorage.getItem(key, (error, value) => {
-              if (error) return resolve(null);
+              if (error) {
+                markSyncStatus("failed", typeof error === "string" ? error : "CloudStorage getItem error");
+                resolve(null);
+                return;
+              }
               resolve(value || null);
             });
-          } catch {
+          } catch (err) {
+            markSyncStatus("failed", err && err.message ? err.message : "CloudStorage getItem exception");
             resolve(null);
           }
         });
@@ -1948,9 +1961,15 @@
           }
           try {
             tg.CloudStorage.setItem(key, value, (error) => {
-              resolve(!error);
+              if (error) {
+                markSyncStatus("failed", typeof error === "string" ? error : "CloudStorage setItem error");
+                resolve(false);
+                return;
+              }
+              resolve(true);
             });
-          } catch {
+          } catch (err) {
+            markSyncStatus("failed", err && err.message ? err.message : "CloudStorage setItem exception");
             resolve(false);
           }
         });
@@ -1971,8 +1990,12 @@
 
         state.cloud.saveInFlight = false;
 
-        if (ok) markSyncStatus("synced");
-        else markSyncStatus("failed");
+        if (ok) {
+          markSyncStatus("synced");
+        } else {
+          markSyncStatus("failed", state.cloud.lastError || "Не удалось сохранить в облако");
+          toast("CloudStorage: не удалось сохранить в облако");
+        }
 
         if (state.cloud.pendingSave) {
           state.cloud.pendingSave = false;
@@ -2105,11 +2128,11 @@
             if (cloudUpdatedAt >= localUpdatedAt) {
               finalSnapshot = cloudSnapshot;
             } else {
-              scheduleCloudPersist(true);
+              await persistNowCloud();
             }
             markSyncStatus("synced");
           } else {
-            scheduleCloudPersist(true);
+            await persistNowCloud();
           }
         }
 
@@ -2210,8 +2233,10 @@
           if (state.cloud.enabled) {
             if (state.cloud.status === "syncing") syncText = "Синхронизация...";
             else if (state.cloud.status === "synced") syncText = "Облако синхронизировано";
-            else if (state.cloud.status === "failed") syncText = "Ошибка синхронизации";
+            else if (state.cloud.status === "failed") syncText = `Ошибка синхронизации${state.cloud.lastError ? `: ${state.cloud.lastError}` : ""}`;
             else syncText = "Облако подключено";
+          } else if (tg) {
+            syncText = "CloudStorage недоступен";
           }
           text(el.screenMeta, syncText);
         }
@@ -3052,19 +3077,30 @@
 
         const payload = buildExportPayload(workout);
 
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-          },
-          body: JSON.stringify(payload)
-        });
+        let response;
+        try {
+          response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify(payload)
+          });
+        } catch (networkError) {
+          throw new Error("Сеть / CORS / недоступен Web App");
+        }
 
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
 
-        const data = await response.json().catch(() => ({}));
+        let data = {};
+        try {
+          data = await response.json();
+        } catch (parseError) {
+          throw new Error("Apps Script вернул не JSON");
+        }
+
         if (!data || data.ok !== true) {
           throw new Error(data && data.error ? data.error : "Ошибка выгрузки");
         }
@@ -3628,7 +3664,7 @@
           idle: { text: "Локальные данные", cls: "" },
           syncing: { text: "Синхронизация...", cls: "syncing" },
           synced: { text: "Облако синхронизировано", cls: "synced" },
-          failed: { text: "Ошибка синхронизации", cls: "failed" }
+          failed: { text: `Ошибка синхронизации${state.cloud.lastError ? `: ${state.cloud.lastError}` : ""}`, cls: "failed" }
         };
         const data = map[state.cloud.status] || map.idle;
         const pill = make("div", `sync-pill ${data.cls}`);
