@@ -965,102 +965,89 @@
 
     .history-list { display: grid; gap: 10px; }
 
-    .history-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 10px;
-      align-items: stretch;
-    }
-
-    .history-item {
-      width: 100%;
-      min-height: 92px;
-      text-align: left;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+    /* НОВЫЕ СТИЛИ КАРТОЧЕК ИСТОРИИ (КАК НА СКРИНШОТЕ) */
+    .history-card {
+      position: relative;
+      margin-bottom: 12px;
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
       background:
         radial-gradient(circle at 100% 0%, rgba(255,100,24,0.06), transparent 30%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
-        rgba(255, 255, 255, 0.025);
-      padding: 14px 16px;
-      border-radius: 22px;
-      border: 1px solid var(--line);
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015)),
+        rgba(255,255,255,0.02);
       overflow: hidden;
-      box-shadow: 0 14px 28px rgba(0,0,0,0.14);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.1s ease;
     }
 
-    .history-item-top {
+    .history-card:active {
+      transform: scale(0.98);
+    }
+
+    .history-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .history-card-title-group {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 8px;
-      min-width: 0;
     }
 
-    .history-title-wrap {
-      min-width: 0;
-      flex: 1;
-    }
-
-    .history-title {
+    .history-card-title {
+      font-size: 19px;
       font-weight: 820;
-      font-size: 17px;
-      margin-bottom: 2px;
-      line-height: 1.22;
-      word-break: break-word;
+      color: #fff;
+      line-height: 1.1;
     }
 
-    .history-status {
-      margin-top: 6px;
-      display: inline-flex;
+    .history-card-actions {
+      display: flex;
       align-items: center;
       gap: 6px;
-      min-height: 28px;
-      padding: 0 10px;
-      width: fit-content;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 800;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.04);
-      color: rgba(255,255,255,0.75);
     }
 
-    .history-status.exported {
-      color: var(--success);
-      background: var(--success-soft);
-      border-color: var(--success-line);
-    }
-
-    .history-status.pending {
-      color: #ffb24a;
-      background: rgba(255, 178, 74, 0.12);
-      border-color: rgba(255, 178, 74, 0.28);
-    }
-
-    .history-status.failed {
-      color: var(--danger);
-      background: var(--danger-soft);
-      border-color: var(--danger-line);
-    }
-
-    .history-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    .history-card-actions .btn-card {
+      width: 40px;
+      min-width: 40px;
+      height: 40px;
+      min-height: 40px;
+      border-radius: 12px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
       justify-content: center;
     }
 
-    .history-action-btn {
-      width: 52px;
-      min-width: 52px;
-      height: 42px;
-      min-height: 42px;
-      border-radius: 14px;
-      font-size: 13px;
-      padding: 0;
+    .history-card-actions svg {
+      width: 18px;
+      height: 18px;
     }
+
+    .history-card-details {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .history-card-details .muted-date {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .history-card-details .stats {
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.85);
+    }
+    /* КОНЕЦ НОВЫХ СТИЛЕЙ КАРТОЧЕК ИСТОРИИ */
+
 
     .progress-controls { display: grid; gap: 10px; }
 
@@ -1321,9 +1308,7 @@
       .smart-field-label { font-size: 9px; }
       .current-set-values { grid-template-columns: 1fr 1fr; }
       .current-set-bottom { align-items: center; }
-      .history-row { grid-template-columns: minmax(0, 1fr) 52px; }
-      .history-actions { gap: 8px; }
-      .history-action-btn { width: 52px; min-width: 52px; }
+      .history-card-actions .btn-card { width: 38px; min-width: 38px; height: 38px; min-height: 38px; }
     }
   </style>
 </head>
@@ -3140,55 +3125,78 @@
         }
 
         const list = make("div", "history-list");
+        
+        // НОВЫЙ РЕНДЕР КАРТОЧЕК ИСТОРИИ
         workouts.forEach((workout) => {
           const stats = getStats(workout);
-          const exportStatus = getExportStatusData(workout);
-          const row = make("div", "history-row");
 
-          const open = make("button", "history-item");
-          open.type = "button";
-          open.onclick = () => openWorkout(workout.id);
+          const card = make("div", "history-card");
+          card.onclick = (e) => {
+            // Если кликнули по кнопкам действий — не открываем модалку тренировки
+            if (e.target.closest('.history-card-actions')) return;
+            openWorkout(workout.id);
+          };
 
-          const top = make("div", "history-item-top");
+          const header = make("div", "history-card-header");
+          const titleGroup = make("div", "history-card-title-group");
           const icon = make("div", "history-item-icon");
           setTypeIcon(icon, workout.trainingType);
-          const titleWrap = make("div", "history-title-wrap");
-          titleWrap.append(
-            make("div", "history-title", formatHistoryCardTitle(workout)),
-            make("div", "muted", `${new Date(workout.performedAt || workout.finishedAt || workout.createdAt).toLocaleDateString("ru-RU")} • ${getWeekdayLabel(workout.performedAt || workout.finishedAt || workout.createdAt)}`)
-          );
-          top.append(icon, titleWrap);
+          const title = make("div", "history-card-title", getTypeLabel(workout.trainingType));
+          titleGroup.append(icon, title);
 
-          const statusNode = make("div", `history-status ${exportStatus.cls}`, exportStatus.text);
+          const actions = make("div", "history-card-actions");
 
-          open.append(
-            top,
-            make("div", "muted", `${stats.exercises} упражнений · ${stats.sets} подходов · ${Math.round(stats.volume)} кг`),
-            statusNode
-          );
-
-          const actions = make("div", "history-actions");
-
-          const exportBtn = make(
-            "button",
-            `btn-card history-action-btn ${workout.isExported ? "btn-success" : "btn-info"}`,
-            workout.isExported ? "✓" : "↑"
-          );
+          const exportBtn = make("button", `btn-card ${workout.isExported ? "btn-success" : "btn-info"}`);
           exportBtn.type = "button";
           exportBtn.disabled = workout.isExported || state.export.inFlightIds.has(workout.id);
-          exportBtn.title = workout.isExported ? "Уже выгружено" : "Выгрузить в таблицу";
+          if (workout.isExported) {
+            exportBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+          } else {
+            exportBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>`;
+          }
           exportBtn.onclick = async (e) => {
             e.stopPropagation();
             await exportWorkoutById(workout.id);
           };
 
-          const del = make("button", "btn-card btn-danger history-action-btn", "×");
-          del.type = "button";
-          del.onclick = (e) => { e.stopPropagation(); confirmDeleteWorkout(workout.id); };
+          const editBtn = make("button", "btn-card btn-accent");
+          editBtn.type = "button";
+          editBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`;
+          editBtn.onclick = (e) => {
+            e.stopPropagation();
+            openEditWorkout(workout.id);
+          };
 
-          actions.append(exportBtn, del);
-          row.append(open, actions);
-          list.appendChild(row);
+          const delBtn = make("button", "btn-card btn-danger");
+          delBtn.type = "button";
+          delBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+          delBtn.onclick = (e) => {
+            e.stopPropagation();
+            confirmDeleteWorkout(workout.id);
+          };
+
+          actions.append(exportBtn, editBtn, delBtn);
+          header.append(titleGroup, actions);
+
+          const details = make("div", "history-card-details");
+          const iso = workout.performedAt || workout.finishedAt || workout.createdAt;
+          const dateStr = formatDateDDMMYYYY(iso);
+          const weekdayStr = getWeekdayLabel(iso).toLowerCase();
+          const relStr = getRelativeDayLabel(iso);
+          
+          let relDisplay = "";
+          if (relStr === "Сегодня" || relStr === "Вчера") {
+              relDisplay = ` • ${relStr}`;
+          }
+          const dateLine = `${dateStr} • ${weekdayStr}${relDisplay}`;
+
+          const dateDiv = make("div", "muted-date", dateLine);
+          const statsDiv = make("div", "stats", `${stats.exercises} упражнений • ${stats.sets} подходов`);
+
+          details.append(dateDiv, statsDiv);
+
+          card.append(header, details);
+          list.appendChild(card);
         });
 
         el.historyList.appendChild(list);
