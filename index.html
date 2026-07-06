@@ -1475,7 +1475,7 @@
     (() => {
       "use strict";
 
-      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbySHBtkwrQ24lslHKl-G5IIqiw8jqS4tPn1BnYJfuu5caM9y8gjucfAqJDS_WVuEsd3/exec";
+      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDuluio7F364Cv_tjLJe6UuxWv1jnjx84PV8g5NjsDOFLP3CV34Gd6UcMfbYb7vMRq/exec";
       const EXPORT_SECRET = "KOCHKI1604";
 
       const CONFIG = {
@@ -3316,9 +3316,27 @@
 
         const header = make("div", "title-row");
         const title = make("div", "title", "Редактировать тренировку");
-        const addBtn = make("button", "btn-card btn-accent icon-square", "+");
-        addBtn.type = "button";
-        header.append(title, addBtn);
+
+        // Кнопка "Выгрузить" напротив заголовка (вместо старого [+])
+        const exportBtn = make("button", "btn-card btn-info icon-square");
+        exportBtn.type = "button";
+        exportBtn.disabled = true;
+        exportBtn.title = "Выгрузить в таблицу";
+        exportBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>`;
+        exportBtn.onclick = async () => {
+          if (exportBtn.disabled) return;
+          await exportWorkoutById(workoutId);
+          // после выгрузки обновляем состояние кнопки
+          const fresh = state.workoutsById.get(workoutId);
+          if (fresh && fresh.isExported) {
+            exportBtn.disabled = true;
+            exportBtn.classList.remove("btn-info");
+            exportBtn.classList.add("btn-success");
+            exportBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+          }
+        };
+
+        header.append(title, exportBtn);
         el.modalBody.appendChild(header);
 
         const dateInput = document.createElement("input");
@@ -3343,8 +3361,6 @@
           form.appendChild(group);
         });
 
-        addBtn.onclick = () => { form.appendChild(createExerciseGroup("")); };
-
         const actions = make("div", "sheet-actions");
         const addExerciseBtn = make("button", "btn-card btn-muted", "Добавить упражнение");
         addExerciseBtn.type = "button";
@@ -3352,15 +3368,29 @@
 
         const save = make("button", "btn-card btn-accent", "Сохранить");
         save.type = "button";
-        save.onclick = () => saveWorkoutEdit(workoutId, form, dateInput);
+        save.onclick = () => {
+          const ok = saveWorkoutEdit(workoutId, form, dateInput, { keepOpen: true });
+          if (ok) {
+            // После успешного сохранения активируем кнопку "Выгрузить"
+            exportBtn.disabled = false;
+            exportBtn.classList.remove("btn-success");
+            exportBtn.classList.add("btn-info");
+            exportBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>`;
+            toast("Сохранено — теперь можно выгрузить");
+          }
+        };
 
-        actions.append(addExerciseBtn, save);
+        const close = make("button", "btn-card btn-muted", "Закрыть");
+        close.type = "button";
+        close.onclick = closeModal;
+
+        actions.append(addExerciseBtn, save, close);
         el.modalBody.append(form, actions);
       }
 
-      function saveWorkoutEdit(workoutId, form, dateInput) {
+      function saveWorkoutEdit(workoutId, form, dateInput, { keepOpen = false } = {}) {
         const oldWorkout = state.workoutsById.get(workoutId);
-        if (!oldWorkout) return;
+        if (!oldWorkout) return false;
 
         const nextExercises = [];
         const groups = [...form.querySelectorAll(".edit-exercise-group")];
@@ -3370,7 +3400,7 @@
           const name = nameInput ? nameInput.value.trim() : "";
           if (!name) {
             toast("Проверь название упражнения");
-            return;
+            return false;
           }
 
           const cards = [...group.querySelectorAll(".edit-set-card")];
@@ -3383,7 +3413,7 @@
             const parsed = parseSetInput(weightEl.value, repsEl.value);
             if (!parsed) {
               toast("Проверь вес и повторы");
-              return;
+              return false;
             }
             sets.push({ id: card.dataset.setId || id(), weight: parsed.weight, reps: parsed.reps });
           }
@@ -3393,7 +3423,7 @@
 
         if (!nextExercises.length) {
           toast("Нельзя сохранить пустую тренировку");
-          return;
+          return false;
         }
 
         const selectedDate = dateInput.value
@@ -3410,15 +3440,24 @@
         });
 
         const workoutIndex = state.workouts.findIndex((item) => item.id === workoutId);
-        if (workoutIndex < 0) return;
+        if (workoutIndex < 0) return false;
 
         state.workouts[workoutIndex] = newWorkout;
         state.workouts.sort((a, b) => getWorkoutTimestamp(b) - getWorkoutTimestamp(a));
         rebuildIndexes();
         persistCritical();
+
+        if (keepOpen) {
+          // Обновляем историю в фоне, но модалку НЕ закрываем
+          renderShell();
+          if (state.tab === "history") renderHistory();
+          return true;
+        }
+
         renderAll();
         closeModal();
         toast("Тренировка обновлена");
+        return true;
       }
 
       async function confirmDeleteWorkout(workoutId) {
