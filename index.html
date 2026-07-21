@@ -45,6 +45,11 @@
       background: var(--bg-solid);
     }
 
+    body.tg-locked {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
     body {
       position: relative;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
@@ -53,7 +58,7 @@
         radial-gradient(circle at 0% 0%, rgba(255, 100, 24, 0.05), transparent 24%),
         var(--bg-solid);
       color: var(--text);
-      padding: max(14px, var(--safe-top)) 14px calc(28px + var(--safe-bottom));
+      padding: max(14px, var(--safe-top)) 14px 28px;
       font-size: 15px;
       overflow-x: hidden;
     }
@@ -448,7 +453,6 @@
       background: rgba(255,100,24,0.78);
     }
 
-    .start-cta { display: none; }
 
     .training-head {
       width: 100%;
@@ -1295,7 +1299,6 @@
         <div id="typeChooserBlock">
           <section class="section">
             <div class="premium-chooser" id="typeChooser"></div>
-            <button class="start-cta" id="startTrainingBtn" type="button" disabled>Начать тренировку</button>
           </section>
         </div>
 
@@ -1528,7 +1531,6 @@
         },
         typeChooserBlock: document.getElementById("typeChooserBlock"),
         typeChooser: document.getElementById("typeChooser"),
-        startTrainingBtn: document.getElementById("startTrainingBtn"),
         trainingScreen: document.getElementById("trainingScreen"),
         trainingHeadBtn: document.getElementById("trainingHeadBtn"),
         trainingHeadIcon: document.getElementById("trainingHeadIcon"),
@@ -1995,7 +1997,6 @@
           el.typeChooser.appendChild(btn);
         });
 
-        el.startTrainingBtn.disabled = !state.selectedStartType;
       }
 
       function renderTodayMode() {
@@ -3595,7 +3596,6 @@
           });
         });
 
-        el.startTrainingBtn.addEventListener("click", startTrainingFlow);
         el.trainingHeadBtn.addEventListener("click", requestChangeTrainingType);
 
         el.exerciseInput.addEventListener("input", () => {
@@ -3701,12 +3701,29 @@
       }
 
 
-            function initTelegram() {
+            function lockBodyToViewport() {
+        if (!tg) return;
+        const h = tg.viewportStableHeight || tg.viewportHeight || window.innerHeight;
+        if (h) {
+          document.body.style.height = h + "px";
+          document.body.style.maxHeight = h + "px";
+        }
+      }
+
+      function initTelegram() {
         if (!tg) return;
         tg.ready();
         tg.expand();
         try { if (typeof tg.lockOrientation === "function") tg.lockOrientation(); } catch (_) {}
         try { if (typeof tg.disableVerticalSwipes === "function") tg.disableVerticalSwipes(); } catch (_) {}
+
+        document.body.classList.add("tg-locked");
+        lockBodyToViewport();
+
+        tg.onEvent("viewportChanged", () => {
+          tg.expand();
+          lockBodyToViewport();
+        });
 
         if (tg.MainButton) {
           tg.MainButton.offClick(startTrainingFlow);
