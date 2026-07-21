@@ -122,7 +122,7 @@
       align-items: flex-start;
       gap: 12px;
       margin-bottom: 16px;
-      padding-right: clamp(138px, 35vw, 176px);
+      padding-right: 0;
     }
 
     .top-copy { min-width: 0; }
@@ -448,8 +448,6 @@
       background: rgba(255,100,24,0.78);
     }
 
-    .start-cta { display: none; }
-
     .training-head {
       width: 100%;
       border-radius: 22px;
@@ -692,9 +690,13 @@
       height: 44px;
       min-height: 44px;
       padding: 0;
-      font-size: 14px;
+      font-size: 24px;
+      line-height: 1;
       flex-shrink: 0;
-      border-radius: 14px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .fallback-finish {
@@ -1222,82 +1224,6 @@
       overflow: hidden;
     }
 
-    .global-timer-layer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 60;
-      transform: translate3d(0, 0, 0);
-    }
-
-    .global-timer {
-      position: absolute;
-      top: calc(12px + var(--safe-top));
-      right: calc(12px + var(--safe-right));
-      pointer-events: none;
-    }
-
-    .timer-widget {
-      min-height: 0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 14px;
-      border-radius: 17px;
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      background: rgba(10, 10, 10, 0.28);
-      color: rgba(255, 255, 255, 0.92);
-      pointer-events: auto;
-      touch-action: manipulation;
-    }
-
-    .timer-idle, .timer-live {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      white-space: nowrap;
-    }
-
-    .timer-idle {
-      color: rgba(255, 255, 255, 0.76);
-      font-size: 15px;
-      font-weight: 780;
-    }
-
-    .timer-live { color: rgba(255, 255, 255, 0.96); }
-
-    .timer-icon {
-      width: 14px;
-      height: 14px;
-      display: block;
-      flex: none;
-      color: var(--accent);
-    }
-
-    .timer-readout {
-      font-size: 20px;
-      line-height: 1;
-      font-weight: 820;
-      letter-spacing: 0.05em;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .timer-mark {
-      width: 16px;
-      height: 16px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent);
-      opacity: 0.88;
-      flex: none;
-    }
-
-    .timer-widget.running .timer-idle { display: none; }
-    .timer-widget:not(.running) .timer-live { display: none; }
 
     @keyframes load {
       0% { transform: translateX(-120%); }
@@ -1343,7 +1269,6 @@
         <div id="typeChooserBlock">
           <section class="section">
             <div class="premium-chooser" id="typeChooser"></div>
-            <button class="start-cta" id="startTrainingBtn" type="button" disabled>Начать тренировку</button>
           </section>
         </div>
 
@@ -1443,23 +1368,6 @@
         </div>
       </section>
     </main>
-  </div>
-
-  <div class="global-timer-layer" id="timerLayer" aria-hidden="false">
-    <div class="global-timer">
-      <button class="timer-widget" id="timerToggleBtn" type="button" aria-label="Запустить секундомер">
-        <span class="timer-idle">
-          <svg class="timer-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M8 6.5c0-.82.93-1.29 1.59-.81l8.15 5.95a1 1 0 0 1 0 1.62L9.59 19.2A1 1 0 0 1 8 18.39V6.5Z"></path>
-          </svg>
-          <span>Старт</span>
-        </span>
-        <span class="timer-live">
-          <span class="timer-readout" id="timerReadout">00:00.00</span>
-          <span class="timer-mark" aria-hidden="true">■</span>
-        </span>
-      </button>
-    </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -1570,12 +1478,6 @@
           activeType: ""
         },
         progressMetric: "weight",
-        timer: {
-          running: false,
-          startedAt: 0,
-          raf: 0,
-          lastPaintAt: 0
-        },
         export: {
           inFlightIds: new Set()
         }
@@ -1594,7 +1496,6 @@
         },
         typeChooserBlock: document.getElementById("typeChooserBlock"),
         typeChooser: document.getElementById("typeChooser"),
-        startTrainingBtn: document.getElementById("startTrainingBtn"),
         trainingScreen: document.getElementById("trainingScreen"),
         trainingHeadBtn: document.getElementById("trainingHeadBtn"),
         trainingHeadIcon: document.getElementById("trainingHeadIcon"),
@@ -1623,13 +1524,9 @@
         progressMetricBtns: [...document.querySelectorAll(".progress-mode-btn")],
         toast: document.getElementById("toast"),
         modal: document.getElementById("modal"),
-        modalBody: document.getElementById("modalBody"),
-        timerLayer: document.getElementById("timerLayer"),
-        timerToggleBtn: document.getElementById("timerToggleBtn"),
-        timerReadout: document.getElementById("timerReadout")
+        modalBody: document.getElementById("modalBody")
       };
 
-      let timerViewportRaf = 0;
 
       function id() {
         return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -1981,7 +1878,6 @@
       function renderAll() {
         renderShell();
         renderCurrentPanel();
-        scheduleTimerViewportSync();
       }
 
       function renderShell() {
@@ -2065,8 +1961,6 @@
           });
           el.typeChooser.appendChild(btn);
         });
-
-        el.startTrainingBtn.disabled = !state.selectedStartType;
       }
 
       function renderTodayMode() {
@@ -3586,66 +3480,6 @@
         hideKeyboard();
       }
 
-      function formatStopwatch(ms) {
-        const centiseconds = Math.floor(ms / 10) % 100;
-        const totalSeconds = Math.floor(ms / 1000);
-        const seconds = totalSeconds % 60;
-        const minutes = Math.floor(totalSeconds / 60);
-        return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(centiseconds).padStart(2, "0")}`;
-      }
-
-      function renderTimer(ms = 0) {
-        text(el.timerReadout, formatStopwatch(ms));
-        el.timerToggleBtn.classList.toggle("running", state.timer.running);
-      }
-
-      function timerLoop(now) {
-        if (!state.timer.running) return;
-        if (!state.timer.lastPaintAt || now - state.timer.lastPaintAt >= 50) {
-          state.timer.lastPaintAt = now;
-          renderTimer(now - state.timer.startedAt);
-        }
-        state.timer.raf = requestAnimationFrame(timerLoop);
-      }
-
-      function toggleTimer() {
-        if (state.timer.running) {
-          cancelAnimationFrame(state.timer.raf);
-          state.timer.running = false;
-          state.timer.startedAt = 0;
-          state.timer.raf = 0;
-          state.timer.lastPaintAt = 0;
-          renderTimer(0);
-          return;
-        }
-        state.timer.running = true;
-        state.timer.startedAt = performance.now();
-        state.timer.lastPaintAt = 0;
-        renderTimer(0);
-        state.timer.raf = requestAnimationFrame(timerLoop);
-      }
-
-      function syncTimerViewportPosition() {
-        const vv = window.visualViewport;
-        const scrollX = window.scrollX || window.pageXOffset || 0;
-        const scrollY = window.scrollY || window.pageYOffset || 0;
-        const left = scrollX + (vv ? vv.offsetLeft : 0);
-        const top = scrollY + (vv ? vv.offsetTop : 0);
-        const width = vv ? vv.width : document.documentElement.clientWidth;
-        const height = vv ? vv.height : window.innerHeight;
-        el.timerLayer.style.width = `${Math.round(width)}px`;
-        el.timerLayer.style.height = `${Math.round(height)}px`;
-        el.timerLayer.style.transform = `translate3d(${Math.round(left)}px, ${Math.round(top)}px, 0)`;
-      }
-
-      function scheduleTimerViewportSync() {
-        if (timerViewportRaf) return;
-        timerViewportRaf = requestAnimationFrame(() => {
-          timerViewportRaf = 0;
-          syncTimerViewportPosition();
-        });
-      }
-
       function scrollPageToDefaultTop() {
         try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) { window.scrollTo(0, 0); }
         try { document.documentElement.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) { document.documentElement.scrollTop = 0; }
@@ -3725,7 +3559,6 @@
           });
         });
 
-        el.startTrainingBtn.addEventListener("click", startTrainingFlow);
         el.trainingHeadBtn.addEventListener("click", requestChangeTrainingType);
 
         el.exerciseInput.addEventListener("input", () => {
@@ -3787,8 +3620,6 @@
           if (!el.exerciseInputWrap.contains(event.target)) closeExerciseDropdown();
         });
 
-        el.timerToggleBtn.addEventListener("click", toggleTimer);
-
         document.addEventListener("pointerdown", (e) => {
           const field = e.target && e.target.closest && e.target.closest("input, select, textarea");
           if (!field) return;
@@ -3815,9 +3646,6 @@
           }, { passive: true });
         }
 
-        window.addEventListener("scroll", scheduleTimerViewportSync, { passive: true });
-        window.addEventListener("resize", scheduleTimerViewportSync, { passive: true });
-
         document.addEventListener("visibilitychange", () => {
           if (document.visibilityState === "hidden") {
             persistNowLocal();
@@ -3837,6 +3665,14 @@
         if (!tg) return;
         tg.ready();
         tg.expand();
+
+        try { if (typeof tg.lockOrientation === "function") tg.lockOrientation("portrait"); } catch (_) {}
+        try {
+          if (screen.orientation && typeof screen.orientation.lock === "function") {
+            screen.orientation.lock("portrait").catch(() => {});
+          }
+        } catch (_) {}
+
         if (tg.MainButton) {
           tg.MainButton.offClick(startTrainingFlow);
           tg.MainButton.offClick(finishWorkoutFlow);
@@ -3847,8 +3683,6 @@
       async function init() {
         initTelegram();
         bindEvents();
-        renderTimer(0);
-        scheduleTimerViewportSync();
         await loadData();
       }
 
