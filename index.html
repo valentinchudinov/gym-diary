@@ -3125,7 +3125,7 @@
         }
 
         const list = make("div", "history-list");
-
+        
         // НОВЫЙ РЕНДЕР КАРТОЧЕК ИСТОРИИ
         workouts.forEach((workout) => {
           const stats = getStats(workout);
@@ -3183,7 +3183,7 @@
           const dateStr = formatDateDDMMYYYY(iso);
           const weekdayStr = getWeekdayLabel(iso).toLowerCase();
           const relStr = getRelativeDayLabel(iso);
-
+          
           let relDisplay = "";
           if (relStr === "Сегодня" || relStr === "Вчера") {
               relDisplay = ` • ${relStr}`;
@@ -3856,3 +3856,4 @@
     })();
   </script>
 </body>
+</html>
