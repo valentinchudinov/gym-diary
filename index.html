@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Святилище ТРЕНЕРА</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -53,7 +53,7 @@
         radial-gradient(circle at 0% 0%, rgba(255, 100, 24, 0.05), transparent 24%),
         var(--bg-solid);
       color: var(--text);
-      padding: max(14px, var(--safe-top)) 14px calc(100px + var(--safe-bottom));
+      padding: max(14px, var(--safe-top)) 14px calc(28px + var(--safe-bottom));
       font-size: 15px;
       overflow-x: hidden;
     }
@@ -3700,28 +3700,13 @@
         });
       }
 
-            function applyViewportHeight() {
-        if (!tg) return;
-        const h = tg.viewportStableHeight || tg.viewportHeight || window.innerHeight;
-        if (h) {
-          document.documentElement.style.minHeight = h + "px";
-          document.body.style.minHeight = h + "px";
-        }
-      }
 
-      function initTelegram() {
+            function initTelegram() {
         if (!tg) return;
         tg.ready();
         tg.expand();
-        try { if (typeof tg.requestFullscreen === "function") tg.requestFullscreen(); } catch (_) {}
         try { if (typeof tg.lockOrientation === "function") tg.lockOrientation(); } catch (_) {}
         try { if (typeof tg.disableVerticalSwipes === "function") tg.disableVerticalSwipes(); } catch (_) {}
-
-        applyViewportHeight();
-        tg.onEvent("viewportChanged", () => {
-          tg.expand();
-          applyViewportHeight();
-        });
 
         if (tg.MainButton) {
           tg.MainButton.offClick(startTrainingFlow);
@@ -3740,3 +3725,4 @@
     })();
   </script>
 </body>
+</html>
